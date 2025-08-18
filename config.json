@@ -1,0 +1,20 @@
+{
+  "db_clients": [
+    {
+        "name": "default",
+        "host": "127.0.0.1",
+        "port": 5433,
+        "rdbms": "postgresql",
+        "dbname": "my_db",
+        "user": "postgres",
+        "passwd": "postgres",
+        "number_of_connections": 1,
+        "timeout": 10
+    }
+  ],
+  "app": {
+    "document_root": "./",
+    "run_as_daemon": false,
+    "relaunch_on_error": false
+  }
+}
