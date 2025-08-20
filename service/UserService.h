@@ -36,6 +36,8 @@ public:
     std::list<UserData> getUsersdb();
 
     void checkData(const std::string &phone_number, const std::string &password);
+    
+    void addRole(int user_id, int role_id);
 
     private:
     std::shared_ptr<UserRepository> repository; // Доступ к БД

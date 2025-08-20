@@ -48,8 +48,8 @@ UserData UserRepository::getUserByPhone(const std::string &phone_number)
     UserData user;
     auto result = db_->execSqlSync
     (
-        "SELECT * FROM users u"
-        "WHERE u.phone_number = $1", phone_number
+        "SELECT * FROM users u "
+        "WHERE u.phone_number = $1 ", phone_number
     );
 
     // 2. Проверяем, что результат не пустой
@@ -62,13 +62,14 @@ UserData UserRepository::getUserByPhone(const std::string &phone_number)
 
     auto result_2 = db_->execSqlSync
     (
-        "SELECT r.role_type FROM users u" 
-        "JOIN users_roles u_r ON u.id = u_r.user_id"
-        "JOIN roles r ON u_r.role_id = r.id"
+        "SELECT r.role_type FROM users u " 
+        "JOIN users_roles u_r ON u.id = u_r.user_id "
+        "JOIN roles r ON u_r.role_id = r.id "
         "WHERE u.phone_number = $1", phone_number
     );
+    
     std::list<std::string> role_type;
-    for (int i = 0; result_2.size(); i++)
+    for (int i = 0; i < result_2.size(); i++)
     {
         role_type.push_back(result_2[i]["role_type"].as<std::string>());
     }
@@ -80,9 +81,9 @@ std::list<UserData> UserRepository::getUsers()
 {
     auto result = db_->execSqlSync
     (
-        "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u"
-        "JOIN users_roles u_r ON u.id = u_r.user_id"
-        "JOIN roles r ON u_r.role_id = r.id"
+        "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u "
+        "JOIN users_roles u_r ON u.id = u_r.user_id "
+        "JOIN roles r ON u_r.role_id = r.id "
     );
     std::list<UserData> users;
     
@@ -100,9 +101,9 @@ UserData UserRepository::getUser(int id)
 {
     try {
         auto result = db_->execSqlSync(
-            "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u"
-            "JOIN users_roles u_r ON u.id = u_r.user_id"
-            "JOIN roles r ON u_r.role_id = r.id"
+            "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u "
+            "JOIN users_roles u_r ON u.id = u_r.user_id "
+            "JOIN roles r ON u_r.role_id = r.id "
             "WHERE id = $1", id
         );
         
@@ -125,18 +126,18 @@ try
 {
     db_->execSqlSync
     (
-        "DELETE FROM users_roles"
-        "WHERE user_id = $1", id
+        "DELETE FROM users_roles "
+        "WHERE user_id = $1 ", id
     );
     db_->execSqlSync
     (
-        "DELETE FROM users"
-        "WHERE id = $1", id
+        "DELETE FROM users " 
+        "WHERE id = $1 ", id
     );
     db_->execSqlSync
     (
         "Delete FROM users "
-        "WHERE id = $1", id
+        "WHERE id = $1 ", id
     );
 }
 catch (const std::exception& e)
@@ -147,9 +148,9 @@ catch (const std::exception& e)
 
 void UserRepository::addRole(int user_id, int role_id) 
 {
-    db_->execSqlSync
+    auto result = db_->execSqlSync
     (
-        "INSERT INTO users_roles (user_id, role_id)" 
+        "INSERT INTO users_roles (user_id, role_id) " 
         "VALUES ($1, $2) ", user_id, role_id
     );
 }

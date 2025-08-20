@@ -270,3 +270,18 @@ void UserController::deleteUser(const HttpRequestPtr& req,
     resp->setStatusCode(k204NoContent);
     callback(resp);
 }
+
+void UserController::addRole(const HttpRequestPtr& req,
+              std::function<void(const HttpResponsePtr&)>&& callback, int user_id, int role_id)
+{
+    // 1. Получаем подключение к БД
+    auto dbClient = drogon::app().getDbClient();
+
+    // 2. Создаём сервис
+    UserService userService(dbClient);
+    userService.addRole(user_id, role_id);
+    // 3. Возвращаем 204 No Content
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setStatusCode(k204NoContent);
+    callback(resp);
+}

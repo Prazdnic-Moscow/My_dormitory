@@ -110,3 +110,8 @@ void UserService::checkData(const std::string &phone_number, const std::string &
         throw std::runtime_error("Invalid phone number format");
     }
 }
+
+void UserService::addRole(int user_id, int role_id)
+{
+    return repository->addRole(user_id, role_id);
+}
