@@ -1,6 +1,7 @@
 #include "UserService.h"
 #include <vector>
 #include <ranges>
+#include <json/json.h>
 
 // Конструктор — инициализируем репозиторий
 UserService::UserService(const drogon::orm::DbClientPtr& dbClient)
@@ -64,9 +65,13 @@ std::string UserService::login(const std::string &phone_number, const std::strin
     try 
     {
         std::list<std::string> roles = user.getRoles();
-        std::vector<std::string> v(roles.begin(), roles.end());
+        Json::Value jsonRoles;
+        for (const auto& role : roles)
+        {
+            jsonRoles.append(role); // Добавляем каждую роль в массив
+        }
         auto token = jwt::create()
-            .set_payload_claim("roles", jwt::claim(jwt::claim::set_t{"roles"})) // Добавляем массив
+            .set_payload_claim("roles", jwt::claim(jsonRoles.toStyledString())) // Добавляем массив
             .set_payload_claim("Id", jwt::claim(user.getId()))
             .set_subject(phone_number)
             .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{24})
