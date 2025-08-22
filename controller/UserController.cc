@@ -1,5 +1,8 @@
 #include "UserController.h"
 #include <string>
+#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+using traits = jwt::traits::open_source_parsers_jsoncpp;
+using claim = jwt::basic_claim<traits>;
 void UserController::login(
     const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& callback) 
@@ -163,18 +166,27 @@ void UserController::getUser(const HttpRequestPtr& req,
 {
     try 
     {
-        
         std::string token = Headerhelper::getTokenFromHeaders(req);
         // 3. Декодирование JWT с улучшенной обработкой ошибок
-        auto decoded = jwt::decode(token);
+        auto decoded = jwt::decode<traits>(token);
         //получение роли и ID
-        auto roleClaim = decoded.get_payload_claim("role");
-        auto role = std::stoi(roleClaim.as_string());
+        auto roleClaim = decoded.get_payload_claim("roles");
+        Json::Value rolesJson = roleClaim.to_json(); // Преобразуем в Json::Value
         auto idClaim = decoded.get_payload_claim("Id");
         auto tokenUserId = std::stoi(idClaim.as_string());
-        
         // 5. Проверка прав доступа (1 - admin, 2 - user)
-        if (role != 1 && userId != tokenUserId) 
+        // Проверяем наличие нужной роли "users_read"
+        
+        bool UsersReadRole = false;
+        for (const auto& role : rolesJson) {
+            if (role.asString() == "user_read") {
+                UsersReadRole = true;
+                break;
+            }
+        }
+        // Проверка прав доступа
+        // Если нет роли users_read И запрашивается не свой ID - доступ запрещен
+        if (!UsersReadRole && userId != tokenUserId) 
         {
             throw std::runtime_error("Access denied: insufficient privileges");
         }

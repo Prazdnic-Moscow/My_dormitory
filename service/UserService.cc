@@ -2,6 +2,9 @@
 #include <vector>
 #include <ranges>
 #include <json/json.h>
+#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+using traits = jwt::traits::open_source_parsers_jsoncpp;
+using claim = jwt::basic_claim<traits>;
 
 // Конструктор — инициализируем репозиторий
 UserService::UserService(const drogon::orm::DbClientPtr& dbClient)
@@ -65,14 +68,15 @@ std::string UserService::login(const std::string &phone_number, const std::strin
     try 
     {
         std::list<std::string> roles = user.getRoles();
+        Json::StreamWriterBuilder builder;
         Json::Value jsonRoles;
         for (const auto& role : roles)
         {
             jsonRoles.append(role); // Добавляем каждую роль в массив
         }
-        auto token = jwt::create()
-            .set_payload_claim("roles", jwt::claim(jsonRoles.toStyledString())) // Добавляем массив
-            .set_payload_claim("Id", jwt::claim(user.getId()))
+        auto token = jwt::create <traits>()
+            .set_payload_claim("roles",jsonRoles)
+            .set_payload_claim("Id",user.getId())
             .set_subject(phone_number)
             .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{24})
             .sign(jwt::algorithm::hs256{"your_secret_key"});

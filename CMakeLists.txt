@@ -17,6 +17,7 @@ file(GLOB SOURCES
     "plugins/*.cc"
     "models/*.cc"
     "controller/UserController.cc"
+    "controller/NewsController.cc"
     "service/UserService.cc"
     "repository/UserRepository.cc"
     "Util/Util.cc"
@@ -26,14 +27,6 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 
 # BCrypt
 find_path(BCRYPT_INCLUDE_DIR NAMES bcrypt/BCrypt.hpp PATHS /usr/local/include)
-find_library(BCRYPT_LIBRARY NAMES bcrypt PATHS /usr/local/lib /usr/lib)
-if(BCRYPT_INCLUDE_DIR AND BCRYPT_LIBRARY)
-    message(STATUS "Found BCrypt: ${BCRYPT_LIBRARY}")
-    target_include_directories(${PROJECT_NAME} PRIVATE ${BCRYPT_INCLUDE_DIR})
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${BCRYPT_LIBRARY})
-else()
-    message(FATAL_ERROR "BCrypt library not found! Install with: sudo apt-get install libbcrypt-dev")
-endif()
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
@@ -41,3 +34,4 @@ target_link_libraries(${PROJECT_NAME}
     Trantor::Trantor
     ${PostgreSQL_LIBRARIES}
 )
+target_link_libraries(myapp PRIVATE bcrypt)

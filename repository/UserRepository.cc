@@ -29,7 +29,7 @@ UserData UserRepository::createUser(
         // 2. Назначаем роль
         db_->execSqlSync
         (
-            "INSERT INTO users_roles (user_id, role_id) VALUES ($1, 6)",
+            "INSERT INTO users_roles (user_id, role_id) VALUES ($1, 1)",
             user.getId()
         );
         std::list<std::string> Roles;
@@ -81,9 +81,7 @@ std::list<UserData> UserRepository::getUsers()
 {
     auto result = db_->execSqlSync
     (
-        "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u "
-        "JOIN users_roles u_r ON u.id = u_r.user_id "
-        "JOIN roles r ON u_r.role_id = r.id "
+        "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document FROM users u "
     );
     std::list<UserData> users;
     
@@ -104,7 +102,7 @@ UserData UserRepository::getUser(int id)
             "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u "
             "JOIN users_roles u_r ON u.id = u_r.user_id "
             "JOIN roles r ON u_r.role_id = r.id "
-            "WHERE id = $1", id
+            "WHERE u.id = $1", id
         );
         
         if (result.empty()) {
@@ -113,6 +111,20 @@ UserData UserRepository::getUser(int id)
 
         UserData user;
         user.fromDb(result[0]);
+
+        auto result_2 = db_->execSqlSync(
+        "SELECT r.role_type FROM users u " 
+        "JOIN users_roles u_r ON u.id = u_r.user_id "
+        "JOIN roles r ON u_r.role_id = r.id "
+        "WHERE u.id = $1", id
+        );
+
+        std::list<std::string> role_type;
+        for (int i=0; i < result_2.size(); i++)
+        {
+            role_type.push_back(result_2[i]["role_type"].as<std::string>());
+        }
+        user.setRoles(role_type);
         return user;
     }
     catch (const std::exception& e) {
