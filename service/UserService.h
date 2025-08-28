@@ -31,13 +31,14 @@ public:
     UserData getUser(int id);
 
     // Удаление
-    void deleteUser(int id);
+    bool deleteUser(int id);
     
-    std::list<UserData> getUsersdb();
+    std::list<UserData> getUsers();
 
     void checkData(const std::string &phone_number, const std::string &password);
     
     void addRole(int user_id, int role_id);
+    bool deleteRole(int user_id, int role_id);
 
     private:
     std::shared_ptr<UserRepository> repository; // Доступ к БД

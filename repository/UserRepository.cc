@@ -81,13 +81,12 @@ std::list<UserData> UserRepository::getUsers()
 {
     auto result = db_->execSqlSync
     (
-        "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document FROM users u "
+        "SELECT * FROM users "
     );
     std::list<UserData> users;
     
     for (int i=0; i < result.size(); i++)
     {
-        std::cout << i;
         UserData user;
         user.fromDb(result[i]);
         users.push_back(user);
@@ -99,10 +98,8 @@ UserData UserRepository::getUser(int id)
 {
     try {
         auto result = db_->execSqlSync(
-            "SELECT u.id, u.phone_number, u.password, u.name, u.last_name, u.surname, u.document, r.role_type FROM users u "
-            "JOIN users_roles u_r ON u.id = u_r.user_id "
-            "JOIN roles r ON u_r.role_id = r.id "
-            "WHERE u.id = $1", id
+            "SELECT * FROM users "
+            "WHERE id = $1", id
         );
         
         if (result.empty()) {
@@ -127,36 +124,31 @@ UserData UserRepository::getUser(int id)
         user.setRoles(role_type);
         return user;
     }
-    catch (const std::exception& e) {
+    catch (const std::exception& e) 
+    {
         throw std::runtime_error("Database error: " + std::string(e.what()));
     }
 }
 
-void UserRepository::deleteUser(int id)
+bool UserRepository::deleteUser(int id)
 {
-try 
-{
-    db_->execSqlSync
+    auto result = db_->execSqlSync
     (
         "DELETE FROM users_roles "
         "WHERE user_id = $1 ", id
     );
     db_->execSqlSync
     (
-        "DELETE FROM users " 
-        "WHERE id = $1 ", id
-    );
-    db_->execSqlSync
-    (
         "Delete FROM users "
         "WHERE id = $1 ", id
     );
+    if (result.affectedRows() == 0)
+    {
+        return false;
+    }
+    return true;
 }
-catch (const std::exception& e)
-{
-    throw std::runtime_error("Database error: " + std::string(e.what()));
-}
-}
+
 
 void UserRepository::addRole(int user_id, int role_id) 
 {
@@ -165,4 +157,18 @@ void UserRepository::addRole(int user_id, int role_id)
         "INSERT INTO users_roles (user_id, role_id) " 
         "VALUES ($1, $2) ", user_id, role_id
     );
+}
+
+bool UserRepository::deleteRole(int user_id, int role_id)
+{
+    auto result = db_->execSqlSync
+    (
+        "DELETE FROM users_roles " 
+        "WHERE user_id = $1 AND role_id = $2", user_id, role_id
+    );
+    if (result.affectedRows() == 0)
+    {
+        return false;
+    }
+    return true;
 }

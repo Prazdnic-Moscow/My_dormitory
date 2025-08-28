@@ -27,9 +27,10 @@ public:
     UserData getUser(int id);
     
     // Удаление
-    void deleteUser(int id);
+    bool deleteUser(int id);
 
     void addRole(int user_id, int role_id);
+    bool deleteRole(int user_id, int role_id);
 
 private:
     drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

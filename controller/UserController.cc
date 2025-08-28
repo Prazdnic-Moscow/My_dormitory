@@ -11,7 +11,9 @@ void UserController::login(
     {
         // 1. Получаем JSON из запроса
         auto json = req->getJsonObject();
-        if (!json) {
+        
+        if (!json) 
+        {
             throw std::runtime_error("Invalid JSON");
         }
 
@@ -129,20 +131,34 @@ void UserController::getUsers(const HttpRequestPtr& req,
 {
     try 
     {
+        auto token = Headerhelper::getTokenFromHeaders(req);
+        auto decoded = jwt::decode<traits>(token);
+        
+        if (!Headerhelper::verifyToken(decoded))
+        {
+            throw std::runtime_error("Token olds");
+        }
+        if (!Headerhelper::checkRoles(decoded, "user_read"))
+        {
+            throw std::runtime_error("Not rights Role - User_read");
+        }
         // 1. Получаем подключение к БД
         auto dbClient = drogon::app().getDbClient();
-
         // 2. Создаём сервис
         UserService userService(dbClient);
-        auto users = userService.getUsersdb();
+        auto users = userService.getUsers();
 
         // 3. Формируем JSON-ответ
         Json::Value jsonUsers;
-        for (const auto& user : users) {
+        for (const auto& user : users) 
+        {
             Json::Value jsonUser;
             jsonUser["id"] = user.getId();
             jsonUser["phone_number"] = user.getPhoneNumber();
-            // ... другие поля
+            jsonUser["name"] = user.getName();
+            jsonUser["last_name"] = user.getLastName();
+            jsonUser["surname"] = user.getSurname();
+            jsonUser["ducuments"] = user.getDocument();
             jsonUsers.append(jsonUser);
         }
 
@@ -162,49 +178,31 @@ void UserController::getUsers(const HttpRequestPtr& req,
 
 }
 void UserController::getUser(const HttpRequestPtr& req,
-              std::function<void(const HttpResponsePtr&)>&& callback, int userId)
+              std::function<void(const HttpResponsePtr&)>&& callback, int user_id)
 {
     try 
     {
+         // 6. Получение данных пользователя
+        auto dbClient = drogon::app().getDbClient();
+        UserService userService(dbClient);
+        UserData user;
         std::string token = Headerhelper::getTokenFromHeaders(req);
         // 3. Декодирование JWT с улучшенной обработкой ошибок
         auto decoded = jwt::decode<traits>(token);
-        //получение роли и ID
-        auto roleClaim = decoded.get_payload_claim("roles");
-        Json::Value rolesJson = roleClaim.to_json(); // Преобразуем в Json::Value
+        // Проверка id доступа
         auto idClaim = decoded.get_payload_claim("Id");
         auto tokenUserId = std::stoi(idClaim.as_string());
-        // 5. Проверка прав доступа (1 - admin, 2 - user)
-        // Проверяем наличие нужной роли "users_read"
         
-        bool UsersReadRole = false;
-        for (const auto& role : rolesJson) {
-            if (role.asString() == "user_read") {
-                UsersReadRole = true;
-                break;
-            }
-        }
-        // Проверка прав доступа
-        // Если нет роли users_read И запрашивается не свой ID - доступ запрещен
-        if (!UsersReadRole && userId != tokenUserId) 
+        if (!Headerhelper::verifyToken(decoded))
         {
-            throw std::runtime_error("Access denied: insufficient privileges");
+            throw std::runtime_error("Token olds");
         }
-
-        // 6. Получение данных пользователя
-        auto dbClient = drogon::app().getDbClient();
-        UserService userService(dbClient);
+        if (!Headerhelper::checkRoles(decoded, "user_read") || user_id != tokenUserId)
+        {
+            throw std::runtime_error("Not rights Role - User_read and Not needs ID we may delete only your account");
+        }
         
-        UserData user;
-        try 
-        {
-            user = userService.getUser(userId);
-        } 
-        
-        catch (const std::exception& e) 
-        {
-            throw std::runtime_error(std::string("Failed to get user: ") + e.what());
-        }
+        user = userService.getUser(user_id);
 
         // 7. Формирование безопасного ответа (без пароля)
         Json::Value jsonUser;
@@ -239,33 +237,30 @@ void UserController::getUser(const HttpRequestPtr& req,
 void UserController::deleteUser(const HttpRequestPtr& req,
               std::function<void(const HttpResponsePtr&)>&& callback, int userId)
 {
+    bool result = false;
     try 
     {
         std::string token = Headerhelper::getTokenFromHeaders(req);
         // 3. Декодирование JWT с улучшенной обработкой ошибок
-        auto decoded = jwt::decode(token);
+        auto decoded = jwt::decode<traits>(token);
         //получение ID
         auto idClaim = decoded.get_payload_claim("Id");
         auto tokenUserId = std::stoi(idClaim.as_string());
         
-        // 5. Проверка прав доступа
-        if (userId != tokenUserId) 
+        if (!Headerhelper::verifyToken(decoded))
         {
-            throw std::runtime_error("Access denied: insufficient privileges");
+            throw std::runtime_error("Token olds");
+        }
+        if (!Headerhelper::checkRoles(decoded, "user_write") || userId != tokenUserId)
+        {
+            throw std::runtime_error("Not rights Role - News_read");
         }
 
         // 6. Получение данных пользователя
         auto dbClient = drogon::app().getDbClient();
         UserService userService(dbClient);
-        try 
-        {
-            userService.deleteUser(userId);
-        } 
         
-        catch (const std::exception& e) 
-        {
-            throw std::runtime_error(std::string("Failed to get user: ") + e.what());
-        }
+        result = userService.deleteUser(userId);
     } 
     catch (const std::runtime_error& e) 
     {
@@ -277,6 +272,15 @@ void UserController::deleteUser(const HttpRequestPtr& req,
         resp->setStatusCode(HttpStatusCode::k401Unauthorized);
         callback(resp);
     } 
+
+    if (!result)
+    {
+        // 3. Возвращаем 404
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k404NotFound);
+        callback(resp);
+    }
+
     // 3. Возвращаем 204 No Content
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k204NoContent);
@@ -288,10 +292,56 @@ void UserController::addRole(const HttpRequestPtr& req,
 {
     // 1. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
-
     // 2. Создаём сервис
     UserService userService(dbClient);
-    userService.addRole(user_id, role_id);
+    std::string token = Headerhelper::getTokenFromHeaders(req);
+    // 3. Декодирование JWT с улучшенной обработкой ошибок
+    auto decoded = jwt::decode<traits>(token);
+    
+    if (!Headerhelper::verifyToken(decoded))
+    {
+        throw std::runtime_error("Token olds");
+    }
+    if (!Headerhelper::checkRoles(decoded, "role_write"))
+    {
+        throw std::runtime_error("Not rights Role - Role_write");
+    }
+
+    userService.addRole(user_id, role_id); 
+    // 3. Возвращаем 201
+    auto resp = HttpResponse::newHttpResponse();
+    resp->setStatusCode(k201Created);
+    callback(resp);
+}
+
+void UserController::deleteRole(const HttpRequestPtr& req,
+              std::function<void(const HttpResponsePtr&)>&& callback, int user_id, int role_id)
+{
+    // 1. Получаем подключение к БД
+    auto dbClient = drogon::app().getDbClient();
+    // 2. Создаём сервис
+    UserService userService(dbClient);
+    std::string token = Headerhelper::getTokenFromHeaders(req);
+    // 3. Декодирование JWT с улучшенной обработкой ошибок
+    auto decoded = jwt::decode<traits>(token);
+    
+    if (!Headerhelper::verifyToken(decoded))
+    {
+        throw std::runtime_error("Token olds");
+    }
+    if (!Headerhelper::checkRoles(decoded, "role_write"))
+    {
+        throw std::runtime_error("Not rights Role - Role_write");
+    }
+    
+    bool result = userService.deleteRole(user_id, role_id); 
+    if (!result)
+    {
+        // 3. Возвращаем 404
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k404NotFound);
+        callback(resp);
+    }
     // 3. Возвращаем 204 No Content
     auto resp = HttpResponse::newHttpResponse();
     resp->setStatusCode(k204NoContent);

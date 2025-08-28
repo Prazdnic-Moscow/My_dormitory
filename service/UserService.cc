@@ -19,16 +19,16 @@ UserData UserService::registerUser(
     const std::string &name,
     const std::string &last_name,
     const std::string &surname,
-    const std::string &document)
+    const std::string &document
+    )
 {
 
     checkData(phone_number, password);
     // Хешируем пароль
     std::string passwordHash = BCrypt::generateHash(password);
     // Создаём пользователя в БД
-    UserData user;
     try {
-        user = repository->createUser(
+        return repository->createUser(
             phone_number,
             passwordHash, 
             name, 
@@ -36,7 +36,6 @@ UserData UserService::registerUser(
             surname, 
             document
         );
-            return user;
     } 
     catch (const std::exception &e) 
     {
@@ -68,7 +67,6 @@ std::string UserService::login(const std::string &phone_number, const std::strin
     try 
     {
         std::list<std::string> roles = user.getRoles();
-        Json::StreamWriterBuilder builder;
         Json::Value jsonRoles;
         for (const auto& role : roles)
         {
@@ -89,7 +87,7 @@ std::string UserService::login(const std::string &phone_number, const std::strin
     }
 }
 
-std::list<UserData> UserService::getUsersdb()
+std::list<UserData> UserService::getUsers()
 {
     return repository->getUsers();
 };
@@ -99,7 +97,7 @@ UserData UserService::getUser(int id)
     return repository->getUser(id);
 }
 
-void UserService::deleteUser(int id)
+bool UserService::deleteUser(int id)
 {
     return repository->deleteUser(id);
 }
@@ -118,4 +116,9 @@ void UserService::checkData(const std::string &phone_number, const std::string &
 void UserService::addRole(int user_id, int role_id)
 {
     return repository->addRole(user_id, role_id);
+}
+
+bool UserService::deleteRole(int user_id, int role_id)
+{
+    return repository->deleteRole(user_id, role_id);
 }
