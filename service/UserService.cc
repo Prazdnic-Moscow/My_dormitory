@@ -49,9 +49,12 @@ std::string UserService::login(const std::string &phone_number, const std::strin
     checkData(phone_number, password);
     // Получаем пользователя из БД
     UserData user;
-    try {
+    try 
+    {
         user = repository->getUserByPhone(phone_number);
-    } catch (const std::exception &e) {
+    } 
+    catch (const std::exception &e) 
+    {
         throw std::runtime_error("User not found");
     }
 
@@ -62,7 +65,6 @@ std::string UserService::login(const std::string &phone_number, const std::strin
         throw std::runtime_error("Invalid password or login");
     }
 
-    
     // Генерируем JWT токен
     try 
     {

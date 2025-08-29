@@ -25,18 +25,13 @@ bool S3Service::uploadFile(const std::string file_path, const std::vector<uint8_
     
     Aws::Auth::AWSCredentials credentials(key, secretkey);
     
-    Aws::S3::S3Client s3Client(
-    credentials,
-    config,
-    Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never,
-    false  // useVirtualAddressing: false для MinIO
-);
+    Aws::S3::S3Client s3Client(credentials, config, Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never, false);
     
     // Создание запроса
     Aws::S3::Model::PutObjectRequest request;
     request.SetBucket(bucketName);
     request.SetKey(file_path);
-    request.SetContentType(contentType.c_str());
+    request.SetContentType(contentType);//contentType.c_str()
     request.SetContentLength(data.size());
 
     // Использование данных из std::vector<uint8_t> для тела запроса
@@ -56,9 +51,51 @@ bool S3Service::uploadFile(const std::string file_path, const std::vector<uint8_
     return true;
 }
 
-bool S3Service::deleteFile(const std::string& key) 
+bool S3Service::deleteFile(const std::string& image_path) 
 {
-    std::cout << "Would delete file: " << bucketName << "/" << key << std::endl;
-    // Заглушка - всегда успех
+    Aws::Client::ClientConfiguration config;
+    config.endpointOverride = url;
+    config.scheme = Aws::Http::Scheme::HTTP;
+
+    Aws::Auth::AWSCredentials credentials(this->key, this->secretkey);
+    Aws::S3::S3Client s3Client(credentials, config, Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never, false);
+
+    Aws::S3::Model::DeleteObjectRequest request;
+    request.SetBucket(bucketName);
+    request.SetKey(image_path);
+    auto outcome = s3Client.DeleteObject(request);
+    if (!outcome.IsSuccess()) 
+    {
+        throw std::runtime_error("Delete failed: " + outcome.GetError().GetMessage());
+    }
     return true;
+}
+
+std::pair<std::vector<uint8_t>, std::string> S3Service:: downloadFile(const std::string& image_path)
+{
+    Aws::Client::ClientConfiguration config;
+    config.endpointOverride = url;
+    config.scheme = Aws::Http::Scheme::HTTP;
+
+    Aws::Auth::AWSCredentials credentials(this->key, this->secretkey);
+    Aws::S3::S3Client s3Client(credentials, config, Aws::Client::AWSAuthV4Signer::PayloadSigningPolicy::Never, false);
+
+    Aws::S3::Model::GetObjectRequest request;
+    request.SetBucket(bucketName);
+    request.SetKey(image_path);
+
+    auto outcome = s3Client.GetObject(request);
+
+    if (!outcome.IsSuccess()) 
+    {
+        throw std::runtime_error(outcome.GetError().GetMessage());
+    }
+
+    auto& stream = outcome.GetResultWithOwnership().GetBody();
+    std::vector<uint8_t> data((std::istreambuf_iterator<char>(stream)),
+                               std::istreambuf_iterator<char>());
+
+    std::string contentType = outcome.GetResult().GetContentType();
+    
+    return { data, contentType };
 }

@@ -33,7 +33,8 @@ void UserController::login(
 
         // 5. Вызываем метод логина
         std::string token = userService.login(phone_number, password);
-        if (token.empty()) {
+        if (token.empty()) 
+        {
             throw std::runtime_error("Invalid phone number or password");
         }
 

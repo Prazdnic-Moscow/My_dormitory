@@ -23,7 +23,7 @@ public:
        date = result["date"].as<std::string>();
        date_start = result["date_start"].as<std::string>();
        date_end = result["date_end"].as<std::string>();
-       image_path = result["date_end"].as<std::string>();
+       image_path = result["image_path"].as<std::string>();
     }
 
 // Setters

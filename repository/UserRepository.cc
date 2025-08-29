@@ -38,7 +38,9 @@ UserData UserRepository::createUser(
         // 3. Получаем полные данные с ролью
         return user;
         
-    } catch (const std::exception& e) {
+    } 
+    catch (const std::exception& e) 
+    {
         throw std::runtime_error("Failed to create user: " + std::string(e.what()));
     }
 }

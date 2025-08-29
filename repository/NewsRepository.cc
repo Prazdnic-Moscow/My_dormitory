@@ -23,13 +23,24 @@
 
     bool NewsRepository::deleteNews(int id)
     {
-        auto result = db_->execSqlSync
+        //для начала нужно удалить фотку из minio
+        S3Service s3service("mydormitory");
+        auto result = db_->execSqlSync(
+            "SELECT * FROM news "
+            "WHERE id = $1 ", id
+        );
+        News news;
+        news.fromDb(result[0]);
+        std::string image_path = news.getImagePath();
+        s3service.deleteFile(image_path);
+
+        auto result_2 = db_->execSqlSync
         (
             "DELETE FROM news "
             "WHERE id = ($1) ", id
         );
 
-        if (result.affectedRows() == 0)
+        if (result_2.affectedRows() == 0)
         {
             return false;
         }

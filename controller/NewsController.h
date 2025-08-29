@@ -1,8 +1,5 @@
 #pragma once
 #include <drogon/HttpController.h>
-#include "../service/UserService.h"
-#include "../model/User.h"
-#include "../repository/UserRepository.h"
 #include <drogon/orm/DbClient.h>
 #include <drogon/drogon.h>
 #include <json/json.h>
@@ -24,11 +21,10 @@ class NewsController : public HttpController<NewsController>
 {
 public:
     METHOD_LIST_BEGIN
+        ADD_METHOD_TO(NewsController::createNews, "/news", Post);
         ADD_METHOD_TO(NewsController::getNews, "/news", Get);
         ADD_METHOD_TO(NewsController::deleteNews, "/news/{}", Delete);
-        ADD_METHOD_TO(NewsController::createNews, "/news", Post);
-        ADD_METHOD_TO(NewsController::getImage, "/news/image/{}", Get);
-        METHOD_LIST_END
+    METHOD_LIST_END
 
     void getNews(const HttpRequestPtr& req,
                  std::function<void(const HttpResponsePtr&)>&& callback);
@@ -38,8 +34,4 @@ public:
     
     void createNews(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback);
-
-    void getImage(const HttpRequestPtr& req,
-                 std::function<void(const HttpResponsePtr&)>&& callback,
-                 const std::string& filename);
 };
