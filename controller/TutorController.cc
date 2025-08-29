@@ -1,5 +1,5 @@
 #include "TutorController.h"
-void TutorController::createTutor(const HttpRequestPtr& req,
+void TutorController::postTutor(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback)
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);

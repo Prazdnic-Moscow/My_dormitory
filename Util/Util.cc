@@ -51,6 +51,8 @@ bool Headerhelper::checkRoles (jwt::decoded_jwt<traits> decoded, std::string rol
 std::string Headerhelper::getExtension(drogon::ContentType contentType) 
 {
     switch(contentType) {
+        case drogon::CT_APPLICATION_MSWORD: return ".docx";
+        case drogon::CT_APPLICATION_MSWORDX: return ".docx";
         case drogon::CT_IMAGE_JPG: return ".jpg";
         case drogon::CT_IMAGE_PNG: return ".png";
         case drogon::CT_IMAGE_GIF: return ".gif";

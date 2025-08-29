@@ -19,21 +19,21 @@ class S3Controller : public HttpController<S3Controller>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(S3Controller::postImage, "/image/{1}", Post);
-        ADD_METHOD_TO(S3Controller::getImage, "/image/{1}/{2}", Get);
-        ADD_METHOD_TO(S3Controller::deleteImage, "/image/{1}/{2}", Delete);
+        ADD_METHOD_TO(S3Controller::postFile, "/file/{1}", Post);
+        ADD_METHOD_TO(S3Controller::getFile, "/file/{1}/{2}", Get);
+        ADD_METHOD_TO(S3Controller::deleteFile, "/file/{1}/{2}", Delete);
 
     METHOD_LIST_END
 
-    void postImage(const HttpRequestPtr& req,
+    void postFile(const HttpRequestPtr& req,
                  std::function<void(const HttpResponsePtr&)>&& callback,
                  std::string folder);
 
-    void getImage(const HttpRequestPtr& req,
+    void getFile(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback,
                             std::string folder, std::string image_path);
 
-    void deleteImage(const HttpRequestPtr& req,
+    void deleteFile(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback,
                             std::string folder, std::string image_path);
 };

@@ -3,7 +3,7 @@ using traits = jwt::traits::open_source_parsers_jsoncpp;
 using claim = jwt::basic_claim<traits>;
 
 void NewsController::getNews(const HttpRequestPtr& req,
-              std::function<void(const HttpResponsePtr&)>&& callback)
+              std::function<void(const HttpResponsePtr&)>&& callback, int limit)
     {
         std::string token = Headerhelper::getTokenFromHeaders(req);
         auto decoded = jwt::decode<traits>(token);
@@ -16,10 +16,12 @@ void NewsController::getNews(const HttpRequestPtr& req,
         {
             throw std::runtime_error("Not rights Role - News_read");
         }
+
+        if (limit > 50) limit = 50;
         // 6. Получение данных пользователя
         auto dbClient = drogon::app().getDbClient();
         NewsService newsService(dbClient);
-        auto news = newsService.getNews();
+        auto news = newsService.getNews(limit);
 
         // 3. Формируем JSON-ответ
         Json::Value jsonUsers;
@@ -75,7 +77,7 @@ void NewsController::deleteNews(const HttpRequestPtr& req,
 
 
 
-void NewsController::createNews(const HttpRequestPtr& req,
+void NewsController::postNews(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback)
     {
         std::string token = Headerhelper::getTokenFromHeaders(req);

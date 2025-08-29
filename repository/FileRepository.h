@@ -1,31 +1,26 @@
 #pragma once
 #include <drogon/orm/DbClient.h> // Подключение к PostgreSQL
 #include <string>
-#include "../model/News.h"
 #include "../controller/S3Controller.h"
+#include "../model/File.h"
 #include <list>
 #include "bcrypt/BCrypt.hpp"
-class NewsRepository 
+class FileRepository 
 {
 public:
     // Конструктор принимает подключение к БД
-    NewsRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
+    FileRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
 
     // Создать пользователя в БД
-    News createNews(
-        const std::string header, 
+    File createFile(
         const std::string body, 
-        const std::string author,
-        const std::string date, 
-        const std::string date_start, 
-        const std::string date_end,
-        const std::string image_path
+        const std::string file_path
     );
     
     // Удаление
-    bool deleteNews(int id);
+    bool deleteFile(int id_tutor);
 
-    std::list<News> getNews(int limit);
+    std::list<File> getFiles();
 
 private:
     drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

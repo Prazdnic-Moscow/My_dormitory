@@ -20,7 +20,7 @@ class TutorController : public HttpController<TutorController>
 {
 public:
     METHOD_LIST_BEGIN
-        ADD_METHOD_TO(TutorController::createTutor, "/tutor", Post);
+        ADD_METHOD_TO(TutorController::postTutor, "/tutor", Post);
         ADD_METHOD_TO(TutorController::getTutor, "/tutor", Get);
         ADD_METHOD_TO(TutorController::deleteTutor, "/tutor/{}", Delete);
     METHOD_LIST_END
@@ -31,6 +31,6 @@ public:
     void deleteTutor(const HttpRequestPtr& req,
                  std::function<void(const HttpResponsePtr&)>&& callback, int id_tutor);
     
-    void createTutor(const HttpRequestPtr& req,
+    void postTutor(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback);
 };

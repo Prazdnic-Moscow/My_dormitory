@@ -1,5 +1,5 @@
 #include "S3Controller.h"
-void S3Controller::postImage(const HttpRequestPtr& req,
+void S3Controller::postFile(const HttpRequestPtr& req,
                  std::function<void(const HttpResponsePtr&)>&& callback,
                  std::string folder)
 {
@@ -51,7 +51,7 @@ void S3Controller::postImage(const HttpRequestPtr& req,
 }
 
 
-void S3Controller::getImage(const HttpRequestPtr& req,
+void S3Controller::getFile(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback,
                             std::string folder, std::string image_path)
 {
@@ -76,7 +76,7 @@ try {
     }
 }
 
-void S3Controller::deleteImage(const HttpRequestPtr& req,
+void S3Controller::deleteFile(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback,
                             std::string folder, std::string image_path)
 {

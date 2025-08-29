@@ -47,13 +47,15 @@
         return true;
     }
 
-    std::list<News> NewsRepository::getNews()
+    std::list<News> NewsRepository::getNews(int limit)
     {
         try
         {
-            auto result = db_->execSqlSync
-            (
-                "SELECT * FROM news "
+            std::string limit_str = std::to_string(limit);
+            auto result = db_->execSqlSync(
+            "SELECT * FROM news "
+            "ORDER BY date DESC "
+            "LIMIT $1 ",limit_str
             );
 
             std::list<News> news_all;

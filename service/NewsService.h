@@ -32,7 +32,7 @@ public:
 
     bool deleteNews(int id_news);
 
-    std::list<News> getNews();
+    std::list<News> getNews(int limit);
 
 private:
     std::shared_ptr<NewsRepository> repository; // Доступ к БД

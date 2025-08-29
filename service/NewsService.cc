@@ -32,7 +32,7 @@ bool NewsService::deleteNews(int id_news)
     return repository->deleteNews(id_news);
 }
 
-std::list<News> NewsService::getNews()
+std::list<News> NewsService::getNews(int limit)
 {
-    return repository->getNews();
+    return repository->getNews(limit);
 }
