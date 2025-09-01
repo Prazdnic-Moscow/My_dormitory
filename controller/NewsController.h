@@ -10,7 +10,6 @@
 #include <string>
 #include <filesystem>
 #include <jwt-cpp/jwt.h>
-#include <uuid/uuid.h>
 #include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
 using claim = jwt::basic_claim<traits>;

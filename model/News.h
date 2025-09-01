@@ -4,7 +4,7 @@
 #include <drogon/drogon.h>
 class News 
 {
-    std::string id;
+    int id;
     std::string header;
     std::string body;
     std::string author;
@@ -16,7 +16,7 @@ public:
 
     void fromDb(const drogon::orm::Row &result) 
     { 
-       id = result["id"].as<std::string>();
+       id = result["id"].as<int>();
        header = result["header"].as<std::string>();
        body = result["body"].as<std::string>();
        author= result["author"].as<std::string>();
@@ -27,7 +27,7 @@ public:
     }
 
 // Setters
-    void setId(const std::string& id_news) { this->id = id_news; }
+    void setId(const int& id_news) { this->id = id_news; }
     void setHeader(const std::string& header_news) { this->header = header_news; }
     void setBody(const std::string& body_news) { this->body = body_news; }
     void setAuthor(const std::string& author_news) { this->author = author_news; }
@@ -36,7 +36,7 @@ public:
     void setDateEnd(const std::string& date_end_news) { this->date_end = date_end_news; }
     void setImagePath(const std::string& path) { image_path = path; }
     // Getters
-    std::string getId() const { return id; }
+    int getId() const { return id; }
     std::string getHeader() const { return header; }
     std::string getBody() const { return body; }
     std::string getAuthor() const { return author; }

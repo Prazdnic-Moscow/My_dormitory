@@ -13,7 +13,6 @@ find_path(BCRYPT_INCLUDE_DIR NAMES bcrypt/BCrypt.hpp PATHS /usr/local/include)
 
 file(GLOB SOURCES
     "main.cpp"
-    "controllers/*.cc"
     "models/*.cc"
     "controller/*.cc"
     "service/*.cc"

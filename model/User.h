@@ -12,12 +12,12 @@ private:
     std::string surname;
     std::string document;
     std::list<std::string> role_type;
-    std::string id;
+    int id;
 
     public:
     void fromDb(const drogon::orm::Row &result) 
     { 
-       id = result["id"].as<std::string>();
+       id = result["id"].as<int>();
        phone_number = result["phone_number"].as<std::string>();
        password = result["password"].as<std::string>();
        name = result["name"].as<std::string>();
@@ -27,7 +27,7 @@ private:
     }
 
     // Setters
-    void setId(const std::string& id) { this->id = id; }
+    void setId(const int& id) { this->id = id; }
     void setPhoneNumber(const std::string& phone) { this->phone_number = phone; }
     void setPassword(const std::string& pass) { this->password = pass; }
     void setName(const std::string& name) { this->name = name; }
@@ -37,7 +37,7 @@ private:
     void setRoles(const std::list<std::string>& role) { this->role_type = role; }
 
     // Getters
-    std::string getId() const { return id; }
+    int getId() const { return id; }
     std::string getPhoneNumber() const { return phone_number; }
     std::string getPassword() const { return password; }
     std::string getName() const { return name; }
