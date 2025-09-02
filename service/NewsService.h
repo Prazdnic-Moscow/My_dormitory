@@ -7,6 +7,7 @@
 #include <bcrypt/BCrypt.hpp>
 #include <jwt-cpp/jwt.h>
 #include <drogon/drogon.h>
+#include <string>
 #include <stdexcept>
 #include <iostream>
 #include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
@@ -27,7 +28,7 @@ public:
         std::string date,
         std::string date_start,
         std::string date_end,
-        std::string image_path
+        std::list<std::string> image_paths
     );
 
     bool deleteNews(int id_news);

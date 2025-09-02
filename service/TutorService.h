@@ -24,7 +24,7 @@ public:
         std::string header,
         std::string body,
         std::string date,
-        std::string image_path
+        std::list<std::string> image_path
     );
 
     bool deleteTutor(int id_tutor);

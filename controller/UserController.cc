@@ -200,7 +200,7 @@ void UserController::getUser(const HttpRequestPtr& req,
         }
         if (!Headerhelper::checkRoles(decoded, "user_read") || user_id != tokenUserId)
         {
-            throw std::runtime_error("Not rights Role - User_read and Not needs ID we may delete only your account");
+            throw std::runtime_error("Not rights Role - User_read or Not needs ID we may delete only your account");
         }
         
         user = userService.getUser(user_id);

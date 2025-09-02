@@ -7,10 +7,11 @@ FileService::FileService(const drogon::orm::DbClientPtr& dbClient)
 File FileService::createFile
 (
     std::string body,
-    std::string file_path
+    std::string date,
+    std::list<std::string> file_path
 )
 {
-    return repository->createFile(body, file_path);
+    return repository->createFile(body, date, file_path);
 }
 
 

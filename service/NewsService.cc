@@ -13,9 +13,13 @@ News NewsService::createNews
     std::string date,
     std::string date_start,
     std::string date_end,
-    std::string image_path
+    std::list<std::string> image_paths
 )
 {
+    if (image_paths.size() >= 5)
+    {
+        throw std::runtime_error("Count files should be < 5");
+    }
     return repository->createNews(
         header,
         body,
@@ -23,7 +27,7 @@ News NewsService::createNews
         date,
         date_start,
         date_end,
-        image_path
+        image_paths
     );
 }
 

@@ -8,7 +8,7 @@ class Tutor
     std::string header;
     std::string body;
     std::string date;
-    std::string image_path;
+    std::list<std::string> image_paths;
 public:
 
     void fromDb(const drogon::orm::Row &result) 
@@ -17,7 +17,7 @@ public:
        header = result["header"].as<std::string>();
        body = result["body"].as<std::string>();
        date = result["date"].as<std::string>();
-       image_path = result["image_path"].as<std::string>();
+       //image_path = result["image_path"].as<std::string>();
     }
 
 // Setters
@@ -25,11 +25,11 @@ public:
     void setHeader(const std::string& header_news) { this->header = header_news; }
     void setBody(const std::string& body_news) { this->body = body_news; }
     void setDate(const std::string& date_news) { this->date = date_news; }
-    void setImagePath(const std::string& path) { image_path = path; }
+    void setImagePaths(const std::list<std::string>& paths) { image_paths = paths; }
     // Getters
     int getId() const { return id; }
     std::string getHeader() const { return header; }
     std::string getBody() const { return body; }
     std::string getDate() const { return date; }
-    std::string getImagePath() const { return image_path; }
+    const std::list<std::string>& getImagePaths() const { return image_paths; }
 };

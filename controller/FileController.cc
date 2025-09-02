@@ -27,22 +27,40 @@ void FileController::postFiles(const HttpRequestPtr& req,
 
     // Извлекаем данные из JSON
     std::string body = json->get("body", "").asString();
-    std::string file_path = json->get("file_path", "").asString();
+    std::string date = json->get("date", "").asString();
+    // Получаем массив файлов
+        std::list<std::string> file_paths;
+        if (json->isMember("files_path") && (*json)["files_path"].isArray()) 
+        {
+            const Json::Value& filesArray = (*json)["files_path"];
+            for (const auto& file : filesArray) 
+            {
+                std::string path = file.asString();
+                if (!path.empty()) 
+                {
+                    file_paths.push_back(path);
+                }
+            }
+        }
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
     FileService file(dbClient);
     
-    auto file_data = file.createFile(
-        body,
-        file_path
-    );
+    auto file_data = file.createFile(body, date, file_paths);
 
     // 3. Формируем JSON-ответ
     Json::Value jsonUser;
     jsonUser["id"] = file_data.getId();
     jsonUser["body"] = file_data.getBody();
-    jsonUser["file_path"] = file_data.getFilePath();
+    jsonUser["date"] = file_data.getDate();
+    // Добавляем массив изображений
+        Json::Value jsonImages(Json::arrayValue);
+        for (const auto& image_path : file_data.getFilePaths()) 
+        {
+            jsonImages.append(image_path);
+        }
+        jsonUser["news_path"] = jsonImages;
 
     // 4. Создаем и настраиваем ответ
     auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
@@ -70,11 +88,19 @@ void FileController::getFiles(const HttpRequestPtr& req,
         Json::Value jsonTutors;
         for (const auto& files : file_all)
         {
-        Json::Value jsonTutor;
-        jsonTutor["id"] = files.getId();
-        jsonTutor["body"] = files.getBody();
-        jsonTutor["file_path"] = files.getFilePath();
-        jsonTutors.append(jsonTutor);   
+            Json::Value jsonTutor;
+            jsonTutor["id"] = files.getId();
+            jsonTutor["body"] = files.getBody();
+            jsonTutor["date"] = files.getDate();
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : files.getFilePaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+
+            jsonTutor["files_path"] = jsonImages; // исправлено имя поля
+            jsonTutors.append(jsonTutor);
         }
         // 4. Создаем и настраиваем ответ
         auto resp = HttpResponse::newHttpJsonResponse(jsonTutors);

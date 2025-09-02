@@ -14,7 +14,8 @@ public:
     // Создать пользователя в БД
     File createFile(
         const std::string body, 
-        const std::string file_path
+        const std::string date,
+        std::list<std::string> file_path
     );
     
     // Удаление

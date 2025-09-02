@@ -16,7 +16,7 @@ public:
         const std::string header, 
         const std::string body, 
         const std::string date, 
-        const std::string image_path
+        const std::list<std::string> image_path
     );
     
     // Удаление

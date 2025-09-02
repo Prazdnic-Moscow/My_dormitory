@@ -19,7 +19,7 @@ public:
         const std::string date, 
         const std::string date_start, 
         const std::string date_end,
-        const std::string image_path
+        const std::list<std::string> image_paths
     );
     
     // Удаление

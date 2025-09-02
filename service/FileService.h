@@ -22,7 +22,8 @@ public:
     File createFile
     (
         std::string body,
-        std::string file_path
+        std::string date,
+        std::list<std::string> file_path
     );
 
     bool deleteFile(int id_file);

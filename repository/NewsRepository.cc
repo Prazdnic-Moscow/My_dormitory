@@ -1,50 +1,78 @@
 #include "NewsRepository.h"
     News NewsRepository::createNews(
-        const std::string header, 
-        const std::string body, 
-        const std::string author,
-        const std::string date, 
-        const std::string date_start, 
-        const std::string date_end,
-        const std::string image_path
+    const std::string header, 
+    const std::string body, 
+    const std::string author,
+    const std::string date, 
+    const std::string date_start, 
+    const std::string date_end,
+    const std::list<std::string> image_paths
     )
     {
-        auto result = db_->execSqlSync
-        (
-            "INSERT INTO news (header, body, author, date, date_start, date_end, image_path) "
-            "VALUES ($1, $2, $3, $4, $5, $6, $7) "
+        auto trans = db_->newTransaction();
+
+        // Вставляем саму новость
+        auto result = trans->execSqlSync(
+            "INSERT INTO news (header, body, author, date, date_start, date_end) "
+            "VALUES ($1, $2, $3, $4, $5, $6) "
             "RETURNING id, header, body, author, date, date_start, date_end",
-            header, body, author, date, date_start, date_end, image_path
+            header, body, author, date, date_start, date_end
         );
+
         News news;
         news.fromDb(result[0]);
+        int news_id = news.getId();
+
+        // Вставляем картинки
+        if (!image_paths.empty()) 
+        {
+            for (const auto& image_path : image_paths) 
+            {
+                trans->execSqlSync(
+                    "INSERT INTO news_file (news_id, image_path) "
+                    "VALUES ($1, $2)",
+                    news_id, image_path
+                );
+            }
+        }
+        news.setImagePaths(image_paths);
         return news;
     }
+
+
 
     bool NewsRepository::deleteNews(int id)
     {
         //для начала нужно удалить фотку из minio
         S3Service s3service("mydormitory");
-        auto result = db_->execSqlSync(
-            "SELECT * FROM news "
-            "WHERE id = $1 ", id
-        );
-        News news;
-        news.fromDb(result[0]);
-        std::string image_path = news.getImagePath();
-        s3service.deleteFile(image_path);
 
+        // 1. Получаем все изображения для удаления из MinIO
+        auto images_result = db_->execSqlSync(
+            "SELECT image_path FROM news_file WHERE news_id = $1",
+            id
+        );
+        
+        for (auto num : images_result)
+        {
+            std::string image_path = num["image_path"].as<std::string>();
+            s3service.deleteFile(image_path);
+        }
+
+        
         auto result_2 = db_->execSqlSync
+        (
+            "DELETE FROM news_file "
+            "WHERE news_id = ($1) ", id
+        );
+        
+        
+        auto result_3 = db_->execSqlSync
         (
             "DELETE FROM news "
             "WHERE id = ($1) ", id
         );
 
-        if (result_2.affectedRows() == 0)
-        {
-            return false;
-        }
-        return true;
+        return result_3.affectedRows() > 0;
     }
 
     std::list<News> NewsRepository::getNews(int limit)
@@ -59,10 +87,29 @@
             );
 
             std::list<News> news_all;
-            for (int i =0; i < result.size(); i++)
+            // Шаг 2: Для каждой новости получаем ее изображения
+            for (const auto& news_row : result) 
             {
                 News news;
-                news.fromDb(result[i]);
+                news.fromDb(news_row); // Заполняем основные данные
+                
+                int news_id = news.getId();
+                
+                // Шаг 3: Получаем ВСЕ изображения для этой новости
+                auto images_result = db_->execSqlSync(
+                    "SELECT image_path FROM news_file WHERE news_id = $1 ORDER BY news_id",
+                    news_id
+                );
+                
+                 std::list<std::string> image_paths;
+                for (const auto& image_row : images_result) 
+                {
+                    image_paths.push_back(image_row["image_path"].as<std::string>());
+                }
+
+                // Шаг 4: Устанавливаем список изображений для новости
+                news.setImagePaths(image_paths);
+
                 news_all.push_back(news);
             }
 

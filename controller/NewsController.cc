@@ -17,30 +17,38 @@ void NewsController::getNews(const HttpRequestPtr& req,
             throw std::runtime_error("Not rights Role - News_read");
         }
 
-        if (limit > 50) limit = 50;
+        if (limit > 20) limit = 20;
         // 6. Получение данных пользователя
         auto dbClient = drogon::app().getDbClient();
         NewsService newsService(dbClient);
         auto news = newsService.getNews(limit);
 
-        // 3. Формируем JSON-ответ
-        Json::Value jsonUsers;
+            // Формируем JSON-ответ
+        Json::Value jsonNewsArray; // переименовал для ясности
         for (const auto& news_current : news) 
         {
-            Json::Value jsonUser;
-            jsonUser["id"] = news_current.getId();
-            jsonUser["header"] = news_current.getHeader();
-            jsonUser["body"] = news_current.getBody();
-            jsonUser["author"] = news_current.getAuthor();
-            jsonUser["date"] = news_current.getDate();
-            jsonUser["date_start"] = news_current.getDateStart();
-            jsonUser["date_end"] = news_current.getDateEnd();
-            jsonUser["image_path"] = news_current.getImagePath();
-            jsonUsers.append(jsonUser);
+            Json::Value jsonNewsItem;
+            jsonNewsItem["id"] = news_current.getId();
+            jsonNewsItem["header"] = news_current.getHeader();
+            jsonNewsItem["body"] = news_current.getBody();
+            jsonNewsItem["author"] = news_current.getAuthor();
+            jsonNewsItem["date"] = news_current.getDate();
+            jsonNewsItem["date_start"] = news_current.getDateStart();
+            jsonNewsItem["date_end"] = news_current.getDateEnd();
+            
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : news_current.getImagePaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+            jsonNewsItem["news_path"] = jsonImages; // исправлено имя поля
+            
+            jsonNewsArray.append(jsonNewsItem); // ДОБАВЛЕНО: добавляем в массив
         }
 
         // 4. Создаем и настраиваем ответ
-        auto resp = HttpResponse::newHttpJsonResponse(jsonUsers);
+        auto resp = HttpResponse::newHttpJsonResponse(jsonNewsArray);
         callback(resp);
     }
 
@@ -109,7 +117,20 @@ void NewsController::postNews(const HttpRequestPtr& req,
         std::string date = json->get("date", "").asString();
         std::string date_start = json->get("date_start", "").asString();
         std::string date_end = json->get("date_end", "").asString();
-        std::string image_path = json->get("image_path", "").asString();
+        // Получаем список изображений (list)
+        std::list<std::string> image_paths;
+        if (json->isMember("news_path") && (*json)["news_path"].isArray()) 
+        {
+            const Json::Value& imagesArray = (*json)["news_path"];
+            for (const auto& image : imagesArray) 
+            {
+                std::string path = image.asString();
+                if (!path.empty()) 
+                {
+                    image_paths.push_back(path); // добавляем в list
+                }
+            }
+        }
 
         // 3. Получаем подключение к БД
         auto dbClient = drogon::app().getDbClient();
@@ -122,22 +143,28 @@ void NewsController::postNews(const HttpRequestPtr& req,
             date,
             date_start,
             date_end,
-            image_path
+            image_paths
         );
 
         // 3. Формируем JSON-ответ
-        Json::Value jsonUser;
-        jsonUser["id"] = news_data.getId();
-        jsonUser["header"] = news_data.getHeader();
-        jsonUser["body"] = news_data.getBody();
-        jsonUser["author"] = news_data.getAuthor();
-        jsonUser["date"] = news_data.getDate();
-        jsonUser["date_start"] = news_data.getDateStart();
-        jsonUser["date_end"] = news_data.getDateEnd();
-        jsonUser["image_path"] = news_data.getImagePath();
+        Json::Value jsonNews;
+        jsonNews["id"] = news_data.getId();
+        jsonNews["header"] = news_data.getHeader();
+        jsonNews["body"] = news_data.getBody();
+        jsonNews["author"] = news_data.getAuthor();
+        jsonNews["date"] = news_data.getDate();
+        jsonNews["date_start"] = news_data.getDateStart();
+        jsonNews["date_end"] = news_data.getDateEnd();
+        // Добавляем массив изображений
+        Json::Value jsonImages(Json::arrayValue);
+        for (const auto& image_path : news_data.getImagePaths()) 
+        {
+            jsonImages.append(image_path);
+        }
+        jsonNews["news_path"] = jsonImages;
 
         // 4. Создаем и настраиваем ответ
-        auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
+        auto resp = HttpResponse::newHttpJsonResponse(jsonNews);
         callback(resp);
     }
 

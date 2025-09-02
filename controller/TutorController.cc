@@ -28,7 +28,20 @@ void TutorController::postTutor(const HttpRequestPtr& req,
     std::string header = json->get("header", "").asString();
     std::string body = json->get("body", "").asString();
     std::string date = json->get("date", "").asString();
-    std::string image_path = json->get("image_path", "").asString();
+    // Получаем массив изображений
+        std::list<std::string> image_paths;
+        if (json->isMember("tutor_path") && (*json)["tutor_path"].isArray()) 
+        {
+            const Json::Value& imagesArray = (*json)["tutor_path"];
+            for (const auto& image : imagesArray) 
+            {
+                std::string path = image.asString();
+                if (!path.empty()) 
+                {
+                    image_paths.push_back(path);
+                }
+            }
+        }
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
@@ -38,19 +51,24 @@ void TutorController::postTutor(const HttpRequestPtr& req,
         header,
         body,
         date,
-        image_path
+        image_paths
     );
 
     // 3. Формируем JSON-ответ
-    Json::Value jsonUser;
-    jsonUser["id"] = tutor_data.getId();
-    jsonUser["header"] = tutor_data.getHeader();
-    jsonUser["body"] = tutor_data.getBody();
-    jsonUser["date"] = tutor_data.getDate();
-    jsonUser["image_path"] = tutor_data.getImagePath();
+    Json::Value jsonTutor;
+    jsonTutor["id"] = tutor_data.getId();
+    jsonTutor["header"] = tutor_data.getHeader();
+    jsonTutor["body"] = tutor_data.getBody();
+    jsonTutor["date"] = tutor_data.getDate();
+    Json::Value jsonImages(Json::arrayValue);
+    for (const auto& image_path : tutor_data.getImagePaths()) 
+    {
+        jsonImages.append(image_path);
+    }
+    jsonTutor["tutor_path"] = jsonImages;
 
     // 4. Создаем и настраиваем ответ
-    auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
+    auto resp = HttpResponse::newHttpJsonResponse(jsonTutor);
     callback(resp);
 }
 
@@ -79,7 +97,13 @@ void TutorController::postTutor(const HttpRequestPtr& req,
             jsonTutor["header"] = tutors.getHeader();
             jsonTutor["body"] = tutors.getBody();
             jsonTutor["date"] = tutors.getDate();
-            jsonTutor["image_path"] = tutors.getImagePath();
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : tutors.getImagePaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+            jsonTutor["tutor_path"] = jsonImages; // исправлено имя поля
             jsonTutors.append(jsonTutor);   
             }
             // 4. Создаем и настраиваем ответ
