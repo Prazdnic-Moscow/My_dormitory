@@ -15,20 +15,20 @@ using claim = jwt::basic_claim<traits>;
 using namespace drogon;
 class WashMachineController: public HttpController<WashMachineController>
 {
-public:
-    METHOD_LIST_BEGIN
-        ADD_METHOD_TO(WashMachineController::addWashMachine, "/washmachine", Post);
-        ADD_METHOD_TO(WashMachineController::getWashMachines,"/washmachine", Get);
-        ADD_METHOD_TO(WashMachineController::deleteWashMachine,"/washmachine/{}", Delete);
-    METHOD_LIST_END
-    
-    void addWashMachine(const HttpRequestPtr& req,
-                  std::function<void(const HttpResponsePtr&)>&& callback);
+    public:
+        METHOD_LIST_BEGIN
+            ADD_METHOD_TO(WashMachineController::addWashMachine, "/washmachine", Post);
+            ADD_METHOD_TO(WashMachineController::getWashMachines,"/washmachine", Get);
+            ADD_METHOD_TO(WashMachineController::deleteWashMachine,"/washmachine/{}", Delete);
+        METHOD_LIST_END
+        
+        void addWashMachine(const HttpRequestPtr& req,
+                            std::function<void(const HttpResponsePtr&)>&& callback);
 
-    void getWashMachines(const HttpRequestPtr& req,
-                  std::function<void(const HttpResponsePtr&)>&& callback);
+        void getWashMachines(const HttpRequestPtr& req,
+                             std::function<void(const HttpResponsePtr&)>&& callback);
 
-    void deleteWashMachine(const HttpRequestPtr& req,
-                  std::function<void(const HttpResponsePtr&)>&& callback,
-                  int id);
+        void deleteWashMachine(const HttpRequestPtr& req,
+                               std::function<void(const HttpResponsePtr&)>&& callback,
+                               int id);
 };

@@ -13,9 +13,15 @@ using claim = jwt::basic_claim<traits>;
 
 class Headerhelper : public HttpController<Headerhelper>
 {
-public:
-    static std::string getTokenFromHeaders (const HttpRequestPtr& req);
-    static bool verifyToken (jwt::decoded_jwt<traits> decoded);
-    static bool checkRoles (jwt::decoded_jwt<traits> decoded, std::string role);
-    static std::string getExtension(drogon::ContentType contentType);
+    public:
+        static std::string getTokenFromHeaders (const HttpRequestPtr& req);
+
+        static bool verifyToken (jwt::decoded_jwt<traits> decoded);
+
+        static std::string getTokenType(jwt::decoded_jwt<traits> decoded);
+
+        static bool checkRoles (jwt::decoded_jwt<traits> decoded, 
+                                std::string role);
+        
+        static std::string getExtension(drogon::ContentType contentType);
 };

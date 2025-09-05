@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include "../model/User.h"
+#include "../Util/Util.h"
 #include "../repository/UserRepository.h"
 #include <bcrypt/BCrypt.hpp>
 #include <jwt-cpp/jwt.h>
@@ -12,58 +13,42 @@
 #include <drogon/HttpResponse.h>
 #include <drogon/HttpTypes.h>
 
-class UserService {
-public:
-    // Конструктор
-    explicit UserService(const drogon::orm::DbClientPtr& dbClient);
+class UserService 
+{
+    public:
+        // Конструктор
+        explicit UserService(const drogon::orm::DbClientPtr& dbClient);
 
-    // Регистрация с полными данными пользователя
-    UserData registerUser(
-        const std::string &phone_number,
-        const std::string &password,
-        const std::string &name,
-        const std::string &last_name,
-        const std::string &surname,
-        const std::list<std::string> &document
-    );
+        UserData registerUser(const std::string &phone_number,
+                              const std::string &password,
+                              const std::string &name,
+                              const std::string &last_name,
+                              const std::string &surname,
+                              const std::list<std::string> &document);
 
-    // Войти в систему
-    std::string login(
-        const std::string &phone_number, 
-        const std::string &password
-    );
+        std::list<std::string> login(const std::string &phone_number, 
+                                     const std::string &password);
 
-    // Получение инфы по Id
-    UserData getUser(
-        int id
-    );
+        UserData getUser(int id);
 
-    // Удаление
-    bool deleteUser(
-        int id
-    );
-    
-    std::list<UserData> getUsers();
+        bool deleteUser(int id);
+        
+        std::list<UserData> getUsers();
 
-    void checkData(
-        const std::string &phone_number, 
-        const std::string &password
-    );
-    
-    void addRole
-    (
-        int user_id, 
-        int role_id
-    );
-    
-    bool deleteRole(
-        int user_id, 
-        int role_id
-    );
+        void checkData(const std::string &phone_number, 
+                       const std::string &password);
+        
+        void addRole(int user_id, 
+                     int role_id);
+        
+        bool deleteRole(int user_id, 
+                        int role_id);
 
 
-    bool checkUserExists(std::string phone_number);
+        bool checkUserExists(std::string phone_number);
+
+        std::list<std::string> refreshTokens(const std::string &refresh_token);
 
     private:
-    std::shared_ptr<UserRepository> repository; // Доступ к БД
+        std::shared_ptr<UserRepository> repository; // Доступ к БД
 };

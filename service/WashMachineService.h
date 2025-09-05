@@ -13,17 +13,18 @@
 using traits = jwt::traits::open_source_parsers_jsoncpp;
 using claim = jwt::basic_claim<traits>;
 
-class WashMachineService{
-public:
-    // Конструктор
-    explicit WashMachineService(const drogon::orm::DbClientPtr& dbClient);
-        
-    std::list<WashMachine> getWashMachines();
+class WashMachineService
+{
+    public:
+        // Конструктор
+        explicit WashMachineService(const drogon::orm::DbClientPtr& dbClient);
+            
+        std::list<WashMachine> getWashMachines();
 
-    void addWashMachine(const std::string name);
+        void addWashMachine(const std::string name);
 
-    bool deleteWashMachine(int id);
+        bool deleteWashMachine(int id);
 
-private:
-    std::shared_ptr<WashMachineRepository> repository; // Доступ к БД
+    private:
+        std::shared_ptr<WashMachineRepository> repository;
 };

@@ -1,14 +1,11 @@
 #include "UserRepository.h"
 // Реализация метода создания пользователя
-UserData UserRepository::createUser(
-    const std::string &phone_number, 
-    const std::string &passwordHash,
-    const std::string &name,
-    const std::string &last_name,
-    const std::string &surname,
-    const std::list<std::string> &document
-)
-
+UserData UserRepository::createUser(const std::string &phone_number, 
+                                    const std::string &passwordHash,
+                                    const std::string &name,
+                                    const std::string &last_name,
+                                    const std::string &surname,
+                                    const std::list<std::string> &document)
 {
     auto trans = db_->newTransaction();
     // 1. Создаём пользователя
@@ -45,7 +42,8 @@ UserData UserRepository::createUser(
     {
         trans->execSqlSync
         (
-            "INSERT INTO users_roles (user_id, role_id) VALUES ($1, $2)",
+            "INSERT INTO users_roles (user_id, role_id) "
+            "VALUES ($1, $2)",
             user.getId(), roleId
         );
     }
@@ -56,25 +54,24 @@ UserData UserRepository::createUser(
 
 bool UserRepository::checkUserExists(const std::string &phone_number)
 {
-    auto result = db_->execSqlSync(
-        "SELECT * FROM users WHERE phone_number = $1", 
+    auto result = db_->execSqlSync
+    (
+        "SELECT * FROM users "
+        "WHERE phone_number = $1", 
         phone_number
     );
-
     return !result.empty();
 }
 
-UserData UserRepository::getUserByPhone(
-    const std::string &phone_number
-) 
-
+UserData UserRepository::getUserByPhone(const std::string &phone_number) 
 {
     auto tran = db_->newTransaction();
     UserData user;
     auto result = tran->execSqlSync
     (
         "SELECT * FROM users u "
-        "WHERE u.phone_number = $1 ", phone_number
+        "WHERE u.phone_number = $1 ", 
+        phone_number
     );
 
     // 2. Проверяем, что результат не пустой
@@ -90,7 +87,8 @@ UserData UserRepository::getUserByPhone(
         "SELECT r.role_type FROM users u " 
         "JOIN users_roles u_r ON u.id = u_r.user_id "
         "JOIN roles r ON u_r.role_id = r.id "
-        "WHERE u.phone_number = $1", phone_number
+        "WHERE u.phone_number = $1", 
+        phone_number
     );
     
     std::list<std::string> role_type;
@@ -105,7 +103,8 @@ UserData UserRepository::getUserByPhone(
     (
         "SELECT u_f.file_path FROM users u " 
         "JOIN user_file u_f ON u.id = u_f.user_id "
-        "WHERE u.phone_number = $1", phone_number
+        "WHERE u.phone_number = $1", 
+        phone_number
     );
 
     std::list<std::string> file_path;
@@ -139,7 +138,8 @@ std::list<UserData> UserRepository::getUsers()
             "SELECT r.role_type FROM users u " 
             "JOIN users_roles u_r ON u.id = u_r.user_id "
             "JOIN roles r ON u_r.role_id = r.id "
-            "WHERE u.id = $1", user_id
+            "WHERE u.id = $1", 
+            user_id
         );
         std::list<std::string> role_type;
         for (int i = 0; i < result_2.size(); i++)
@@ -154,7 +154,8 @@ std::list<UserData> UserRepository::getUsers()
         (
             "SELECT u_f.file_path FROM users u " 
             "JOIN user_file u_f ON u.id = u_f.user_id "
-            "WHERE u.id = $1", user_id
+            "WHERE u.id = $1", 
+            user_id
         );
         std::list<std::string> file_path;
         for (int i = 0; i < result_3.size(); i++)
@@ -167,16 +168,14 @@ std::list<UserData> UserRepository::getUsers()
     return users;
 }
 
-UserData UserRepository::getUser(
-    int id
-)
-
+UserData UserRepository::getUser(int id)
 {
     auto tran = db_->newTransaction();
     auto result = tran->execSqlSync
     (
         "SELECT * FROM users "
-        "WHERE id = $1", id
+        "WHERE id = $1", 
+        id
     );
     
     if (result.empty()) 
@@ -192,7 +191,8 @@ UserData UserRepository::getUser(
     "SELECT r.role_type FROM users u " 
     "JOIN users_roles u_r ON u.id = u_r.user_id "
     "JOIN roles r ON u_r.role_id = r.id "
-    "WHERE u.id = $1", id
+    "WHERE u.id = $1", 
+    id
     );
 
     std::list<std::string> role_type;
@@ -207,7 +207,8 @@ UserData UserRepository::getUser(
     (
         "SELECT u_f.file_path FROM users u " 
         "JOIN user_file u_f ON u.id = u_f.user_id "
-        "WHERE u.id = $1", id
+        "WHERE u.id = $1", 
+        id
     );
     std::list<std::string> file_path;
     for (int i = 0; i < result_3.size(); i++)
@@ -219,28 +220,28 @@ UserData UserRepository::getUser(
     return user;
 }
 
-bool UserRepository::deleteUser(
-    int id
-)
-
+bool UserRepository::deleteUser(int id)
 {
     auto tran = db_->newTransaction();
     tran->execSqlSync
     (
         "DELETE FROM users_roles "
-        "WHERE user_id = $1 ", id
+        "WHERE user_id = $1 ", 
+        id
     );
     
     tran->execSqlSync
     (
         "DELETE FROM user_file "
-        "WHERE user_id = $1 ", id
+        "WHERE user_id = $1 ", 
+        id
     );
     
     auto result = tran->execSqlSync
     (
         "Delete FROM users "
-        "WHERE id = $1 ", id
+        "WHERE id = $1 ", 
+        id
     );
     
     if (result.affectedRows() == 0)
@@ -251,33 +252,25 @@ bool UserRepository::deleteUser(
 }
 
 
-void UserRepository::addRole(
-    int user_id, 
-    int role_id
-) 
-
+void UserRepository::addRole(int user_id, 
+                             int role_id) 
 {
     auto result = db_->execSqlSync
     (
         "INSERT INTO users_roles (user_id, role_id) " 
-        "VALUES ($1, $2) ", user_id, role_id
+        "VALUES ($1, $2) ", 
+        user_id, role_id
     );
 }
 
-bool UserRepository::deleteRole(
-    int user_id, 
-    int role_id
-)
-
+bool UserRepository::deleteRole(int user_id, 
+                                int role_id)
 {
     auto result = db_->execSqlSync
     (
         "DELETE FROM users_roles " 
-        "WHERE user_id = $1 AND role_id = $2", user_id, role_id
+        "WHERE user_id = $1 AND role_id = $2", 
+        user_id, role_id
     );
-    if (result.affectedRows() == 0)
-    {
-        return false;
-    }
-    return true;
+    return !result.affectedRows() == 0;
 }

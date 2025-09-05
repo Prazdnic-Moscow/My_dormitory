@@ -13,55 +13,50 @@ UserService::UserService(const drogon::orm::DbClientPtr& dbClient)
 }
 
 // Регистрация пользователя
-UserData UserService::registerUser(
-    const std::string &phone_number,
-    const std::string &password,
-    const std::string &name,
-    const std::string &last_name,
-    const std::string &surname,
-    const std::list<std::string> &document
-    )
+UserData UserService::registerUser(const std::string &phone_number,
+                                   const std::string &password,
+                                   const std::string &name,
+                                   const std::string &last_name,
+                                   const std::string &surname,
+                                   const std::list<std::string> &document)
 {
 
-    checkData(phone_number, password);
+    checkData(phone_number, 
+              password);
+
     // Хешируем пароль
     std::string passwordHash = BCrypt::generateHash(password);
     // Создаём пользователя в БД
-    try {
-        return repository->createUser(
-            phone_number,
-            passwordHash, 
-            name, 
-            last_name, 
-            surname, 
-            document
-        );
+    try 
+    {
+        return repository->createUser(phone_number,
+                                      passwordHash, 
+                                      name, 
+                                      last_name, 
+                                      surname, 
+                                      document);
     } 
+
     catch (const std::exception &e) 
     {
         throw std::runtime_error(std::string("Failed to register user: ") + e.what());
     }
 }
 
-// Логин
-std::string UserService::login(const std::string &phone_number, const std::string &password)
+std::list<std::string> UserService::login(const std::string &phone_number, 
+                                          const std::string &password)
 {
-    checkData(phone_number, password);
+    checkData(phone_number, 
+              password);
+
     // Получаем пользователя из БД
     UserData user;
-    try 
-    {
-        user = repository->getUserByPhone(phone_number);
-    } 
-    catch (const std::exception &e) 
-    {
-        throw std::runtime_error("User not found");
-    }
-
+    user = repository->getUserByPhone(phone_number);
     std::string db_password_hash = user.getPassword();
 
     // Проверяем пароль
-    if (!BCrypt::validatePassword(password, db_password_hash)) {
+    if (!BCrypt::validatePassword(password, db_password_hash)) 
+    {
         throw std::runtime_error("Invalid password or login");
     }
 
@@ -74,20 +69,95 @@ std::string UserService::login(const std::string &phone_number, const std::strin
         {
             jsonRoles.append(role); // Добавляем каждую роль в массив
         }
-        auto token = jwt::create <traits>()
-            .set_payload_claim("roles",jsonRoles)
-            .set_payload_claim("Id",user.getId())
-            .set_subject(phone_number)
-            .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{24})
-            .sign(jwt::algorithm::hs256{"your_secret_key"});
 
-        return token;
+        // Access token (10 минут)
+        auto access_token = jwt::create<traits>()
+        .set_payload_claim("roles", jsonRoles)
+        .set_payload_claim("Id", user.getId())
+        .set_subject(phone_number)
+        .set_type("access")
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{10})
+        .sign(jwt::algorithm::hs256{"your_secret_key"});
+
+        // Refresh token (7 дней)
+        auto refresh_token = jwt::create<traits>()
+        .set_payload_claim("Id", user.getId())
+        .set_subject(phone_number)
+        .set_type("refresh")
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{168})
+        .sign(jwt::algorithm::hs256{"your_secret_key"});
+
+        // Возвращаем в списке: [access_token, refresh_token]
+        std::list<std::string> tokens;
+        tokens.push_back(access_token);
+        tokens.push_back(refresh_token);
+        return tokens;
     } 
+
     catch (const std::exception &e) 
     {
         throw std::runtime_error(std::string("Token generation failed: ") + e.what());
     }
 }
+
+
+std::list<std::string> UserService::refreshTokens(const std::string &refresh_token)
+{
+    try 
+    {
+        // Декодируем и проверяем refresh token
+        auto decoded = jwt::decode<traits>(refresh_token);
+        
+        if (!Headerhelper::verifyToken(decoded)) 
+        {
+            throw std::runtime_error("Invalid or expired refresh token");
+        }
+
+        if (decoded.get_type() != "refresh") 
+        {
+            throw std::runtime_error("Not a refresh token");
+        }
+
+        // Получаем данные пользователя
+        auto userId = decoded.get_payload_claim("Id").as_integer();
+        UserData user = repository->getUser(userId);
+        
+        std::list<std::string> roles = user.getRoles();
+        Json::Value jsonRoles;
+        for (const auto& role : roles) 
+        {
+            jsonRoles.append(role);
+        }
+
+        // Генерируем новые токены
+        auto new_access_token = jwt::create<traits>()
+            .set_payload_claim("roles", jsonRoles)
+            .set_payload_claim("Id", user.getId())
+            .set_subject(user.getPhoneNumber())
+            .set_type("access")
+            .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{10})
+            .sign(jwt::algorithm::hs256{"your_secret_key"});
+
+        auto new_refresh_token = jwt::create<traits>()
+            .set_payload_claim("Id", user.getId())
+            .set_subject(user.getPhoneNumber())
+            .set_type("refresh")
+            .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{168})
+            .sign(jwt::algorithm::hs256{"your_secret_key"});
+
+        // Возвращаем в списке: [access_token, refresh_token]
+        std::list<std::string> tokens;
+        tokens.push_back(new_access_token);
+        tokens.push_back(new_refresh_token);
+        return tokens;
+    } 
+
+    catch (const std::exception &e) 
+    {
+        throw std::runtime_error(std::string("Token refresh failed: ") + e.what());
+    }
+}
+
 
 std::list<UserData> UserService::getUsers()
 {
@@ -110,9 +180,11 @@ bool UserService::checkUserExists(std::string phone_number)
 }
 
 
-void UserService::checkData(const std::string &phone_number, const std::string &password)
+void UserService::checkData(const std::string &phone_number, 
+                            const std::string &password)
 {
-    if (phone_number.empty() || password.empty()) {
+    if (phone_number.empty() || password.empty()) 
+    {
         throw std::runtime_error("Phone number or password are MULL");
     }
 
@@ -122,12 +194,16 @@ void UserService::checkData(const std::string &phone_number, const std::string &
     }
 }
 
-void UserService::addRole(int user_id, int role_id)
+void UserService::addRole(int user_id, 
+                          int role_id)
 {
-    return repository->addRole(user_id, role_id);
+    return repository->addRole(user_id, 
+                               role_id);
 }
 
-bool UserService::deleteRole(int user_id, int role_id)
+bool UserService::deleteRole(int user_id, 
+                             int role_id)
 {
-    return repository->deleteRole(user_id, role_id);
+    return repository->deleteRole(user_id, 
+                                  role_id);
 }

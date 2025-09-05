@@ -5,27 +5,21 @@
 #include "../model/ReserveWashMachine.h"
 #include <list>
 #include "bcrypt/BCrypt.hpp"
-class WashMachineRepository{
-public:
-    explicit WashMachineRepository(const drogon::orm::DbClientPtr& dbClient) : db_(dbClient) {}
-        
-    ReserveWashMachine  createReserveWashMachine(
-            std::string userId,
-            std::string machineId,
-            std::string date,
-            std::string date_start,
-            float duration);
+class WashMachineRepository
+{
+    public:
+        explicit WashMachineRepository(const drogon::orm::DbClientPtr& dbClient) : db_(dbClient) {}
 
-    std::list<WashMachine> getWashMachines();
+        std::list<WashMachine> getWashMachines();
 
-    bool deleteWashMachine(int id);
+        bool deleteWashMachine(int id);
 
-    void addWashMachine(const std::string &name);
+        void addWashMachine(const std::string &name);
 
-    std::list<ReserveWashMachine> getReserveWashMachines();
+        std::list<ReserveWashMachine> getReserveWashMachines();
 
-    bool deleteReserveWashMachine(int id);
+        bool deleteReserveWashMachine(int id);
 
-private:
-    drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL
+    private:
+        drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL
 };

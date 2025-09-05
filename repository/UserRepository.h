@@ -6,47 +6,34 @@
 #include "bcrypt/BCrypt.hpp"
 class UserRepository 
 {
-public:
-    // Конструктор принимает подключение к БД
-    UserRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
+    public:
+        // Конструктор принимает подключение к БД
+        UserRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
 
-    // Создать пользователя в БД
-    UserData createUser(
-        const std::string &phone_number, 
-        const std::string &passwordHash, 
-        const std::string &name,
-        const std::string &last_name, 
-        const std::string &surname, 
-        const std::list<std::string> &document
-    );
-    
-    UserData getUserByPhone(
-        const std::string &phone_number
-    );
-    
-    std::list<UserData> getUsers();
+        // Создать пользователя в БД
+        UserData createUser(const std::string &phone_number, 
+                            const std::string &passwordHash, 
+                            const std::string &name,
+                            const std::string &last_name, 
+                            const std::string &surname, 
+                            const std::list<std::string> &document);
+        
+        UserData getUserByPhone(const std::string &phone_number);
+        
+        std::list<UserData> getUsers();
 
-    UserData getUser(
-        int id
-    );
-    
-    // Удаление
-    bool deleteUser(
-        int id
-    );
+        UserData getUser(int id);
+        
+        bool deleteUser(int id);
 
-    void addRole(
-        int user_id, 
-        int role_id
-    );
+        void addRole(int user_id, 
+                     int role_id);
 
-    bool deleteRole(
-        int user_id, 
-        int role_id
-    );
+        bool deleteRole(int user_id, 
+                        int role_id);
 
-    bool checkUserExists(const std::string &phone_number);
+        bool checkUserExists(const std::string &phone_number);
 
-private:
-    drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL
+    private:
+        drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL
 };
