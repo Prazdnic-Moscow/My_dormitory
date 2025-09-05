@@ -55,8 +55,6 @@ std::string Headerhelper::getExtension(drogon::ContentType contentType)
         case drogon::CT_APPLICATION_MSWORDX: return ".docx";
         case drogon::CT_IMAGE_JPG: return ".jpg";
         case drogon::CT_IMAGE_PNG: return ".png";
-        case drogon::CT_IMAGE_GIF: return ".gif";
-        case drogon::CT_IMAGE_WEBP: return ".webp";
         case drogon::CT_APPLICATION_PDF: return ".pdf";
         default: 
             throw std::runtime_error("Unsupported file type");

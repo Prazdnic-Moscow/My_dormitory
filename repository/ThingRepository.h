@@ -2,29 +2,27 @@
 #include <drogon/orm/DbClient.h> // Подключение к PostgreSQL
 #include <string>
 #include "../controller/S3Controller.h"
-#include "../model/Tutor.h"
+#include "../model/Thing.h"
 #include <list>
 #include "bcrypt/BCrypt.hpp"
-class TutorRepository 
+class ThingRepository 
 {
 public:
     // Конструктор принимает подключение к БД
-    TutorRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
+    ThingRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
 
     // Создать пользователя в БД
-    Tutor createTutor(
-        const std::string header, 
+    Thing createThing(
+        const std::string type, 
         const std::string body, 
-        const std::string date, 
-        const std::list<std::string> image_path
+        const std::string date,
+        std::list<std::string> thing_paths
     );
     
     // Удаление
-    bool deleteTutor(
-        int id_tutor
-    );
+    bool deleteThing(int id_tutor);
 
-    std::list<Tutor> getTutor();
+    std::list<Thing> getThings();
 
 private:
     drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

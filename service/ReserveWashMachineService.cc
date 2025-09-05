@@ -5,8 +5,8 @@
         repository = std::make_shared<ReserveWashMachineRepository>(dbClient);
     }
 ReserveWashMachine ReserveWashMachineService::createReserveWashMachine(
-        const std::string userId,
-        const std::string machineId,
+        const int userId,
+        const int machineId,
         const std::string date,
         const std::string startTime,
         float duration)

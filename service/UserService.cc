@@ -19,7 +19,7 @@ UserData UserService::registerUser(
     const std::string &name,
     const std::string &last_name,
     const std::string &surname,
-    const std::string &document
+    const std::list<std::string> &document
     )
 {
 
@@ -104,13 +104,20 @@ bool UserService::deleteUser(int id)
     return repository->deleteUser(id);
 }
 
+bool UserService::checkUserExists(std::string phone_number)
+{
+    return repository->checkUserExists(phone_number);
+}
+
+
 void UserService::checkData(const std::string &phone_number, const std::string &password)
 {
     if (phone_number.empty() || password.empty()) {
-        throw std::runtime_error("Phone number and password are required");
+        throw std::runtime_error("Phone number or password are MULL");
     }
 
-    if (phone_number.length() != 11) {
+    if (phone_number.length() != 11) 
+    {
         throw std::runtime_error("Invalid phone number format");
     }
 }

@@ -10,7 +10,7 @@ private:
     std::string name;
     std::string last_name;
     std::string surname;
-    std::string document;
+    std::list<std::string> document;
     std::list<std::string> role_type;
     int id;
 
@@ -23,7 +23,6 @@ private:
        name = result["name"].as<std::string>();
        last_name = result["last_name"].as<std::string>();
        surname = result["surname"].as<std::string>();
-       document = result["document"].as<std::string>();
     }
 
     // Setters
@@ -33,7 +32,7 @@ private:
     void setName(const std::string& name) { this->name = name; }
     void setLastName(const std::string& lastName) { this->last_name = lastName; }
     void setSurname(const std::string& surname) { this->surname = surname; }
-    void setDocument(const std::string& doc) { this->document = doc; }
+    void setDocuments(const std::list<std::string>& path) { document = path; }
     void setRoles(const std::list<std::string>& role) { this->role_type = role; }
 
     // Getters
@@ -43,6 +42,6 @@ private:
     std::string getName() const { return name; }
     std::string getLastName() const { return last_name; }
     std::string getSurname() const { return surname; }
-    std::string getDocument() const { return document; }
+    std::list<std::string> getDocument() const { return document; }
     std::list<std::string> getRoles() const { return role_type; }
 };

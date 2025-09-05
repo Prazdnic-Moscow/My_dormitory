@@ -8,8 +8,8 @@ public:
     explicit ReserveWashMachineRepository(const drogon::orm::DbClientPtr& dbClient) 
         : db_(dbClient) {}
     ReserveWashMachine createReserveWashMachine(
-            const std::string &userId,
-            const std::string &machineId,
+            const int& userId,
+            const int& machineId,
             const std::string &date,
             const std::string &startTime,
             float duration);

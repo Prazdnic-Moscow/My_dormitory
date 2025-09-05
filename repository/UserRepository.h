@@ -17,20 +17,35 @@ public:
         const std::string &name,
         const std::string &last_name, 
         const std::string &surname, 
-        const std::string &document
+        const std::list<std::string> &document
     );
     
-    UserData getUserByPhone(const std::string &phone_number);
+    UserData getUserByPhone(
+        const std::string &phone_number
+    );
     
     std::list<UserData> getUsers();
 
-    UserData getUser(int id);
+    UserData getUser(
+        int id
+    );
     
     // Удаление
-    bool deleteUser(int id);
+    bool deleteUser(
+        int id
+    );
 
-    void addRole(int user_id, int role_id);
-    bool deleteRole(int user_id, int role_id);
+    void addRole(
+        int user_id, 
+        int role_id
+    );
+
+    bool deleteRole(
+        int user_id, 
+        int role_id
+    );
+
+    bool checkUserExists(const std::string &phone_number);
 
 private:
     drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

@@ -1,8 +1,8 @@
 #include "ReserveWashMachineRepository.h"
 
 ReserveWashMachine ReserveWashMachineRepository::createReserveWashMachine(
-        const std::string &userId,
-        const std::string &machineId,
+        const int &userId,
+        const int &machineId,
         const std::string &date,
         const std::string &startTime,
         float duration)

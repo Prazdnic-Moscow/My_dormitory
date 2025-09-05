@@ -12,11 +12,6 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
             callback(resp);
             return;
         }
-        
-        if (!Headerhelper::checkRoles(decode, "wash_machine_write"))
-        {
-            throw std::runtime_error("Access denied: insufficient privileges");
-        }
         // Получаем JSON данные
         auto json = req->getJsonObject();
         if (!json) 
@@ -24,8 +19,8 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
             throw std::runtime_error("Invalid JSON");
         }
         
-        std::string userId = decode.get_payload_claim("Id").as_string();
-        std::string machineId = json->get("machine_id", "").asString();
+        int userId = decode.get_payload_claim("Id").as_integer();
+        int machineId = json->get("machine_id", "").asInt();
         std::string date = json->get("date", "").asString();
         std::string date_start = json->get("date_start", "").asString();
         float duration = json->get("duration", "").asFloat();
@@ -66,11 +61,6 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
             return;
         }
 
-        if (!Headerhelper::checkRoles(decode, "wash_machine_write"))
-        {
-            throw std::runtime_error("Access denied: insufficient privileges");
-        }
-
         // 3. Получаем подключение к БД
         auto dbClient = drogon::app().getDbClient();
         ReserveWashMachineService washmachine(dbClient);
@@ -94,7 +84,7 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
 
     void ReserveWashMachineController::deleteReserveWashMachine(const HttpRequestPtr &req,
                   std::function<void(const HttpResponsePtr&)>&& callback,
-                  int id)
+                  int reserve_id, int user_id)
     {
         std::string token = Headerhelper::getTokenFromHeaders(req);
         auto decode = jwt::decode<traits>(token);
@@ -106,7 +96,7 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
             return;
         }
 
-        if (!Headerhelper::checkRoles(decode, "wash_machine_write"))
+        if (!Headerhelper::checkRoles(decode, "reserve_wash_machine_write") && user_id != decode.get_payload_claim("id").as_integer())
         {
             throw std::runtime_error("Access denied: insufficient privileges");
         }
@@ -114,7 +104,7 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
         // 3. Получаем подключение к БД
         auto dbClient = drogon::app().getDbClient();
         ReserveWashMachineService washmachine(dbClient);
-        auto result = washmachine.deleteReserveWashMachine(id);
+        auto result = washmachine.deleteReserveWashMachine(reserve_id);
         if (!result)
         {
             // 3. Возвращаем 404

@@ -22,6 +22,7 @@ public:
     bool uploadFile(const std::string file_path, const std::vector<uint8_t> data, 
                    const std::string contentType);
     bool deleteFile(const std::string& key);
+    
     std::pair<std::vector<uint8_t>, std::string> downloadFile(const std::string& image_path);
 
 private:
@@ -29,4 +30,5 @@ private:
     std::string url; // URL MinIO сервера (http://localhost:9000)
     std::string key;// Ключ доступа (логин)
     std::string secretkey; // Секретный ключ (пароль)
+    std::shared_ptr<Aws::S3::S3Client> s3Client;
 };

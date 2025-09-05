@@ -19,8 +19,8 @@ public:
     explicit ReserveWashMachineService(const drogon::orm::DbClientPtr& dbClient);
     
     ReserveWashMachine createReserveWashMachine(
-        std::string userId,
-        std::string machineId,
+        int userId,
+        int machineId,
         std::string date,
         std::string start_time,
         float duration);

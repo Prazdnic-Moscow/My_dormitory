@@ -19,7 +19,7 @@ public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(ReserveWashMachineController::postReserveWashMachine, "/reserve", Post);
         ADD_METHOD_TO(ReserveWashMachineController::getReserveWashMachines, "/reserve", Get);
-        ADD_METHOD_TO(ReserveWashMachineController::deleteReserveWashMachine,"/reserve/{}", Delete);
+        ADD_METHOD_TO(ReserveWashMachineController::deleteReserveWashMachine,"/reserve/{}/{}", Delete);
     METHOD_LIST_END
     
     void postReserveWashMachine(const HttpRequestPtr &req,
@@ -30,5 +30,5 @@ public:
 
     void deleteReserveWashMachine(const HttpRequestPtr &req,
                   std::function<void(const HttpResponsePtr&)>&& callback,
-                  int id);
+                  int id, int user_id);
 };

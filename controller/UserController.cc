@@ -2,7 +2,6 @@
 #include <string>
 #include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 void UserController::login(
     const HttpRequestPtr& req,
     std::function<void(const HttpResponsePtr&)>&& callback) 
@@ -64,67 +63,102 @@ void UserController::registerUser(const HttpRequestPtr& req,
     {
         try 
         {
-        // 1. Получаем JSON из запроса
-        auto json = req->getJsonObject();
-        if (!json) 
-        {
-            throw std::runtime_error("Invalid JSON");
+            // 1. Получаем JSON из запроса
+            auto json = req->getJsonObject();
+            if (!json) 
+            {
+                throw std::runtime_error("Invalid JSON");
+            }
+
+            // 2. Извлекаем даные
+            std::string phone_number = json->get("phone_number", "").asString();
+            std::string password = json->get("password", "").asString();
+            std::string name = json->get("name", "").asString();
+            std::string last_name = json->get("last_name", "").asString();
+            std::string surname = json->get("surname", "").asString();
+            // Получаем список изображений (list)
+            std::list<std::string> document_paths;
+            if (json->isMember("document_path") && (*json)["document_path"].isArray()) 
+            {
+                const Json::Value& imagesArray = (*json)["document_path"];
+                for (const auto& doc : imagesArray) 
+                {
+                    std::string path = doc.asString();
+                    if (!path.empty()) 
+                    {
+                        document_paths.push_back(path); // добавляем в list
+                    }
+                }
+            }
+
+            if (phone_number.empty() || password.empty() || name.empty() || last_name.empty() || surname.empty()
+                || document_paths.empty()) 
+            {
+                throw std::runtime_error("phone_number or password or name or last_name or surname or documents or role_type must be not NULL");
+            }
+
+            // 3. Получаем подключение к БД
+            auto dbClient = drogon::app().getDbClient();
+
+            // 4. Создаём сервис
+            UserService userService(dbClient);
+
+            if (userService.checkUserExists(phone_number)) 
+            {
+                auto resp = HttpResponse::newHttpResponse();
+                resp->setStatusCode(k409Conflict);
+                callback(resp);
+                return;
+            }
+
+            // 5. Вызываем метод регистрации
+            auto users = userService.registerUser(
+                phone_number,
+                password,
+                name,
+                last_name,
+                surname,
+                document_paths
+            );
+
+            
+            // Формируем JSON-ответ
+            Json::Value jsonUser;
+            jsonUser["id"] = users.getId();
+            jsonUser["phone_number"] = users.getPhoneNumber();
+            jsonUser["name"] = users.getName();
+            jsonUser["last_name"] = users.getLastName();
+            jsonUser["surname"] = users.getSurname();
+            // Добавляем массив изображений
+            Json::Value jsonFiles(Json::arrayValue);
+            for (const auto& document_path : users.getDocument()) 
+            {
+                jsonFiles.append(document_path);
+            }
+            jsonUser["document_path"] = jsonFiles;
+
+            Json::Value jsonRoles(Json::arrayValue);
+            for (const auto& role : users.getRoles()) 
+            {
+                jsonRoles.append(role);
+            }
+            jsonUser["roles"] = jsonRoles;
+
+
+            //Создаем и настраиваем ответ
+            auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
+            callback(resp);
         }
-
-        // 2. Извлекаем даные
-        std::string phone_number = json->get("phone_number", "").asString();
-        std::string password = json->get("password", "").asString();
-        std::string name = json->get("name", "").asString();
-        std::string last_name = json->get("last_name", "").asString();
-        std::string surname = json->get("surname", "").asString();
-        std::string document = json->get("document", "").asString();
-
-        if (phone_number.empty() || password.empty() || name.empty() || last_name.empty() || surname.empty()
-            || document.empty()) 
+        catch (const std::exception& e) 
         {
-            throw std::runtime_error("phone_number or password or name or last_name or surname or documents or role_type must be not NULL");
+            Json::Value error;
+            error["error"]  = e.what();
+            error["status"] = "error";
+
+            auto resp = HttpResponse::newHttpJsonResponse(error);
+            resp->setStatusCode(k400BadRequest);
+            callback(resp);
         }
-
-        // 3. Получаем подключение к БД
-        auto dbClient = drogon::app().getDbClient();
-
-        // 4. Создаём сервис
-        UserService userService(dbClient);
-
-        // 5. Вызываем метод регистрации
-        auto users = userService.registerUser(
-            phone_number,
-            password,
-            name,
-            last_name,
-            surname,
-            document
-        );
-
-        
-        // Формируем JSON-ответ
-        Json::Value jsonUser;
-        jsonUser["id"] = users.getId();
-        jsonUser["phone_number"] = users.getPhoneNumber();
-        jsonUser["name"] = users.getName();
-        jsonUser["last_name"] = users.getLastName();
-        jsonUser["surname"] = users.getSurname();
-        jsonUser["document"] = users.getDocument();
-
-        //Создаем и настраиваем ответ
-        auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
-        callback(resp);
-    }
-    catch (const std::exception& e) 
-    {
-        Json::Value error;
-        error["error"]  = e.what();
-        error["status"] = "error";
-
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k400BadRequest);
-        callback(resp);
-    }
     }
 
 void UserController::getUsers(const HttpRequestPtr& req,
@@ -159,7 +193,22 @@ void UserController::getUsers(const HttpRequestPtr& req,
             jsonUser["name"] = user.getName();
             jsonUser["last_name"] = user.getLastName();
             jsonUser["surname"] = user.getSurname();
-            jsonUser["ducuments"] = user.getDocument();
+            
+            Json::Value jsonFiles(Json::arrayValue);
+            for (const auto& document_path : user.getDocument()) 
+            {
+                jsonFiles.append(document_path);
+            }
+            jsonUser["document_path"] = jsonFiles;
+
+            Json::Value jsonRoles(Json::arrayValue);
+            for (const auto& role : user.getRoles()) 
+            {
+                jsonRoles.append(role);
+            }
+            jsonUser["roles"] = jsonRoles;
+            
+            
             jsonUsers.append(jsonUser);
         }
 
@@ -188,19 +237,17 @@ void UserController::getUser(const HttpRequestPtr& req,
         UserService userService(dbClient);
         UserData user;
         std::string token = Headerhelper::getTokenFromHeaders(req);
-        // 3. Декодирование JWT с улучшенной обработкой ошибок
         auto decoded = jwt::decode<traits>(token);
         // Проверка id доступа
-        auto idClaim = decoded.get_payload_claim("Id");
-        auto tokenUserId = std::stoi(idClaim.as_string());
+        auto idClaim = decoded.get_payload_claim("Id").as_integer();
         
         if (!Headerhelper::verifyToken(decoded))
         {
             throw std::runtime_error("Token olds");
         }
-        if (!Headerhelper::checkRoles(decoded, "user_read") || user_id != tokenUserId)
+        if (!Headerhelper::checkRoles(decoded, "user_read") || user_id != idClaim)
         {
-            throw std::runtime_error("Not rights Role - User_read or Not needs ID we may delete only your account");
+            throw std::runtime_error("Not rights Role - User_read or Not needs ID we may delete-get only your account");
         }
         
         user = userService.getUser(user_id);
@@ -212,14 +259,19 @@ void UserController::getUser(const HttpRequestPtr& req,
         jsonUser["name"] = user.getName();
         jsonUser["last_name"] = user.getLastName();
         jsonUser["surname"] = user.getSurname();
-        jsonUser["document"] = user.getDocument();
         Json::Value rolesArray(Json::arrayValue); // Создаем JSON-массив
+        Json::Value docArray(Json::arrayValue); // Создаем JSON-массив
         for (const auto& role : user.getRoles())
         {
             rolesArray.append(role); // Добавляем каждую роль в массив
         }
         jsonUser["roles"] = rolesArray; // Добавляем массив в основной объект
 
+        for (const auto& doc : user.getDocument())
+        {
+            docArray.append(doc);
+        }
+        jsonUser["document"] = docArray;
         auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
         callback(resp);
     } 
@@ -245,16 +297,15 @@ void UserController::deleteUser(const HttpRequestPtr& req,
         // 3. Декодирование JWT с улучшенной обработкой ошибок
         auto decoded = jwt::decode<traits>(token);
         //получение ID
-        auto idClaim = decoded.get_payload_claim("Id");
-        auto tokenUserId = std::stoi(idClaim.as_string());
+        auto idClaim = decoded.get_payload_claim("Id").as_integer();
         
         if (!Headerhelper::verifyToken(decoded))
         {
             throw std::runtime_error("Token olds");
         }
-        if (!Headerhelper::checkRoles(decoded, "user_write") || userId != tokenUserId)
+        if (!Headerhelper::checkRoles(decoded, "user_write") && userId != idClaim)
         {
-            throw std::runtime_error("Not rights Role - News_read");
+            throw std::runtime_error("Not rights Role - User_write or Not needs ID we may delete-get only your account");
         }
 
         // 6. Получение данных пользователя
