@@ -2,39 +2,36 @@
 #include <string>
 #include <list>
 #include <memory>
-#include "../model/News.h"
-#include "../repository/NewsRepository.h"
+#include "News.h"
+#include "NewsRepository.h"
 #include <bcrypt/BCrypt.hpp>
 #include <jwt-cpp/jwt.h>
-#include <drogon/drogon.h>
+#include <drogon.h>
 #include <string>
 #include <stdexcept>
 #include <iostream>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 
 class NewsService
 {
-public:
-    // Конструктор
-    explicit NewsService(const drogon::orm::DbClientPtr& dbClient);
 
-    News createNews
-    (
-        std::string header,
-        std::string body,
-        std::string author,
-        std::string date,
-        std::string date_start,
-        std::string date_end,
-        std::list<std::string> image_paths
-    );
+    public:
+        // Конструктор
+        explicit NewsService(const drogon::orm::DbClientPtr& dbClient);
 
-    bool deleteNews(int id_news);
+        News createNews(std::string header,
+                        std::string body,
+                        std::string author,
+                        std::string date,
+                        std::string date_start,
+                        std::string date_end,
+                        std::list<std::string> image_paths);
 
-    std::list<News> getNews(int limit);
+        bool deleteNews(int id_news);
 
-private:
-    std::shared_ptr<NewsRepository> repository; // Доступ к БД
+        std::list<News> getNews(int limit);
+
+    private:
+        std::shared_ptr<NewsRepository> repository; // Доступ к БД
 };

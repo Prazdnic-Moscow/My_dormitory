@@ -2,9 +2,8 @@
 #include <vector>
 #include <ranges>
 #include <json/json.h>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 
 // Конструктор — инициализируем репозиторий
 UserService::UserService(const drogon::orm::DbClientPtr& dbClient)
@@ -27,28 +26,18 @@ UserData UserService::registerUser(const std::string &phone_number,
     // Хешируем пароль
     std::string passwordHash = BCrypt::generateHash(password);
     // Создаём пользователя в БД
-    try 
-    {
-        return repository->createUser(phone_number,
-                                      passwordHash, 
-                                      name, 
-                                      last_name, 
-                                      surname, 
-                                      document);
-    } 
-
-    catch (const std::exception &e) 
-    {
-        throw std::runtime_error(std::string("Failed to register user: ") + e.what());
-    }
+    
+    return repository->createUser(phone_number,
+                                    passwordHash, 
+                                    name, 
+                                    last_name, 
+                                    surname, 
+                                    document);
 }
 
 std::list<std::string> UserService::login(const std::string &phone_number, 
                                           const std::string &password)
 {
-    checkData(phone_number, 
-              password);
-
     // Получаем пользователя из БД
     UserData user;
     user = repository->getUserByPhone(phone_number);
@@ -145,7 +134,6 @@ std::list<std::string> UserService::refreshTokens(const std::string &refresh_tok
             .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{168})
             .sign(jwt::algorithm::hs256{"your_secret_key"});
 
-        // Возвращаем в списке: [access_token, refresh_token]
         std::list<std::string> tokens;
         tokens.push_back(new_access_token);
         tokens.push_back(new_refresh_token);
@@ -188,7 +176,7 @@ void UserService::checkData(const std::string &phone_number,
         throw std::runtime_error("Phone number or password are MULL");
     }
 
-    if (phone_number.length() != 11) 
+    if (phone_number.size() != 11) 
     {
         throw std::runtime_error("Invalid phone number format");
     }

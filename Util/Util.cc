@@ -73,3 +73,39 @@ std::string Headerhelper::getExtension(drogon::ContentType contentType)
             throw std::runtime_error("Unsupported file type");
     }
 }
+
+void Headerhelper::responseCheckJson(const std::function<void(const HttpResponsePtr&)>& callback)
+{
+    Json::Value error;
+    error["error"] = "Invalid JSON format";
+    error["code"] = 400;
+    
+    auto resp = HttpResponse::newHttpJsonResponse(error);
+    resp->setStatusCode(k400BadRequest);
+    callback(resp);
+    return;
+}
+
+void Headerhelper::responseCheckToken(const std::function<void(const HttpResponsePtr&)>& callback)
+ {      
+    Json::Value error;
+    error["error"] = "Invalid or expired token";
+    error["code"] = 401;
+    
+    auto resp = HttpResponse::newHttpJsonResponse(error);
+    resp->setStatusCode(k401Unauthorized);
+    callback(resp);
+    return;
+ }
+
+void Headerhelper::responseCheckRoles(const std::function<void(const HttpResponsePtr&)>& callback)
+{  
+    Json::Value error;
+    error["error"] = "Not right Role";
+    error["code"] = 403;
+    
+    auto resp = HttpResponse::newHttpJsonResponse(error);
+    resp->setStatusCode(k403Forbidden);
+    callback(resp);
+    return;
+}

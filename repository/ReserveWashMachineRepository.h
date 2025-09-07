@@ -1,22 +1,24 @@
 #pragma once
-#include <drogon/orm/DbClient.h>
-#include "../model/ReserveWashMachine.h"
+#include <DbClient.h>
+#include "ReserveWashMachine.h"
 #include <list>
 #include <chrono>
-class ReserveWashMachineRepository {
-public:
-    explicit ReserveWashMachineRepository(const drogon::orm::DbClientPtr& dbClient) 
-        : db_(dbClient) {}
-    ReserveWashMachine createReserveWashMachine(
-            const int& userId,
-            const int& machineId,
-            const std::string &date,
-            const std::string &startTime,
-            float duration);
+class ReserveWashMachineRepository 
+{
+    public:
+        explicit ReserveWashMachineRepository(const drogon::orm::DbClientPtr& dbClient) 
+            : db_(dbClient) {}
+        
+        ReserveWashMachine createReserveWashMachine(const int& userId,
+                                                    const int& machineId,
+                                                    const std::string &date,
+                                                    const std::string &startTime,
+                                                    float duration);
 
-    std::list<ReserveWashMachine> getReserveWashMachines();
-    bool deleteReserveWashMachine(int id);
+        std::list<ReserveWashMachine> getReserveWashMachines();
+        
+        bool deleteReserveWashMachine(int id);
 
     private:
-    drogon::orm::DbClientPtr db_;
+        drogon::orm::DbClientPtr db_;
 };

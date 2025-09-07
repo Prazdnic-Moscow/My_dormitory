@@ -1,18 +1,17 @@
 #pragma once
-#include <drogon/HttpController.h>
-#include <drogon/orm/DbClient.h>
-#include <drogon/drogon.h>
+#include <HttpController.h>
+#include <DbClient.h>
+#include <drogon.h>
 #include <json/json.h>
-#include "../model/Repair.h"
-#include "../Util/Util.h"
-#include "../service/S3Service.h"
-#include "../service/RepairService.h"
+#include "Repair.h"
+#include "Util.h"
+#include "S3Service.h"
+#include "RepairService.h"
 #include <string>
 #include <filesystem>
 #include <jwt-cpp/jwt.h>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 
 using namespace drogon;
 

@@ -2,16 +2,16 @@
 #include <list>
 #include <string>
 #include <memory>
-#include "../model/User.h"
-#include "../Util/Util.h"
-#include "../repository/UserRepository.h"
+#include "User.h"
+#include "Util.h"
+#include "UserRepository.h"
 #include <bcrypt/BCrypt.hpp>
 #include <jwt-cpp/jwt.h>
-#include <drogon/drogon.h>
+#include <drogon.h>
 #include <stdexcept>
 #include <iostream>
-#include <drogon/HttpResponse.h>
-#include <drogon/HttpTypes.h>
+#include <HttpResponse.h>
+#include <HttpTypes.h>
 
 class UserService 
 {

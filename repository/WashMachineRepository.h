@@ -1,8 +1,8 @@
 #pragma once
-#include <drogon/orm/DbClient.h> // Подключение к PostgreSQL
+#include <DbClient.h> // Подключение к PostgreSQL
 #include <string>
-#include "../model/WashMachine.h"
-#include "../model/ReserveWashMachine.h"
+#include "WashMachine.h"
+#include "ReserveWashMachine.h"
 #include <list>
 #include "bcrypt/BCrypt.hpp"
 class WashMachineRepository

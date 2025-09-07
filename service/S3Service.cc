@@ -29,12 +29,8 @@ S3Service::S3Service(const std::string& bucket,
 }
 
 bool S3Service::uploadFile(const std::string file_path, const std::vector<uint8_t> data, 
-                   const std::string contentType)
+                           const std::string contentType)
 {
-    if (data.empty())
-    {
-        throw std::runtime_error("uploadFile: data is empty");
-    }
     // Создание запроса
     Aws::S3::Model::PutObjectRequest request;
     request.SetBucket(bucketName);
@@ -54,20 +50,35 @@ bool S3Service::uploadFile(const std::string file_path, const std::vector<uint8_
     
     if (!outcome.IsSuccess()) 
     {
-        throw std::runtime_error("S3 upload failed: " + outcome.GetError().GetMessage());
+        return false;
     }  
     return true;
 }
 
 bool S3Service:: deleteFile(const std::string& image_path) 
 {
+    Aws::S3::Model::HeadObjectRequest headRequest;
+    headRequest.SetBucket(bucketName);
+    headRequest.SetKey(image_path);
     Aws::S3::Model::DeleteObjectRequest request;
     request.SetBucket(bucketName);
     request.SetKey(image_path);
+
+
+    auto headOutcome = s3Client->HeadObject(headRequest);
+    if (!headOutcome.IsSuccess()) 
+    {
+        if (headOutcome.GetError().GetErrorType() == Aws::S3::S3Errors::RESOURCE_NOT_FOUND) 
+        {
+            return true;
+        }
+        return false;
+    }
+
     auto outcome = s3Client->DeleteObject(request);
     if (!outcome.IsSuccess()) 
     {
-        throw std::runtime_error("Delete failed: " + outcome.GetError().GetMessage());
+        return false;
     }
     return true;
 }
@@ -79,17 +90,10 @@ std::pair<std::vector<uint8_t>, std::string> S3Service:: downloadFile(const std:
     request.SetKey(image_path);
 
     auto outcome = s3Client->GetObject(request);
-
-    if (!outcome.IsSuccess()) 
-    {
-        throw std::runtime_error(outcome.GetError().GetMessage());
-    }
-
     auto& stream = outcome.GetResultWithOwnership().GetBody();
     std::vector<uint8_t> data((std::istreambuf_iterator<char>(stream)),
                                std::istreambuf_iterator<char>());
 
     std::string contentType = outcome.GetResult().GetContentType();
-    
     return { data, contentType };
 }

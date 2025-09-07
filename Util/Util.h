@@ -1,15 +1,14 @@
 #pragma once
-#include <drogon/HttpController.h>
-#include "../service/S3Service.h"
-#include <drogon/orm/DbClient.h>
-#include <drogon/drogon.h>
+#include <HttpController.h>
+#include "S3Service.h"
+#include <DbClient.h>
+#include <drogon.h>
 #include <json/json.h>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 #include <string>
 #include <jwt-cpp/jwt.h>
 using namespace drogon;
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 
 class Headerhelper : public HttpController<Headerhelper>
 {
@@ -24,4 +23,10 @@ class Headerhelper : public HttpController<Headerhelper>
                                 std::string role);
         
         static std::string getExtension(drogon::ContentType contentType);
+
+        static void responseCheckJson(const std::function<void(const HttpResponsePtr&)>& callback);
+
+        static void responseCheckToken(const std::function<void(const HttpResponsePtr&)>& callback);
+
+        static void responseCheckRoles(const std::function<void(const HttpResponsePtr&)>& callback);
 };

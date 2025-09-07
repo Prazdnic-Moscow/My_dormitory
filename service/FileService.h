@@ -2,16 +2,14 @@
 #include <string>
 #include <list>
 #include <memory>
-#include "../model/File.h"
-#include "../repository/FileRepository.h"
-#include <bcrypt/BCrypt.hpp>
+#include "File.h"
+#include "FileRepository.h"
 #include <jwt-cpp/jwt.h>
-#include <drogon/drogon.h>
+#include <drogon.h>
 #include <stdexcept>
 #include <iostream>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
-using claim = jwt::basic_claim<traits>;
 
 class FileService
 {

@@ -17,21 +17,21 @@ std::list<WashMachine> WashMachineRepository::getWashMachines()
     return machines;
 }
 
-    bool WashMachineRepository::deleteWashMachine(int id)
-    {
-        auto result = db_->execSqlSync
-        (
-            "DELETE FROM machines "
-            "WHERE id=$1", id
-        );
-        return result.affectedRows() > 0;
-    }
+bool WashMachineRepository::deleteWashMachine(int id)
+{
+    auto result = db_->execSqlSync
+    (
+        "DELETE FROM machines "
+        "WHERE id=$1", id
+    );
+    return result.affectedRows() > 0;
+}
 
-    void WashMachineRepository::addWashMachine(const std::string &name)
-    {
-        db_->execSqlSync
-        (
-            "INSERT INTO machines(name) "
-            "VALUES($1)", name
-        );
-    }
+void WashMachineRepository::addWashMachine(const std::string &name)
+{
+    db_->execSqlSync
+    (
+        "INSERT INTO machines(name) "
+        "VALUES($1)", name
+    );
+}

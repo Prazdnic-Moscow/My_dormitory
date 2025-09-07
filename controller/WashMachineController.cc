@@ -2,21 +2,18 @@
 void WashMachineController::addWashMachine(const HttpRequestPtr& req,
                                            std::function<void(const HttpResponsePtr&)>&& callback)
 {
-    try
-    {
-        std::string token = Headerhelper::getTokenFromHeaders(req);
+         std::string token = Headerhelper::getTokenFromHeaders(req);
         auto decode = jwt::decode<traits>(token);
         if (!Headerhelper::verifyToken(decode))
         {
-            auto resp = HttpResponse::newHttpResponse();
-            resp->setStatusCode(k401Unauthorized);
-            callback(resp);
+            Headerhelper::responseCheckToken(callback);
             return;
         }
         
         if (!Headerhelper::checkRoles(decode, "wash_machine_write"))
         {
-            throw std::runtime_error("Access denied: insufficient privileges");
+            Headerhelper::responseCheckRoles(callback);
+            return;
         }
         // Получаем JSON данные
         auto json = req->getJsonObject();
@@ -34,11 +31,6 @@ void WashMachineController::addWashMachine(const HttpRequestPtr& req,
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k201Created);
         callback(resp);
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
 }
 
 void WashMachineController::getWashMachines(const HttpRequestPtr& req,
@@ -48,15 +40,14 @@ void WashMachineController::getWashMachines(const HttpRequestPtr& req,
     auto decode = jwt::decode<traits>(token);
     if (!Headerhelper::verifyToken(decode))
     {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
     
     if (!Headerhelper::checkRoles(decode, "wash_machine_read"))
     {
-        throw std::runtime_error("Access denied: insufficient privileges");
+        Headerhelper::responseCheckRoles(callback);
+        return;
     }
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
@@ -84,15 +75,14 @@ void WashMachineController::deleteWashMachine(const HttpRequestPtr& req,
     auto decode = jwt::decode<traits>(token);
     if (!Headerhelper::verifyToken(decode))
     {
-        auto resp = HttpResponse::newHttpResponse();
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
     
     if (!Headerhelper::checkRoles(decode, "wash_machine_write"))
     {
-        throw std::runtime_error("Access denied: insufficient privileges");
+        Headerhelper::responseCheckRoles(callback);
+        return;
     }
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();

@@ -1,10 +1,9 @@
 #pragma once
-#include <drogon/orm/DbClient.h> // Подключение к PostgreSQL
+#include <DbClient.h> // Подключение к PostgreSQL
 #include <string>
-#include "../model/News.h"
-#include "../controller/S3Controller.h"
+#include "News.h"
+#include "S3Controller.h"
 #include <list>
-#include "bcrypt/BCrypt.hpp"
 class NewsRepository 
 {
 public:

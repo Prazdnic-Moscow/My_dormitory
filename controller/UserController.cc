@@ -1,7 +1,8 @@
 #include "UserController.h"
 #include <string>
-#include "jwt-cpp/traits/open-source-parsers-jsoncpp/traits.h"
+#include "traits.h"
 using traits = jwt::traits::open_source_parsers_jsoncpp;
+
 void UserController::login(const HttpRequestPtr& req,
                            std::function<void(const HttpResponsePtr&)>&& callback) 
 {
@@ -9,13 +10,7 @@ void UserController::login(const HttpRequestPtr& req,
     auto json = req->getJsonObject();
     if (!json) 
     {
-        Json::Value error;
-        error["error"] = "Invalid JSON format";
-        error["code"] = 400;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k400BadRequest);
-        callback(resp);
+        Headerhelper::responseCheckJson(callback);
         return;
     }
 
@@ -46,11 +41,7 @@ void UserController::login(const HttpRequestPtr& req,
 
     if (tokens.size() != 2 || tokens.empty()) 
     {
-        Json::Value error;
-        error["error"] = "Invalid phone number or password";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
+        auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k401Unauthorized);
         callback(resp);
         return;
@@ -115,13 +106,7 @@ void UserController::registerUser(const HttpRequestPtr& req,
     auto json = req->getJsonObject();
     if (!json) 
     {
-        Json::Value error;
-        error["error"] = "Invalid JSON format";
-        error["code"] = 400;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k400BadRequest);
-        callback(resp);
+        Headerhelper::responseCheckJson(callback);
         return;
     }
 
@@ -144,6 +129,17 @@ void UserController::registerUser(const HttpRequestPtr& req,
                 document_paths.push_back(path); // добавляем в list
             }
         }
+    }
+
+    if (password.size() < 5)
+    {
+        Json::Value error;
+        error["error"]  = "Password should be > 4 symbol";
+        error["status"] = "error";
+        auto resp = HttpResponse::newHttpJsonResponse(error);
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+        return;
     }
 
     if (phone_number.empty() || password.empty() || name.empty() || last_name.empty() || surname.empty() || document_paths.empty()) 
@@ -206,12 +202,11 @@ void UserController::registerUser(const HttpRequestPtr& req,
     }
     jsonUser["roles"] = jsonRoles;
 
-    //Создаем и настраиваем ответ
-    auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
+    Json::Value message;
+    message["message"] = "User Created!";
+    auto resp = HttpResponse::newHttpJsonResponse(message);
+    resp->setStatusCode(k201Created);
     callback(resp);
-    // auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
-    // resp->setStatusCode(drogon::k201Created);
-    // callback(resp);
 }
 
 void UserController::getUsers(const HttpRequestPtr& req,
@@ -222,25 +217,14 @@ void UserController::getUsers(const HttpRequestPtr& req,
     
     if (!Headerhelper::verifyToken(decoded))
     {
-        Json::Value error;
-        error["error"] = "Invalid or expired token";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
 
     if (!Headerhelper::checkRoles(decoded, "user_read"))
     {
-        Json::Value error;
-        error["error"] = "Not right Role";
-        error["code"] = 403;
         
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k403Forbidden);
-        callback(resp);
+        Headerhelper::responseCheckRoles(callback);
         return;
     }
 
@@ -300,25 +284,13 @@ void UserController::getUser(const HttpRequestPtr& req,
     
     if (!Headerhelper::verifyToken(decoded))
     {
-        Json::Value error;
-        error["error"] = "Invalid authentication token";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
 
-    if (!Headerhelper::checkRoles(decoded, "user_read") || user_id != idClaim)
+    if (!Headerhelper::checkRoles(decoded, "user_read") && user_id != idClaim)
     {
-        Json::Value error;
-        error["error"] = "Not rights Role - User_read or Not needs ID we may delete-get only your account";
-        error["code"] = 403;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k403Forbidden);
-        callback(resp);
+        Headerhelper::responseCheckRoles(callback);
         return;
     }
 
@@ -346,11 +318,13 @@ void UserController::getUser(const HttpRequestPtr& req,
     }
     jsonUser["document"] = docArray;
     auto resp = HttpResponse::newHttpJsonResponse(jsonUser);
+    resp->setStatusCode(k200OK);
     callback(resp);
 }
 
 void UserController::deleteUser(const HttpRequestPtr& req,
-                                std::function<void(const HttpResponsePtr&)>&& callback, int userId)
+                                std::function<void(const HttpResponsePtr&)>&& callback, 
+                                int userId)
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);
     // 3. Декодирование JWT с улучшенной обработкой ошибок
@@ -360,25 +334,13 @@ void UserController::deleteUser(const HttpRequestPtr& req,
     
     if (!Headerhelper::verifyToken(decoded))
     {
-        Json::Value error;
-        error["error"] = "Invalid authentication token";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
 
     if (!Headerhelper::checkRoles(decoded, "user_write") && userId != idClaim)
     {
-        Json::Value error;
-        error["error"] = "Not rights Role - User_write or Not needs ID we may delete-get only your account";
-        error["code"] = 403;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k403Forbidden);
-        callback(resp);
+        Headerhelper::responseCheckRoles(callback);
         return;
     }
 
@@ -417,25 +379,13 @@ void UserController::addRole(const HttpRequestPtr& req,
     
     if (!Headerhelper::verifyToken(decoded))
     {
-        Json::Value error;
-        error["error"] = "Invalid authentication token";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
 
     if (!Headerhelper::checkRoles(decoded, "role_write"))
     {
-        Json::Value error;
-        error["error"] = "Not rights Role - Role_write";
-        error["code"] = 403;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k403Forbidden);
-        callback(resp);
+        Headerhelper::responseCheckRoles(callback);
         return;
     }
 
@@ -463,25 +413,13 @@ void UserController::deleteRole(const HttpRequestPtr& req,
     
     if (!Headerhelper::verifyToken(decoded))
     {
-        Json::Value error;
-        error["error"] = "Invalid authentication token";
-        error["code"] = 401;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k401Unauthorized);
-        callback(resp);
+        Headerhelper::responseCheckToken(callback);
         return;
     }
     
     if (!Headerhelper::checkRoles(decoded, "role_write"))
     {
-        Json::Value error;
-        error["error"] = "Not rights Role - Role_write";
-        error["code"] = 403;
-        
-        auto resp = HttpResponse::newHttpJsonResponse(error);
-        resp->setStatusCode(k403Forbidden);
-        callback(resp);
+        Headerhelper::responseCheckRoles(callback);
         return;
     }
     

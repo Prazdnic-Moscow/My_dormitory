@@ -33,7 +33,6 @@ UserData UserRepository::createUser(const std::string &phone_number,
         }
     }
     user.setDocuments(document);
-    
     // 2. Назначаем роли
     std::vector<int> roleIds = {1, 5, 8, 10, 12};
     std::vector<std::string> roleNames = {"news_read", "user_read", "tutor_read", "file_read", "wash_machine_read"};
@@ -81,7 +80,6 @@ UserData UserRepository::getUserByPhone(const std::string &phone_number)
     }
 
     user.fromDb(result[0]);
-
     auto result_2 = tran->execSqlSync
     (
         "SELECT r.role_type FROM users u " 
@@ -98,7 +96,6 @@ UserData UserRepository::getUserByPhone(const std::string &phone_number)
     }
     user.setRoles(role_type);
 
-
     auto result_3 = tran->execSqlSync
     (
         "SELECT u_f.file_path FROM users u " 
@@ -113,7 +110,6 @@ UserData UserRepository::getUserByPhone(const std::string &phone_number)
         file_path.push_back(result_3[i]["file_path"].as<std::string>());
     }
     user.setDocuments(file_path);
-    
     return user;
 }
 
@@ -130,9 +126,7 @@ std::list<UserData> UserRepository::getUsers()
     {
         UserData user;
         user.fromDb(result[i]);
-
         int user_id = user.getId();
-
         auto result_2 = tran->execSqlSync
         (
             "SELECT r.role_type FROM users u " 
@@ -147,8 +141,6 @@ std::list<UserData> UserRepository::getUsers()
             role_type.push_back(result_2[i]["role_type"].as<std::string>());
         }
         user.setRoles(role_type);
-
-
 
         auto result_3 = tran->execSqlSync
         (
@@ -188,11 +180,11 @@ UserData UserRepository::getUser(int id)
 
     auto result_2 = tran->execSqlSync
     (
-    "SELECT r.role_type FROM users u " 
-    "JOIN users_roles u_r ON u.id = u_r.user_id "
-    "JOIN roles r ON u_r.role_id = r.id "
-    "WHERE u.id = $1", 
-    id
+        "SELECT r.role_type FROM users u " 
+        "JOIN users_roles u_r ON u.id = u_r.user_id "
+        "JOIN roles r ON u_r.role_id = r.id "
+        "WHERE u.id = $1", 
+        id
     );
 
     std::list<std::string> role_type;
@@ -223,6 +215,22 @@ UserData UserRepository::getUser(int id)
 bool UserRepository::deleteUser(int id)
 {
     auto tran = db_->newTransaction();
+    //для начала нужно удалить фотку из minio
+    S3Service s3service("mydormitory");
+    // 1. Получаем все изображения для удаления из MinIO
+    auto files_result = tran->execSqlSync
+    (
+        "SELECT file_path FROM user_file " 
+        "WHERE user_id = $1",
+        id
+    );
+    
+    for (auto num : files_result)
+    {
+        std::string file_path = num["file_path"].as<std::string>();
+        s3service.deleteFile(file_path);
+    }
+
     tran->execSqlSync
     (
         "DELETE FROM users_roles "

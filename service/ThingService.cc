@@ -4,13 +4,10 @@ ThingService::ThingService(const drogon::orm::DbClientPtr& dbClient)
     {
         repository = std::make_shared<ThingRepository>(dbClient);
     }
-Thing ThingService::createThing
-(
-    std::string type,
-    std::string body,
-    std::string date,
-    std::list<std::string> file_path
-)
+Thing ThingService::createThing(std::string type,
+                                std::string body,
+                                std::string date,
+                                std::list<std::string> file_path)
 {
     return repository->createThing(type, body, date, file_path);
 }

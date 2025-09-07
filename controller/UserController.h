@@ -1,12 +1,12 @@
 #pragma once
-#include <drogon/HttpController.h>
-#include "../service/UserService.h"
-#include "../model/User.h"
-#include "../repository/UserRepository.h"
-#include <drogon/orm/DbClient.h>
-#include <drogon/drogon.h>
+#include <HttpController.h>
+#include "UserService.h"
+#include "User.h"
+#include "UserRepository.h"
+#include <DbClient.h>
+#include <drogon.h>
 #include <json/json.h>
-#include "../Util/Util.h"
+#include "Util.h"
 
 using namespace drogon;
 
