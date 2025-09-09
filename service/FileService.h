@@ -17,12 +17,8 @@ public:
     // Конструктор
     explicit FileService(const drogon::orm::DbClientPtr& dbClient);
 
-    File createFile
-    (
-        std::string body,
-        std::string date,
-        std::list<std::string> file_path
-    );
+    File createFile(std::string body,
+                    std::list<std::string> file_path);
 
     bool deleteFile(int id_file);
 

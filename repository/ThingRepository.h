@@ -13,7 +13,6 @@ class ThingRepository
         // Создать пользователя в БД
         Thing createThing(const std::string type, 
                           const std::string body, 
-                          const std::string date,
                           std::list<std::string> thing_paths);
         
         // Удаление

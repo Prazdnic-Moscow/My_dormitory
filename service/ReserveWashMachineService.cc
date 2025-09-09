@@ -23,7 +23,11 @@ ReserveWashMachine ReserveWashMachineService::createReserveWashMachine(const int
 
     if (tp > now && tp <= max_time)
     {
-        return repository->createReserveWashMachine(userId, machineId, date, startTime, duration);
+        return repository->createReserveWashMachine(userId, 
+                                                    machineId, 
+                                                    date, 
+                                                    startTime, 
+                                                    duration);
     }
 
     throw std::runtime_error("Максимальный срок бронирования - 7 дней");

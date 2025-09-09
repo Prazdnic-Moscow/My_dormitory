@@ -94,7 +94,7 @@ file(GLOB SOURCES
     "controller/*.cc"
     "service/*.cc"
     "repository/*.cc"
-    "Util/*.cc"
+    "util/*.cc"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -116,7 +116,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/controller  
     ${CMAKE_SOURCE_DIR}/service   
     ${CMAKE_SOURCE_DIR}/repository
-    ${CMAKE_SOURCE_DIR}/Util      
+    ${CMAKE_SOURCE_DIR}/util      
     ${BCRYPT_INCLUDE_DIR}
 )
 

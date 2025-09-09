@@ -20,26 +20,29 @@ void RepairController::postRepair(const HttpRequestPtr& req,
     // Извлекаем данные из JSON
     std::string type = json->get("type", "").asString();
     std::string body = json->get("body", "").asString();
-    std::string date = json->get("date", "").asString();
     // Получаем массив файлов
     std::list<std::string> repair_paths;
-    if (json->isMember("repair_paths") && (*json)["repair_paths"].isArray()) 
+    if (!json->isMember("repair_paths") || !(*json)["repair_paths"].isArray()) 
     {
-        const Json::Value& filesArray = (*json)["repair_paths"];
-        for (const auto& file : filesArray) 
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    const Json::Value& filesArray = (*json)["repair_paths"];
+    for (const auto& file : filesArray) 
+    {
+        std::string path = file.asString();
+        if (!path.empty()) 
         {
-            std::string path = file.asString();
-            if (!path.empty()) 
-            {
-                repair_paths.push_back(path);
-            }
+            repair_paths.push_back(path);
         }
     }
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
     RepairService repair(dbClient);
-    auto repair_data = repair.createRepair(type, body, date, repair_paths);
+    auto repair_data = repair.createRepair(type, 
+                                           body, 
+                                           repair_paths);
 
     // 3. Формируем JSON-ответ
     Json::Value jsonRepair;

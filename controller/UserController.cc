@@ -118,9 +118,13 @@ void UserController::registerUser(const HttpRequestPtr& req,
     std::string surname = json->get("surname", "").asString();
     // Получаем список изображений (list)
     std::list<std::string> document_paths;
-    if (json->isMember("document_path") && (*json)["document_path"].isArray()) 
+    if (!json->isMember("document_path") || !(*json)["document_path"].isArray()) 
     {
-        const Json::Value& imagesArray = (*json)["document_path"];
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+
+    const Json::Value& imagesArray = (*json)["document_path"];
         for (const auto& doc : imagesArray) 
         {
             std::string path = doc.asString();
@@ -129,7 +133,6 @@ void UserController::registerUser(const HttpRequestPtr& req,
                 document_paths.push_back(path); // добавляем в list
             }
         }
-    }
 
     if (password.size() < 5)
     {
@@ -179,28 +182,28 @@ void UserController::registerUser(const HttpRequestPtr& req,
                                             document_paths);
 
     
-    // Формируем JSON-ответ
-    Json::Value jsonUser;
-    jsonUser["id"] = users.getId();
-    jsonUser["phone_number"] = users.getPhoneNumber();
-    jsonUser["name"] = users.getName();
-    jsonUser["last_name"] = users.getLastName();
-    jsonUser["surname"] = users.getSurname();
+    // // Формируем JSON-ответ
+    // Json::Value jsonUser;
+    // jsonUser["id"] = users.getId();
+    // jsonUser["phone_number"] = users.getPhoneNumber();
+    // jsonUser["name"] = users.getName();
+    // jsonUser["last_name"] = users.getLastName();
+    // jsonUser["surname"] = users.getSurname();
 
-    // Добавляем массив изображений
-    Json::Value jsonFiles(Json::arrayValue);
-    for (const auto& document_path : users.getDocument()) 
-    {
-        jsonFiles.append(document_path);
-    }
-    jsonUser["document_path"] = jsonFiles;
+    // // Добавляем массив изображений
+    // Json::Value jsonFiles(Json::arrayValue);
+    // for (const auto& document_path : users.getDocument()) 
+    // {
+    //     jsonFiles.append(document_path);
+    // }
+    // jsonUser["document_path"] = jsonFiles;
 
-    Json::Value jsonRoles(Json::arrayValue);
-    for (const auto& role : users.getRoles()) 
-    {
-        jsonRoles.append(role);
-    }
-    jsonUser["roles"] = jsonRoles;
+    // Json::Value jsonRoles(Json::arrayValue);
+    // for (const auto& role : users.getRoles()) 
+    // {
+    //     jsonRoles.append(role);
+    // }
+    // jsonUser["roles"] = jsonRoles;
 
     Json::Value message;
     message["message"] = "User Created!";
@@ -293,8 +296,17 @@ void UserController::getUser(const HttpRequestPtr& req,
         Headerhelper::responseCheckRoles(callback);
         return;
     }
-
-    user = userService.getUser(user_id);
+    try
+    {
+        user = userService.getUser(user_id);
+    }
+    catch(const std::exception& e)
+    {
+        std::string err = "User not Found";
+        auto resp = HttpResponse::newHttpJsonResponse(err);
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+    }
 
     // 7. Формирование безопасного ответа (без пароля)
     Json::Value jsonUser;

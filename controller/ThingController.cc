@@ -20,19 +20,20 @@ void ThingController::postThing(const HttpRequestPtr& req,
     // Извлекаем данные из JSON
     std::string type = json->get("type", "").asString();
     std::string body = json->get("body", "").asString();
-    std::string date = json->get("date", "").asString();
     // Получаем массив файлов
     std::list<std::string> thing_paths;
-    if (json->isMember("thing_paths") && (*json)["thing_paths"].isArray()) 
+    if (!json->isMember("thing_paths") || !(*json)["thing_paths"].isArray()) 
     {
-        const Json::Value& filesArray = (*json)["thing_paths"];
-        for (const auto& file : filesArray) 
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    const Json::Value& filesArray = (*json)["thing_paths"];
+    for (const auto& file : filesArray) 
+    {
+        std::string path = file.asString();
+        if (!path.empty()) 
         {
-            std::string path = file.asString();
-            if (!path.empty()) 
-            {
-                thing_paths.push_back(path);
-            }
+            thing_paths.push_back(path);
         }
     }
 
@@ -42,7 +43,6 @@ void ThingController::postThing(const HttpRequestPtr& req,
     
     auto thing_data = thing.createThing(type, 
                                         body, 
-                                        date, 
                                         thing_paths);
 
     // 3. Формируем JSON-ответ

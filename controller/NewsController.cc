@@ -56,7 +56,8 @@ void NewsController::getNews(const HttpRequestPtr& req,
 
 void NewsController::deleteNews(const HttpRequestPtr& req,
                                 std::function<void(const HttpResponsePtr&)>&& callback, 
-                                int id_news)
+                                int id_news, 
+                                int id_user)
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decoded = jwt::decode<traits>(token);
@@ -66,7 +67,7 @@ void NewsController::deleteNews(const HttpRequestPtr& req,
         Headerhelper::responseCheckToken(callback);
         return;
     }
-    if (!Headerhelper::checkRoles(decoded, "news_write"))
+    if (!Headerhelper::checkRoles(decoded, "news_write") && id_user != decoded.get_payload_claim("Id").as_integer())
     {
         Headerhelper::responseCheckRoles(callback);
         return;
@@ -121,21 +122,22 @@ void NewsController::postNews(const HttpRequestPtr& req,
     std::string header = json->get("header", "").asString();
     std::string body = json->get("body", "").asString();
     std::string author = json->get("author", "").asString();
-    std::string date = json->get("date", "").asString();
     std::string date_start = json->get("date_start", "").asString();
     std::string date_end = json->get("date_end", "").asString();
     // Получаем список изображений (list)
     std::list<std::string> image_paths;
-    if (json->isMember("news_path") && (*json)["news_path"].isArray()) 
+    if (!json->isMember("news_path") || !(*json)["news_path"].isArray()) 
     {
-        const Json::Value& imagesArray = (*json)["news_path"];
-        for (const auto& image : imagesArray) 
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    const Json::Value& imagesArray = (*json)["news_path"];
+    for (const auto& image : imagesArray) 
+    {
+        std::string path = image.asString();
+        if (!path.empty()) 
         {
-            std::string path = image.asString();
-            if (!path.empty()) 
-            {
-                image_paths.push_back(path); // добавляем в list
-            }
+            image_paths.push_back(path); // добавляем в list
         }
     }
 
@@ -146,7 +148,6 @@ void NewsController::postNews(const HttpRequestPtr& req,
     auto news_data = news.createNews(header,
                                      body,
                                      author,
-                                     date,
                                      date_start,
                                      date_end,
                                      image_paths);

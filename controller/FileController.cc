@@ -27,19 +27,20 @@ void FileController::postFiles(const HttpRequestPtr& req,
 
     // Извлекаем данные из JSON
     std::string body = json->get("body", "").asString();
-    std::string date = json->get("date", "").asString();
     // Получаем массив файлов
     std::list<std::string> file_paths;
-    if (json->isMember("files_path") && (*json)["files_path"].isArray()) 
+    if (!json->isMember("files_path") || !(*json)["files_path"].isArray()) 
     {
-        const Json::Value& filesArray = (*json)["files_path"];
-        for (const auto& file : filesArray) 
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    const Json::Value& filesArray = (*json)["files_path"];
+    for (const auto& file : filesArray) 
+    {
+        std::string path = file.asString();
+        if (!path.empty()) 
         {
-            std::string path = file.asString();
-            if (!path.empty()) 
-            {
-                file_paths.push_back(path);
-            }
+            file_paths.push_back(path);
         }
     }
 
@@ -47,7 +48,6 @@ void FileController::postFiles(const HttpRequestPtr& req,
     auto dbClient = drogon::app().getDbClient();
     FileService file(dbClient);
     auto file_data = file.createFile(body, 
-                                     date, 
                                      file_paths);
 
     // 3. Формируем JSON-ответ

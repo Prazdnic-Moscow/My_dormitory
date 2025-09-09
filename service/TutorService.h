@@ -22,7 +22,6 @@ class TutorService
         (
             std::string header,
             std::string body,
-            std::string date,
             std::list<std::string> image_path
         );
 

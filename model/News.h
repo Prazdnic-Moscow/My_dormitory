@@ -17,13 +17,13 @@ class News
 
         void fromDb(const drogon::orm::Row &result) 
         { 
-        id = result["id"].as<int>();
-        header = result["header"].as<std::string>();
-        body = result["body"].as<std::string>();
-        author= result["author"].as<std::string>();
-        date = result["date"].as<std::string>();
-        date_start = result["date_start"].as<std::string>();
-        date_end = result["date_end"].as<std::string>();
+            id = result["id"].as<int>();
+            header = result["header"].as<std::string>();
+            body = result["body"].as<std::string>();
+            author= result["author"].as<std::string>();
+            date = result["date"].as<std::string>();
+            date_start = result["date_start"].as<std::string>();
+            date_end = result["date_end"].as<std::string>();
         }
 
     // Setters

@@ -21,14 +21,17 @@ public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(NewsController::postNews, "/news", Post);
         ADD_METHOD_TO(NewsController::getNews, "/news/{}", Get);
-        ADD_METHOD_TO(NewsController::deleteNews, "/news/{}", Delete);
+        ADD_METHOD_TO(NewsController::deleteNews, "/news/{}/{}", Delete);
     METHOD_LIST_END
 
     void getNews(const HttpRequestPtr& req,
-                 std::function<void(const HttpResponsePtr&)>&& callback, int limit);
+                 std::function<void(const HttpResponsePtr&)>&& callback, 
+                 int limit);
 
     void deleteNews(const HttpRequestPtr& req,
-                 std::function<void(const HttpResponsePtr&)>&& callback, int id_news);
+                    std::function<void(const HttpResponsePtr&)>&& callback, 
+                    int id_news,
+                    int id_user);
     
     void postNews(const HttpRequestPtr& req,
                    std::function<void(const HttpResponsePtr&)>&& callback);

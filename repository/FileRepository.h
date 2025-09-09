@@ -11,11 +11,8 @@ class FileRepository
         FileRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
 
         // Создать пользователя в БД
-        File createFile(
-            const std::string body, 
-            const std::string date,
-            std::list<std::string> file_path
-        );
+        File createFile(const std::string body, 
+                        std::list<std::string> file_path);
         
         // Удаление
         bool deleteFile(int id_tutor);

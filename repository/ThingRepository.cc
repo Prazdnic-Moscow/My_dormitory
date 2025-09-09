@@ -2,17 +2,16 @@
     // Создать пользователя в БД
     Thing ThingRepository::createThing(const std::string type, 
                                        const std::string body, 
-                                       const std::string date,
                                        std::list<std::string> thing_paths)
 {
     auto transaction = db_->newTransaction();
     // Создаем запись файла
     auto result = transaction->execSqlSync
     (
-        "INSERT INTO thing (type, body, date) "
-        "VALUES ($1, $2, $3) "
+        "INSERT INTO thing (type, body) "
+        "VALUES ($1, $2) "
         "RETURNING id, type, body, date",
-        type, body, date
+        type, body
     );
     
     Thing thing;

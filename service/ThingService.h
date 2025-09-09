@@ -20,7 +20,6 @@ class ThingService
 
         Thing createThing(std::string type,
                           std::string body,
-                          std::string date,
                           std::list<std::string> file_path);
 
         bool deleteThing(int id_thing);

@@ -8,20 +8,25 @@ NewsService::NewsService(const drogon::orm::DbClientPtr& dbClient)
 News NewsService::createNews(std::string header,
                              std::string body,
                              std::string author,
-                             std::string date,
                              std::string date_start,
                              std::string date_end,
                              std::list<std::string> image_paths)
                              
 {
+
     if (image_paths.size() >= 5)
     {
         throw std::runtime_error("Count files should be < 5");
     }
+
+    if (date_start > date_end)
+    {
+        throw std::runtime_error("Date start must be bigger that date end");
+    }
+
     return repository->createNews(header,
                                   body,
                                   author,
-                                  date,
                                   date_start,
                                   date_end,
                                   image_paths);

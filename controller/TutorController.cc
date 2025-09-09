@@ -27,21 +27,22 @@ void TutorController::postTutor(const HttpRequestPtr& req,
     // Извлекаем данные из JSON
     std::string header = json->get("header", "").asString();
     std::string body = json->get("body", "").asString();
-    std::string date = json->get("date", "").asString();
     // Получаем массив изображений
-        std::list<std::string> image_paths;
-        if (json->isMember("tutor_path") && (*json)["tutor_path"].isArray()) 
+    std::list<std::string> image_paths;
+    if (!json->isMember("tutor_path") || !(*json)["tutor_path"].isArray()) 
+    {
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    const Json::Value& imagesArray = (*json)["tutor_path"];
+    for (const auto& image : imagesArray) 
+    {
+        std::string path = image.asString();
+        if (!path.empty()) 
         {
-            const Json::Value& imagesArray = (*json)["tutor_path"];
-            for (const auto& image : imagesArray) 
-            {
-                std::string path = image.asString();
-                if (!path.empty()) 
-                {
-                    image_paths.push_back(path);
-                }
-            }
+            image_paths.push_back(path);
         }
+    }
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
@@ -49,7 +50,6 @@ void TutorController::postTutor(const HttpRequestPtr& req,
     
     auto tutor_data = tutor.createTutor(header,
                                         body,
-                                        date,
                                         image_paths);
 
     // 3. Формируем JSON-ответ
@@ -65,8 +65,9 @@ void TutorController::postTutor(const HttpRequestPtr& req,
     }
     jsonTutor["tutor_path"] = jsonImages;
 
-    // 4. Создаем и настраиваем ответ
-    auto resp = HttpResponse::newHttpJsonResponse(jsonTutor);
+    //4. Создаем и настраиваем ответ
+    auto message = "Tutor created";
+    auto resp = HttpResponse::newHttpJsonResponse(message);
     resp->setStatusCode(k201Created);
     callback(resp);
 }

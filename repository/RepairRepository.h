@@ -12,12 +12,9 @@ class RepairRepository
         RepairRepository(const drogon::orm::DbClientPtr &dbClient) : db_(dbClient) {}
 
         // Создать пользователя в БД
-        Repair createRepair(
-            const std::string type, 
-            const std::string body, 
-            const std::string date,
-            std::list<std::string> repair_paths
-        );
+        Repair createRepair(const std::string type, 
+                            const std::string body, 
+                            std::list<std::string> repair_paths);
         
         // Удаление
         bool deleteRepair(int id_repair);

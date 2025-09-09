@@ -6,10 +6,11 @@ RepairService::RepairService(const drogon::orm::DbClientPtr& dbClient)
 }
 Repair RepairService::createRepair(std::string type,
                                    std::string body,
-                                   std::string date,
                                    std::list<std::string> repair_path)
 {
-    return repository->createRepair(type ,body, date, repair_path);
+    return repository->createRepair(type, 
+                                    body, 
+                                    repair_path);
 }
 
 

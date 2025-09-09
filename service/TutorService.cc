@@ -6,12 +6,10 @@ TutorService::TutorService(const drogon::orm::DbClientPtr& dbClient)
     }
 Tutor TutorService::createTutor(std::string header,
                                 std::string body,
-                                std::string date,
                                 std::list<std::string> image_path)
 {
     return repository->createTutor(header,
                                    body,
-                                   date,
                                    image_path);
 }
 

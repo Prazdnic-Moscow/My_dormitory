@@ -21,7 +21,6 @@ class RepairService
 
         Repair createRepair(std::string type,
                             std::string body,
-                            std::string date,
                             std::list<std::string> repair_path);
 
         bool deleteRepair(int id_repair);

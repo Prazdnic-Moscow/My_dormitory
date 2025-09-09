@@ -19,8 +19,8 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
     
     int userId = decode.get_payload_claim("Id").as_integer();
     int machineId = json->get("machine_id", "").asInt();
-    std::string date = json->get("date", "").asString();
-    std::string date_start = json->get("date_start", "").asString();
+    std::string date = json->get("date_start", "").asString();
+    std::string time_start = json->get("time_start", "").asString();
     float duration = json->get("duration", "").asFloat();
     
     // 3. Получаем подключение к БД
@@ -29,7 +29,7 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
     auto machine = washmachine.createReserveWashMachine(userId,
                                                         machineId,
                                                         date,
-                                                        date_start,
+                                                        time_start,
                                                         duration);
     
     Json::Value respJson;
@@ -90,7 +90,7 @@ void ReserveWashMachineController::deleteReserveWashMachine(const HttpRequestPtr
         return;
     }
 
-    if (!Headerhelper::checkRoles(decode, "reserve_wash_machine_write") && user_id != decode.get_payload_claim("id").as_integer())
+    if (!Headerhelper::checkRoles(decode, "reserve_wash_machine_write") && user_id != decode.get_payload_claim("Id").as_integer())
     {
         Headerhelper::responseCheckRoles(callback);
         return;
