@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    tools:context=".AvitostanActivity">
+    android:background="@color/white">
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
+        android:id="@+id/avitoToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary_color"
@@ -21,13 +20,13 @@
 
     <!-- Табы категорий -->
     <LinearLayout
-        android:id="@+id/categoryTabsLayout"
+        android:id="@+id/avotoCategory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="6dp"
         android:layout_marginTop="16dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+        app:layout_constraintTop_toBottomOf="@+id/avitoToolbar">
 
         <Button
             android:id="@+id/give"
@@ -75,11 +74,11 @@
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="24dp"
         android:orientation="horizontal"
-        app:layout_constraintTop_toBottomOf="@+id/categoryTabsLayout"
+        app:layout_constraintTop_toBottomOf="@+id/avotoCategory"
         tools:layout_editor_absoluteX="16dp">
 
         <TextView
-            android:id="@+id/sectionTitle"
+            android:id="@+id/avotoTitle"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -100,7 +99,7 @@
 
     <!-- Список объявлений -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/announcementsRecyclerView"
+        android:id="@+id/avitoBody"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:clipToPadding="false"
@@ -110,6 +109,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout"
-        app:layout_constraintVertical_bias="0.637" />
+        app:layout_constraintVertical_bias="0.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

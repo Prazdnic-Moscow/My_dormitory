@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".MainActivity"
+    tools:context=".loginActivity"
     tools:openDrawer="start">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -52,7 +52,7 @@
 
             <!-- Список новостей -->
             <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerViewNews"
+                android:id="@+id/allNews"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:layout_marginTop="8dp"

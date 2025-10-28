@@ -18,7 +18,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="28">
         <activity
-            android:name=".LoginActivity"
+            android:name=".loginActivity"
             android:exported="true"
             android:theme="@style/Theme.MyDormitory.NoActionBar">
             <intent-filter>
@@ -27,42 +27,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
-            android:name=".MainActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".RegisterActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".DocumentsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".LaundryActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".AvitostanActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".GuideActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".StudyRoomActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".GymActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-        <activity
-            android:name=".RepairActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
+            android:name=".registerActivity"
+            android:exported="true"
+            android:theme="@style/Theme.MyDormitory.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
     </application>
 
 </manifest>

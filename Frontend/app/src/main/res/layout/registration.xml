@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/background_color">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- Кнопка возврата -->
+        <Button
+            android:id="@+id/buttonBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginLeft="-15dp"
+            android:text="Назад"
+            android:textColor="@color/primary_color"
+            android:textSize="16sp"
+            android:background="?android:attr/selectableItemBackground"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:gravity="center"
+            android:text="Регистрация"
+            android:textColor="@color/black"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonBack" />
+
+        <TextView
+            android:id="@+id/textViewSubtitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Заполните форму для регистрации"
+            android:textColor="@color/text_secondary"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+        <!-- ПРОСТЫЕ поля для регистрации -->
+
+        <!-- Телефон -->
+        <EditText
+            android:id="@+id/registrationLogin"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:hint="Номер телефона"
+            android:inputType="phone"
+            android:maxLines="1"
+            android:padding="16dp"
+            android:text="+7"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/primary_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSubtitle" />
+
+        <!-- Пароль -->
+        <EditText
+            android:id="@+id/registrationPassword"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:hint="Пароль"
+            android:inputType="textPassword"
+            android:maxLines="1"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/primary_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationLogin" />
+
+        <!-- Имя -->
+        <EditText
+            android:id="@+id/registrationName"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:hint="Имя"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/primary_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationPassword" />
+
+        <!-- Фамилия -->
+        <EditText
+            android:id="@+id/registrationLastName"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:hint="Фамилия"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/primary_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationName" />
+
+        <!-- Отчество -->
+        <EditText
+            android:id="@+id/registrationSurname"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:hint="Отчество (необязательно)"
+            android:inputType="text"
+            android:maxLines="1"
+            android:padding="16dp"
+            android:background="@drawable/edit_text_background"
+            android:textColor="@color/black"
+            android:textColorHint="@color/primary_color"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationLastName" />
+
+        <TextView
+            android:id="@+id/textViewDocumentTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Документ для подтверждения"
+            android:textColor="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationSurname" />
+
+        <TextView
+            android:id="@+id/textViewDocumentDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Загрузите документ, подтверждающий ваше проживание/работу в общежитии"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewDocumentTitle" />
+
+        <!-- Кнопка выбора файла -->
+        <Button
+            android:id="@+id/registrationButtonSelectDocument"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:text="Выбрать PDF документ"
+            android:textSize="16sp"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@color/white"
+            android:drawablePadding="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewDocumentDescription" />
+
+        <TextView
+            android:id="@+id/textViewSelectedFile"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Файл не выбран"
+            android:textColor="@color/text_secondary"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/registrationButtonSelectDocument" />
+
+        <!-- Кнопка регистрации -->
+        <Button
+            android:id="@+id/buttonRegistration"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:text="Зарегистрироваться"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSelectedFile" />
+
+        <!-- Информация -->
+        <TextView
+            android:id="@+id/textViewInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
+            android:text="После регистрации администратор проверит ваши данные и активирует аккаунт"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp"
+            android:textAlignment="center"
+            android:lineSpacingExtra="4dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/buttonRegistration" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
