@@ -1,0 +1,89 @@
+<resources>
+    <string name="app_name">MyDormitory</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="action_settings">Settings</string>
+    
+    <!-- Документы -->
+    <string name="documents_title">Документы</string>
+    <string name="document_templates">Шаблоны документов</string>
+    <string name="payment_receipts">Квитанции для оплаты</string>
+    
+    <!-- Шаблоны документов -->
+    <string name="document_templates_title">Шаблоны документов</string>
+    <string name="guest_mode_application">Заявление на гостевой режим</string>
+    <string name="settlement_application">Заявление на поселение</string>
+    <string name="download">Скачать</string>
+    
+    <!-- Прачечная -->
+    <string name="laundry_title">Прачечная</string>
+    <string name="machine_1">Машина 1</string>
+    <string name="machine_2">Машина 2</string>
+    <string name="machine_3">Машина 3</string>
+    <string name="select_date">Выберите дату</string>
+    <string name="select_start_time">Выберите время начала</string>
+    <string name="duration">Длительность</string>
+    <string name="my_bookings">Мои бронирования</string>
+    
+    <!-- Авитостан -->
+    <string name="avitostan_title">Авитостан</string>
+    <string name="category_give_away">Отдам</string>
+    <string name="category_take">Возьму</string>
+    <string name="category_lost_found">Потеряшки</string>
+    <string name="latest_announcements">Последние объявления</string>
+    <string name="add_announcement">Добавить объявление</string>
+    
+    <!-- Диалог добавления объявления -->
+    <string name="give_away_item">Отдать вещь</string>
+    <string name="ad_type_required">Тип объявления*</string>
+    <string name="title_required">Заголовок*</string>
+    <string name="title_hint">Краткое описание</string>
+    <string name="detailed_description_required">Подробное описание*</string>
+    <string name="description_hint">Опишите детали</string>
+    <string name="contacts_required">Ваши контакты*</string>
+    <string name="contacts_hint">Комната или телеграм</string>
+    <string name="photos_max_3">Фотографии (макс. 3)</string>
+    <string name="add_photo">Добавить фото</string>
+    <string name="publish_announcement">Опубликовать объявление</string>
+    
+    <!-- Гайд -->
+    <string name="guide_title">Гайд</string>
+    <string name="study_room">Учебная комната</string>
+    <string name="study_room_location">1 этаж, рядом с администрацией</string>
+    <string name="study_room_location_detail">Местоположение: 1 этаж, рядом с администрацией</string>
+    <string name="study_room_hours">Время работы: ежедневно с 8:00 до 22:00</string>
+    <string name="study_room_features_title">В учебной комнате есть:</string>
+    <string name="study_room_feature_1">• 10 рабочих мест</string>
+    <string name="study_room_feature_2">• Бесплатный Wi-Fi</string>
+    <string name="study_room_feature_3">• Розетки для зарядки устройств</string>
+    <string name="study_room_feature_4">• Доска для заметок</string>
+    
+    <string name="gym">Спортзал</string>
+    <string name="gym_location">Цокольный этаж, левое крыло</string>
+    <string name="gym_location_detail">Местоположение: цокольный этаж, левое крыло</string>
+    <string name="gym_hours">Время работы: Пн-Пт с 7:00 до 23:00, Сб-Вс с 9:00 до 21:00</string>
+    <string name="gym_features_title">В спортзале доступно:</string>
+    <string name="gym_feature_1">• Тренажеры для силовых тренировок</string>
+    <string name="gym_feature_2">• Беговая дорожка и велотренажеры</string>
+    <string name="gym_feature_3">• Гантели и штанги</string>
+    <string name="gym_feature_4">• Раздевалки с душевыми</string>
+    <string name="gym_access_note">* Для доступа необходим пропуск в спортзал</string>
+    
+    <!-- Ремонт -->
+    <string name="repair_title">Ремонт</string>
+    <string name="plumber">Сантехник</string>
+    <string name="plumber_description">Протечки, засоры, проблемы с сантехникой</string>
+    <string name="carpenter">Плотник</string>
+    <string name="carpenter_description">Мебель, двери, окна, деревянные конструкции</string>
+    <string name="electrician">Электрик</string>
+    <string name="electrician_description">Розетки, выключатели, проблемы с проводкой</string>
+    
+    <!-- Диалог заявки на ремонт -->
+    <string name="room_number">Номер комнаты</string>
+    <string name="room_number_hint">Введите номер комнаты</string>
+    <string name="problem_description">Описание проблемы</string>
+    <string name="problem_description_hint">Опишите проблему подробно</string>
+    <string name="attach_photo">Прикрепить фото</string>
+    <string name="submit_request">Отправить заявку</string>
+    <string name="close">Закрыть</string>
+</resources>
