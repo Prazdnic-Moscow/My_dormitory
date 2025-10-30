@@ -27,7 +27,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/spinner_background"
             android:paddingHorizontal="12dp" />
 
         <!-- Заголовок -->
@@ -45,7 +44,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
             android:hint="@string/title_hint"
             android:inputType="textCapSentences"
             android:paddingHorizontal="12dp"
@@ -66,7 +64,6 @@
             android:layout_width="match_parent"
             android:layout_height="120dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
             android:gravity="top"
             android:hint="@string/description_hint"
             android:inputType="textCapSentences|textMultiLine"
@@ -89,7 +86,6 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginBottom="20dp"
-            android:background="@drawable/edittext_background"
             android:hint="@string/contacts_hint"
             android:inputType="textCapSentences"
             android:paddingHorizontal="12dp"
@@ -118,7 +114,6 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_marginEnd="12dp"
-                android:background="@drawable/add_photo_background"
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?android:attr/selectableItemBackground"
@@ -149,7 +144,6 @@
             android:layout_width="match_parent"
             android:layout_height="56dp"
             android:layout_marginTop="20dp"
-            android:background="@drawable/button"
             android:text="@string/publish_announcement"
             android:textColor="@color/white"
             android:textSize="16sp"

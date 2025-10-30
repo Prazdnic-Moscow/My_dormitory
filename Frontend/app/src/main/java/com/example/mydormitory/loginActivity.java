@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 
@@ -32,6 +34,18 @@ public class loginActivity extends AppCompatActivity
             {
                 String userLogin = login.getText().toString();
                 String userPassword = password.getText().toString();
+                // Простая проверка и переход
+                if (userLogin.isEmpty() || userPassword.isEmpty())
+                {
+                    Toast.makeText(loginActivity.this, "Заполните все поля!", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    // Переход на главный экран
+                    Intent intent = new Intent(loginActivity.this, newsActivity.class);
+                    startActivity(intent);
+                    finish(); // Закрыть экран входа
+                }
             }
         });
 
@@ -40,7 +54,7 @@ public class loginActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-
+                Toast.makeText(loginActivity.this, "Восстановление пароля", Toast.LENGTH_LONG).show();
             }
         });
 

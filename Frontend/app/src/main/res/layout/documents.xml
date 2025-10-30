@@ -3,55 +3,62 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginVertical="8dp"
-    android:background="@drawable/document_template_background"
-    android:elevation="2dp"
-    android:padding="20dp">
+    android:layout_height="match_parent"
+    android:background="@color/white">
 
-    <!-- Заголовок документа -->
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:fontFamily="sans-serif-medium"
+    <LinearLayout
+        android:id="@+id/documentToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/primary_color"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="Заявление на гостевой режим" />
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Детали файла (тип и размер) -->
-    <TextView
-        android:id="@+id/detailsTextView"
+        <!-- Кнопка назад -->
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/primary_color"
+            android:src="@drawable/ic_arrow_right"
+            android:tint="@color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Документы"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/addDocumentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/primary_color"
+            android:src="@drawable/ic_add"
+            android:tint="@color/white" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView для списка документов-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/newsList"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:textColor="@color/text_secondary"
-        android:textSize="14sp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTextView"
-        tools:text="DOCX - 45 KB" />
-
-    <!-- Кнопка скачивания -->
-    <TextView
-        android:id="@+id/downloadTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground"
-        android:clickable="true"
-        android:focusable="true"
-        android:padding="8dp"
-        android:text="@string/download"
-        android:textColor="@color/blue"
-        android:textSize="14sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/detailsTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/documentToolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

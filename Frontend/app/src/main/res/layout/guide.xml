@@ -6,152 +6,59 @@
     android:layout_height="match_parent"
     android:background="@color/white">
 
-    <!-- Toolbar -->
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/guideToolbar"
+    <LinearLayout
+        android:id="@+id/documentToolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="@color/primary_color"
-        android:elevation="4dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:popupTheme="@style/Theme.MyDormitory.PopupOverlay"
-        app:title="@string/guide_title"
-        app:titleTextColor="@color/white" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <!-- Основной контейнер -->
-    <ScrollView
-        android:layout_width="match_parent"
+        <!-- Кнопка назад -->
+        <ImageButton
+            android:id="@+id/menuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/primary_color"
+            android:src="@drawable/ic_arrow_right"
+            android:tint="@color/white" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:layout_marginStart="16dp"
+            android:text="Гайды"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <ImageButton
+            android:id="@+id/addGuideButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:background="@color/primary_color"
+            android:src="@drawable/ic_add"
+            android:tint="@color/white" />
+
+    </LinearLayout>
+
+    <!-- RecyclerView для списка гайдов-->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/guideList"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/guideToolbar">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <!-- Учебная комната -->
-            <LinearLayout
-                android:id="@+id/guideLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/guide_item_background"
-                android:elevation="2dp"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:clickable="true"
-                android:focusable="true">
-
-                <!-- Иконка учебной комнаты -->
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_study_room"
-                    android:tint="@color/grey" />
-
-                <!-- Текст -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/study_room"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/study_room_location"
-                        android:textColor="@color/grey"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- Стрелка -->
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_arrow_right"
-                    android:tint="@color/grey" />
-
-            </LinearLayout>
-
-            <!-- Спортзал -->
-            <LinearLayout
-                android:id="@+id/gymLayout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:background="@drawable/guide_item_background"
-                android:elevation="2dp"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:clickable="true"
-                android:focusable="true">
-
-                <!-- Иконка спортзала -->
-                <ImageView
-                    android:layout_width="48dp"
-                    android:layout_height="48dp"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginEnd="16dp"
-                    android:src="@drawable/ic_gym"
-                    android:tint="@color/grey" />
-
-                <!-- Текст -->
-                <LinearLayout
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/gym"
-                        android:textColor="@color/black"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        android:fontFamily="sans-serif-medium" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:text="@string/gym_location"
-                        android:textColor="@color/grey"
-                        android:textSize="14sp" />
-
-                </LinearLayout>
-
-                <!-- Стрелка -->
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:layout_gravity="center_vertical"
-                    android:src="@drawable/ic_arrow_right"
-                    android:tint="@color/grey" />
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-    </ScrollView>
+        app:layout_constraintTop_toBottomOf="@+id/documentToolbar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
