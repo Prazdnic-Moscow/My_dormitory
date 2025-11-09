@@ -27,7 +27,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/news"
                 android:scaleType="centerInside" />
 
             <TextView
@@ -52,7 +52,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/documents"
                 android:scaleType="centerInside" />
 
             <TextView
@@ -77,7 +77,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/washmachine"
                 android:scaleType="centerInside" />
 
             <TextView
@@ -111,7 +111,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/avito"
                 android:scaleType="centerInside" />
 
             <TextView
@@ -136,13 +136,13 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/guide"
                 android:scaleType="centerInside" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Гайд"
+                android:text="Гайды"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_marginTop="0dp" />
@@ -161,7 +161,7 @@
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/add_button_background"
+                app:srcCompat="@drawable/repair"
                 android:scaleType="centerInside" />
 
             <TextView

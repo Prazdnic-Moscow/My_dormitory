@@ -20,54 +20,51 @@
 
         <activity
             android:name=".loginActivity"
-            android:exported="true"
-            android:theme="@style/Theme.MyDormitory.NoActionBar">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+        android:exported="true"
+        android:theme="@style/Theme.MyDormitory.NoActionBar">
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter>
+    </activity>
 
-        <activity
-            android:name=".registerActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <!-- Остальные активности -->
+    <activity
+        android:name=".registerActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".newsActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".allWidjet"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".documentsActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".reserveMachineActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".avitoStanActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".guideActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".repairActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
+        android:name=".addRepairActivity"
+        android:exported="false"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+</application>
 
-        <activity
-            android:name=".newsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".allWidjet"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".documentsActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".reserveMachineActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".avitoStanActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".guideActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-        <activity
-            android:name=".repairActivity"
-            android:exported="false"
-            android:theme="@style/Theme.MyDormitory.NoActionBar" />
-
-    </application>
-
-</manifest>
+    </manifest>

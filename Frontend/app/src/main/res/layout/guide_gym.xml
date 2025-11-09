@@ -18,19 +18,15 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!-- Кнопка возврата -->
-        <Button
-            android:id="@+id/buttonBack"
+        <!-- Кнопка назад -->
+        <ImageButton
+            android:id="@+id/menuButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginLeft="-15dp"
-            android:text="Назад"
-            android:textColor="@color/white"
-            android:textSize="12sp"
-            android:background="?android:attr/selectableItemBackground"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:background="@color/primary_color"
+            android:src="@drawable/ic_arrow_right"
+            android:tint="@color/white" />
 
         <TextView
             android:layout_width="0dp"
