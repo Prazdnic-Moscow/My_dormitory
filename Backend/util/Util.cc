@@ -70,7 +70,7 @@ std::string Headerhelper::getExtension(drogon::ContentType contentType)
         case drogon::CT_IMAGE_PNG: return ".png";
         case drogon::CT_APPLICATION_PDF: return ".pdf";
         default: 
-            throw std::runtime_error("Unsupported file type");
+            throw std::runtime_error("Unsupported file type " + contentType);
     }
 }
 

@@ -34,15 +34,26 @@ UserData UserRepository::createUser(const std::string &phone_number,
     }
     user.setDocuments(document);
     // 2. Назначаем роли
-    std::vector<int> roleIds = {1, 5, 8, 10, 12};
     std::vector<std::string> roleNames = {"news_read", "user_read", "tutor_read", "file_read", "wash_machine_read"};
 
-    for (int roleId : roleIds) 
+    for (const auto &roleName : roleNames)
     {
+        auto roleResult = trans->execSqlSync
+        (
+            "SELECT id FROM roles WHERE role_type = $1 ",
+            roleName
+        );
+        if (roleResult.empty())
+        {
+            LOG_WARN << "Роль " << roleName << " не найдена!";
+            continue;
+        }
+        
+        int roleId = roleResult[0]["id"].as<int>();
+        // 3. Добавляем связь user-role
         trans->execSqlSync
         (
-            "INSERT INTO users_roles (user_id, role_id) "
-            "VALUES ($1, $2)",
+            "INSERT INTO users_roles (user_id, role_id) VALUES ($1, $2)",
             user.getId(), roleId
         );
     }

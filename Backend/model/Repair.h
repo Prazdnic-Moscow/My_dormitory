@@ -9,7 +9,9 @@ class Repair
     std::string type;
     std::string body;
     std::string date;
+    int room;
     std::list<std::string> repair_paths;
+    int user_id;
 
     public:
         void fromDb(const drogon::orm::Row& result)
@@ -17,7 +19,9 @@ class Repair
             id = result["id"].as<int>();
             type = result["type"].as<std::string>();
             body = result["body"].as<std::string>();
+            room = result["room"].as<int>();
             date = result["date"].as<std::string>();
+            user_id = result["user_id"].as<int>();
         }
 
         // Setters
@@ -41,9 +45,19 @@ class Repair
             this->date = date_thing;
         }
 
+        void setRoom(const int& room_student)
+        {
+            this->room = room_student;
+        }
+
         void setRepairPaths(const std::list<std::string>& paths)
         {
             repair_paths = paths;
+        }
+
+        void setUserId(int userId)
+        {
+            user_id = userId;
         }
 
         // Getters
@@ -65,6 +79,16 @@ class Repair
         std::string getDate() const
         {
             return date;
+        }
+
+        int getRoom() const
+        {
+            return room;
+        }
+
+        int getUserId() const
+        {
+            return user_id;
         }
 
         std::list<std::string>& getRepairPaths()

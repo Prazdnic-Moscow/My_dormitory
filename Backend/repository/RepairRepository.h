@@ -14,7 +14,9 @@ class RepairRepository
         // Создать пользователя в БД
         Repair createRepair(const std::string type, 
                             const std::string body, 
-                            std::list<std::string> repair_paths);
+                            int room,
+                            std::list<std::string> repair_paths,
+                            int user_id);
         
         // Удаление
         bool deleteRepair(int id_repair);

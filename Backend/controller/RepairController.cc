@@ -10,6 +10,7 @@ void RepairController::postRepair(const HttpRequestPtr& req,
         Headerhelper::responseCheckToken(callback);
         return;
     }
+    int user_id = decoded.get_payload_claim("Id").as_integer();
     // Получаем JSON данные
     auto json = req->getJsonObject();
     if (!json) 
@@ -20,6 +21,7 @@ void RepairController::postRepair(const HttpRequestPtr& req,
     // Извлекаем данные из JSON
     std::string type = json->get("type", "").asString();
     std::string body = json->get("body", "").asString();
+    int room = json->get("room", "").asInt();
     // Получаем массив файлов
     std::list<std::string> repair_paths;
     if (!json->isMember("repair_paths") || !(*json)["repair_paths"].isArray()) 
@@ -36,19 +38,28 @@ void RepairController::postRepair(const HttpRequestPtr& req,
             repair_paths.push_back(path);
         }
     }
+    if (type != "plumber" && type != "carpenter" && type != "electrician")
+    {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+    }
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
     RepairService repair(dbClient);
     auto repair_data = repair.createRepair(type, 
                                            body, 
-                                           repair_paths);
+                                           room,
+                                           repair_paths,
+                                           user_id);
 
     // 3. Формируем JSON-ответ
     Json::Value jsonRepair;
     jsonRepair["id"] = repair_data.getId();
     jsonRepair["type"] = repair_data.getType();
     jsonRepair["body"] = repair_data.getBody();
+    jsonRepair["room"] = repair_data.getRoom();
     jsonRepair["date"] = repair_data.getDate();
     // Добавляем массив изображений
     Json::Value jsonImages(Json::arrayValue);
@@ -86,6 +97,7 @@ void RepairController::getRepairs(const HttpRequestPtr& req,
         Json::Value jsonRepair;
         jsonRepair["id"] = repairs.getId();
         jsonRepair["body"] = repairs.getBody();
+        jsonRepair["room"] = repairs.getRoom();
         jsonRepair["date"] = repairs.getDate();
         // Добавляем массив изображений
         Json::Value jsonImages(Json::arrayValue);
@@ -130,7 +142,6 @@ void RepairController::deleteRepair(const HttpRequestPtr& req,
     if (!result)
     {
         auto resp = HttpResponse::newHttpResponse();
-        // 3. Возвращаем 204 No Content
         resp->setStatusCode(k404NotFound);
         callback(resp);
     }

@@ -66,7 +66,8 @@ public class avitoStanActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(avitoStanActivity.this, "Добавление открыли!",Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent (avitoStanActivity.this, addAvitoActivity.class);
+                startActivity(intent);
             }
         });
     }

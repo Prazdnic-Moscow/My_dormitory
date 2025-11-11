@@ -38,13 +38,13 @@
     <string name="ad_type_required">Тип объявления*</string>
     <string name="title_required">Заголовок*</string>
     <string name="title_hint">Краткое описание</string>
-    <string name="detailed_description_required">Подробное описание*</string>
+    <string name="detailed_description_required">Подробное описание проблемы</string>
     <string name="description_hint">Опишите детали</string>
-    <string name="contacts_required">Ваши контакты*</string>
-    <string name="contacts_hint">Комната или телеграм</string>
+    <string name="contacts_required">Ваши контакты</string>
+    <string name="contacts_hint">Ваша комната</string>
     <string name="photos_max_3">Фотографии (макс. 3)</string>
     <string name="add_photo">Добавить фото</string>
-    <string name="publish_announcement">Опубликовать объявление</string>
+    <string name="publish_announcement">Отправить заявку</string>
 
     <!-- Гайд -->
     <string name="guide_title">Гайд</string>

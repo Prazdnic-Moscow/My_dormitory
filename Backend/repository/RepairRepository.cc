@@ -2,16 +2,18 @@
 // Создать пользователя в БД
     Repair RepairRepository::createRepair(const std::string type, 
                                           const std::string body, 
-                                          std::list<std::string> repair_paths)
+                                          int room,
+                                          std::list<std::string> repair_paths,
+                                          int user_id)
 {
     auto transaction = db_->newTransaction();
     // Создаем запись файла
     auto result = transaction->execSqlSync
     (
-        "INSERT INTO repair (type, body) "
-        "VALUES ($1, $2) "
-        "RETURNING id, type, body, date",
-        type, body
+        "INSERT INTO repair (type, body, room, user_id) "
+        "VALUES ($1, $2, $3, $4) "
+        "RETURNING id, type, body, room, date, user_id",
+        type, body, room, user_id
     );
     
     Repair repair;

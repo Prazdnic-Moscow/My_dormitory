@@ -21,7 +21,7 @@
 
         <!-- Кнопка назад -->
         <ImageButton
-            android:id="@+id/backToRepairButton"
+            android:id="@+id/backToAvitoButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -57,6 +57,43 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Тип объявления -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/ad_type_required"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/categorySpinner"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                android:paddingHorizontal="12dp" />
+
+            <!-- Заголовок -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/title_required"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/titleEditText"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                android:hint="@string/title_hint"
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="12dp"
+                android:textSize="16sp" />
+
             <!-- Подробное описание -->
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +105,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/detailsEditTextRepair"
+                android:id="@+id/descriptionEditText"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_marginBottom="20dp"
@@ -90,7 +127,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/roomsEditTextRepair"
+                android:id="@+id/contactsEditText"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="20dp"
@@ -118,7 +155,7 @@
 
                 <!-- Кнопка добавления фото -->
                 <LinearLayout
-                    android:id="@+id/addPhotoLinearLayout"
+                    android:id="@+id/addPhotoButton"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginEnd="12dp"
@@ -146,25 +183,12 @@
 
             </LinearLayout>
 
-            <HorizontalScrollView
-                android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginTop="-25dp">
-
-                <LinearLayout
-                    android:id="@+id/imagesContainer"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
-
             <!-- Кнопка публикации -->
 
             <Button
                 android:id="@+id/publishButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginTop="20dp"
                 android:backgroundTint="@color/primary_color"
                 android:text="@string/publish_announcement"
                 android:textColor="@color/white"
