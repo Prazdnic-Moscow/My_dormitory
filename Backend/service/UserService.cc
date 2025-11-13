@@ -65,7 +65,7 @@ std::list<std::string> UserService::login(const std::string &phone_number,
         .set_payload_claim("Id", user.getId())
         .set_subject(phone_number)
         .set_type("access")
-        .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{10})
+        .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{1})
         .sign(jwt::algorithm::hs256{"your_secret_key"});
 
         // Refresh token (7 дней)
@@ -124,7 +124,7 @@ std::list<std::string> UserService::refreshTokens(const std::string &refresh_tok
             .set_payload_claim("Id", user.getId())
             .set_subject(user.getPhoneNumber())
             .set_type("access")
-            .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{10})
+            .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{1})
             .sign(jwt::algorithm::hs256{"your_secret_key"});
 
         auto new_refresh_token = jwt::create<traits>()
@@ -176,7 +176,7 @@ void UserService::checkData(const std::string &phone_number,
         throw std::runtime_error("Phone number or password are MULL");
     }
 
-    if (phone_number.size() != 11) 
+    if (phone_number.size() != 11 && phone_number.size() != 12) 
     {
         throw std::runtime_error("Invalid phone number format");
     }

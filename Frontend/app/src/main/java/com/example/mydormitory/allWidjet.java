@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class allWidjet extends AppCompatActivity
 {
-    private ImageButton openNewsButton, openDocumentButton, openMachineButton, openAvitostanButton, openGuideButton, openRepairButton;
+    private ImageButton openNewsButton, openDocumentButton, openMachineButton, openAvitostanButton, openGuideButton, openRepairButton, exitButton;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -21,6 +21,7 @@ public class allWidjet extends AppCompatActivity
         openAvitostanButton = findViewById(R.id.openAvitostanButton);
         openGuideButton = findViewById(R.id.openGuideButton);
         openRepairButton = findViewById(R.id.openRepairButton);
+        exitButton = findViewById(R.id.exitButton);
 
         openNewsButton.setOnClickListener(new View.OnClickListener()
         {
@@ -28,6 +29,17 @@ public class allWidjet extends AppCompatActivity
             public void onClick(View v)
             {
                 Intent intent = new Intent (allWidjet.this, newsActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        exitButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent (allWidjet.this, loginActivity.class);
                 startActivity(intent);
                 finish();
             }

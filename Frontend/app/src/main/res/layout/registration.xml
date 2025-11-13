@@ -180,23 +180,32 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textViewDocumentDescription" />
 
-        <TextView
-            android:id="@+id/textViewSelectedFile"
-            android:layout_width="wrap_content"
+        <!-- Контейнер для отображения выбранных файлов -->
+        <ScrollView
+            android:id="@+id/scrollFiles"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Файл не выбран"
-            android:textColor="@color/text_secondary"
-            android:textSize="14sp"
+            android:layout_marginTop="5dp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/registrationButtonSelectDocument" />
+            app:layout_constraintTop_toBottomOf="@id/registrationButtonSelectDocument">
+
+            <LinearLayout
+                android:id="@+id/filesContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="4dp"
+                android:gravity="center_vertical"/>
+        </ScrollView>
+
 
         <!-- Кнопка регистрации -->
         <Button
             android:id="@+id/buttonRegistration"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="5dp"
             android:text="Зарегистрироваться"
             android:textSize="16sp"
             android:textStyle="bold"
@@ -204,7 +213,8 @@
             android:textColor="@color/white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textViewSelectedFile" />
+            app:layout_constraintTop_toBottomOf="@+id/scrollFiles" />
+
 
         <!-- Информация -->
         <TextView

@@ -2,10 +2,12 @@ package com.example.mydormitory;
 
 import android.content.ContentResolver;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Button;
@@ -52,7 +54,21 @@ public class addRepairActivity extends AppCompatActivity
         roomsEditTextRepair = findViewById(R.id.roomsEditTextRepair);
         addPhotoLinearLayout = findViewById(R.id.addPhotoLinearLayout);
         imagesContainer = findViewById(R.id.imagesContainer);
+        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        String accessToken = prefs.getString("access_token", null);
+        String refreshToken = prefs.getString("refresh_token", null);
 
+        if (accessToken != null)
+        {
+            // Можно использовать токен в запросах
+            Log.d("TOKEN", "Access: " + accessToken);
+        }
+        else
+        {
+            // Пользователь не авторизован
+            startActivity(new Intent(this, loginActivity.class));
+            finish();
+        }
 
         backToRepairButton.setOnClickListener(new View.OnClickListener()
         {
@@ -108,7 +124,7 @@ public class addRepairActivity extends AppCompatActivity
                             }
 
                             // 2. Отправляем данные о ремонте
-                            sendRepairData(details, rooms, photoPaths, repairType);
+                            sendRepairData(details, rooms, photoPaths, repairType, accessToken, refreshToken);
 
                             // Показываем успех
                             runOnUiThread(() -> {
@@ -129,7 +145,6 @@ public class addRepairActivity extends AppCompatActivity
             }
         });
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
@@ -193,8 +208,6 @@ public class addRepairActivity extends AppCompatActivity
         imagesContainer.addView(imageLayout);
     }
 
-    // Простой метод загрузки фото
-    // Метод загрузки фото на сервер
     private String uploadPhoto(Uri imageUri) throws Exception
     {
         String uploadUrl = "http://10.0.2.2:3000/file/repair";
@@ -243,32 +256,55 @@ public class addRepairActivity extends AppCompatActivity
         return jsonResponse.getString("file_path");
     }
 
-    // Метод отправки данных о ремонте
-    private void sendRepairData(String details, int rooms, List<String> photos, String repairType) throws Exception
+    private void sendRepairData(String details,
+                                int rooms, List<String> photos,
+                                String repairType,
+                                String accessToken,
+                                String refreshToken) throws Exception
     {
         String apiUrl = "http://10.0.2.2:3000/repair";
-        String token = "eyJhbGciOiJIUzI1NiIsInR5cCI6ImFjY2VzcyJ9.eyJJZCI6NywiZXhwIjoxNzYyODkwNzAzLCJyb2xlcyI6WyJuZXdzX3JlYWQiLCJ1c2VyX3JlYWQiLCJ0dXRvcl9yZWFkIiwiZmlsZV9yZWFkIiwid2FzaF9tYWNoaW5lX3JlYWQiXSwic3ViIjoiODkxMzA0NzU5MDkifQ.shTwiBB8hTgXrsvcqW3MgkkbRHViZJMEXOQqc3M60cY"; // ← сюда реальный JWT
 
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("body", details);
         jsonBody.put("room", rooms);
         jsonBody.put("type", repairType);
-        JSONArray jsonPhotos = new JSONArray(photos);
-        jsonBody.put("repair_paths", jsonPhotos);
+        jsonBody.put("repair_paths", new JSONArray(photos));
 
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; utf-8");
-        connection.setRequestProperty("Authorization", "Bearer " + token);
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
         connection.setDoOutput(true);
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8"));
-        writer.write(jsonBody.toString());
-        writer.flush();
-        writer.close();
+        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(connection.getOutputStream(), "UTF-8")))
+        {
+            writer.write(jsonBody.toString());
+        }
 
         int responseCode = connection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_CREATED && responseCode != HttpURLConnection.HTTP_OK)
+
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+        {
+            //токен устарел → делаем запрос на бек /refresh
+            connection.disconnect();
+            if (refreshAccessToken(refreshToken))
+            {
+                // читаем новые токены из SharedPreferences
+                SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                String newAccess = prefs.getString("access_token", null);
+                String newRefresh = prefs.getString("refresh_token", null);
+
+                // повторяем исходный запрос с новым токеном
+                sendRepairData(details, rooms, photos, repairType, newAccess, newRefresh);
+                return;
+            }
+            else
+            {
+                throw new Exception("Токен устарел и обновить не удалось");
+            }
+        }
+
+        if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_CREATED)
         {
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
             StringBuilder errorResponse = new StringBuilder();
@@ -282,5 +318,56 @@ public class addRepairActivity extends AppCompatActivity
         }
 
         connection.disconnect();
+    }
+
+    private boolean refreshAccessToken(String refreshToken)
+    {
+        try
+        {
+            String refreshUrl = "http://10.0.2.2:3000/refresh";
+
+            JSONObject jsonBody = new JSONObject();
+            jsonBody.put("refresh_token", refreshToken);
+
+            HttpURLConnection conn = (HttpURLConnection) new URL(refreshUrl).openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            conn.setDoOutput(true);
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(conn.getOutputStream(), "UTF-8")))
+            {
+                writer.write(jsonBody.toString());
+            }
+
+            int code = conn.getResponseCode();
+            if (code == HttpURLConnection.HTTP_OK)
+            {
+                String response = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"))
+                        .lines().reduce("", (acc, line) -> acc + line);
+
+                JSONObject json = new JSONObject(response);
+                String newAccess = json.getString("access_token");
+                String newRefresh = json.getString("refresh_token");
+
+                // сохраняем новые токены
+                getSharedPreferences("MyAppPrefs", MODE_PRIVATE)
+                        .edit()
+                        .putString("access_token", newAccess)
+                        .putString("refresh_token", newRefresh)
+                        .apply();
+
+                conn.disconnect();
+                return true;
+            }
+
+            conn.disconnect();
+            return false;
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

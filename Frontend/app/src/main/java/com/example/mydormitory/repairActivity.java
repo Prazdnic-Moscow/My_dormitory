@@ -1,7 +1,9 @@
 package com.example.mydormitory;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -21,7 +23,6 @@ public class repairActivity extends AppCompatActivity
         plumberLayout = findViewById(R.id.plumberLayout);
         carpenterLayout = findViewById(R.id.carpenterLayout);
         electricianLayout = findViewById(R.id.electricianLayout);
-
 
         menuButton.setOnClickListener(new View.OnClickListener()
         {

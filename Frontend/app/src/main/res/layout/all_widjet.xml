@@ -11,32 +11,32 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_marginTop="70sp"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="32dp"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openNewsButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/news"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/news" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Новости"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -44,24 +44,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openDocumentButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/documents"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/documents" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Документы"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -69,24 +69,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openMachineButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/washmachine"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/washmachine" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Прачечная"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -96,31 +96,31 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="32dp"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openAvitostanButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/avito"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/avito" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Авитостан"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -128,24 +128,24 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openGuideButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/guide"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/guide" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Гайды"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
 
         </LinearLayout>
 
@@ -153,26 +153,60 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:gravity="center">
+            android:gravity="center"
+            android:orientation="vertical">
 
             <ImageButton
                 android:id="@+id/openRepairButton"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                app:srcCompat="@drawable/repair"
-                android:scaleType="centerInside" />
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/repair" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
                 android:text="Ремонт"
                 android:textSize="14sp"
-                android:textStyle="bold"
-                android:layout_marginTop="0dp" />
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/exitButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/exit" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:text="Выйти"
+                android:textSize="14sp"
+                android:layout_marginLeft="-10dp"
+                android:textStyle="bold" />
+
+
+        </LinearLayout>
+    </LinearLayout>
+
 
 </LinearLayout>

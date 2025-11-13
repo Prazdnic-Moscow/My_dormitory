@@ -15,9 +15,14 @@ void UserController::login(const HttpRequestPtr& req,
     }
 
     // 2. Извлекаем номер и пароль
-    std::string phone_number = json->get("phone_number", "").asString();
+    std::string phone_numberWithPlus7 = json->get("phone_number", "").asString();
     std::string password = json->get("password", "").asString();
 
+    if (phone_numberWithPlus7[0] == '8')
+    {
+        phone_numberWithPlus7 = "+7" + phone_numberWithPlus7.substr(1);
+    }
+    std::string phone_number = phone_numberWithPlus7;
     if (phone_number.empty() || password.empty()) 
     {
         Json::Value error;
@@ -29,6 +34,7 @@ void UserController::login(const HttpRequestPtr& req,
         callback(resp);
         return;
     }
+    LOG_ERROR << "Phone number: " << phone_number;
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
@@ -172,6 +178,7 @@ void UserController::registerUser(const HttpRequestPtr& req,
         callback(resp);
         return;
     }
+    LOG_ERROR << "Phone number: " << phone_number;
 
     // 5. Вызываем метод регистрации
     auto users = userService.registerUser(phone_number,
