@@ -67,6 +67,7 @@
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
+            <!-- Подробное описание -->
             <EditText
                 android:id="@+id/headersEditTextGuide"
                 android:layout_width="match_parent"
@@ -77,7 +78,6 @@
                 android:paddingHorizontal="12dp"
                 android:textSize="16sp" />
 
-            <!-- Подробное описание -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

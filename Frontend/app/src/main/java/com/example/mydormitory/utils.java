@@ -6,6 +6,8 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
@@ -28,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -85,6 +88,55 @@ public class utils {
 
         JSONObject jsonResponse = new JSONObject(response.toString());
         return jsonResponse.getString("file_path");
+    }
+
+    public static Bitmap downloadImageFromServer(String imagePath) throws Exception {
+        String downloadUrl = "http://10.0.2.2:3000/file" + imagePath;
+        Log.d("IMAGE_DEBUG", "🔄 Loading image: " + downloadUrl);
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(downloadUrl).openConnection();
+        connection.setRequestMethod("GET");
+
+        try {
+            int responseCode = connection.getResponseCode();
+            Log.d("IMAGE_DEBUG", "📊 Response code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream inputStream = connection.getInputStream();
+
+                // Читаем все данные в массив байтов
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    byteArrayOutputStream.write(buffer, 0, bytesRead);
+                }
+
+                byte[] imageData = byteArrayOutputStream.toByteArray();
+                Log.d("IMAGE_DEBUG", "📦 Received " + imageData.length + " bytes");
+
+                // Пробуем создать Bitmap из байтов
+                Bitmap bitmap = BitmapFactory.decodeByteArray(imageData, 0, imageData.length);
+
+                inputStream.close();
+                byteArrayOutputStream.close();
+
+                if (bitmap == null) {
+                    Log.e("IMAGE_DEBUG", "❌ BitmapFactory returned null - invalid image data");
+                    throw new Exception("Invalid image data received");
+                }
+
+                Log.d("IMAGE_DEBUG", "✅ Successfully created bitmap: " + bitmap.getWidth() + "x" + bitmap.getHeight());
+                return bitmap;
+            } else {
+                throw new Exception("HTTP error: " + responseCode);
+            }
+        } catch (Exception e) {
+            Log.e("IMAGE_DEBUG", "💥 Exception: " + e.getMessage());
+            throw e;
+        } finally {
+            connection.disconnect();
+        }
     }
 
 

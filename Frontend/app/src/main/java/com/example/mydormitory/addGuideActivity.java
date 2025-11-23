@@ -120,11 +120,18 @@ public class addGuideActivity extends AppCompatActivity
                             }
 
                             // 2. Отправляем данные о ремонте
-                            sendGuideData(header, detail, photoPaths, accessToken, refreshToken);
+                            sendGuideData(header,
+                                          detail,
+                                          photoPaths,
+                                          accessToken,
+                                          refreshToken);
 
                             // Показываем успех
                             runOnUiThread(() -> {
                                 Toast.makeText(addGuideActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(addGuideActivity.this, guideActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
                                 finish();
                             });
 
@@ -205,8 +212,8 @@ public class addGuideActivity extends AppCompatActivity
     }
 
 
-    private void sendGuideData(String details,
-                                String header,
+    private void sendGuideData(String header,
+                                String detail,
                                 List<String> photos,
                                 String accessToken,
                                 String refreshToken) throws Exception
@@ -214,8 +221,8 @@ public class addGuideActivity extends AppCompatActivity
         String apiUrl = "http://10.0.2.2:3000/tutor";
 
         JSONObject jsonBody = new JSONObject();
-        jsonBody.put("body", details);
         jsonBody.put("header", header);
+        jsonBody.put("body", detail);
         jsonBody.put("tutor_path", new JSONArray(photos));
 
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
@@ -241,9 +248,8 @@ public class addGuideActivity extends AppCompatActivity
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                 String newAccess = prefs.getString("access_token", null);
                 String newRefresh = prefs.getString("refresh_token", null);
-
                 // повторяем исходный запрос с новым токеном
-                sendGuideData(details, header, photos, newAccess, newRefresh);
+                sendGuideData(detail, header, photos, newAccess, newRefresh);
                 return;
             }
             else

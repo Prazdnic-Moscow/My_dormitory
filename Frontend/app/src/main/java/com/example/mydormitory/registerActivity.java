@@ -34,7 +34,7 @@ public class registerActivity extends AppCompatActivity {
 
     private static final int PICK_FILE_REQUEST = 2;
     private List<Uri> selectedFiles = new ArrayList<>();
-    private LinearLayout filesContainer;
+    private LinearLayout filesContainerForRegister;
     private EditText registrationLogin, registrationPassword, registrationName, registrationLastName, registrationSurname;
     private Button buttonBack, registrationButtonSelectDocument, buttonRegistration;
 
@@ -51,7 +51,7 @@ public class registerActivity extends AppCompatActivity {
         buttonBack = findViewById(R.id.buttonBack);
         registrationButtonSelectDocument = findViewById(R.id.registrationButtonSelectDocument);
         buttonRegistration = findViewById(R.id.buttonRegistration);
-        filesContainer = findViewById(R.id.filesContainer);
+        filesContainerForRegister = findViewById(R.id.filesContainerForRegister);
 
         // Кнопка назад
         buttonBack.setOnClickListener(v ->
@@ -164,7 +164,7 @@ public class registerActivity extends AppCompatActivity {
         deleteButton.setImageResource(android.R.drawable.ic_delete);
         deleteButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         deleteButton.setOnClickListener(v -> {
-            filesContainer.removeView(fileLayout);
+            filesContainerForRegister.removeView(fileLayout);
             selectedFiles.remove(fileUri);
         });
 
@@ -173,7 +173,7 @@ public class registerActivity extends AppCompatActivity {
         fileLayout.addView(deleteButton);
 
         // Добавляем row в контейнер
-        filesContainer.addView(fileLayout);
+        filesContainerForRegister.addView(fileLayout);
     }
 
     private String getFileNameFromUri(Uri uri) {
