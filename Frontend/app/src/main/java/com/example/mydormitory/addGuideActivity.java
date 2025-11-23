@@ -1,15 +1,12 @@
 package com.example.mydormitory;
-
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -34,26 +31,25 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class addRepairActivity extends AppCompatActivity
+public class addGuideActivity extends AppCompatActivity
 {
-    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PICK_IMAGE_REQUEST = 2;
     private List<Uri> selectedImages = new ArrayList<>();
-    Button publishRepairButton;
-    ImageButton backToRepairButton;
-    EditText detailsEditTextRepair, roomsEditTextRepair;
-    LinearLayout addPhotoRepairLinearLayout, imagesContainerForRepair;
+    Button publishGuideButton;
+    ImageButton backToGuideButton;
+    EditText headersEditTextGuide, detailsEditTextGuide;
+    LinearLayout addPhotoGuideLinearLayout, imagesContainerForGuide;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        String repairType = getIntent().getStringExtra("repair_type");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_repair);
-        publishRepairButton = findViewById(R.id.publishRepairButton);
-        backToRepairButton = findViewById(R.id.backToRepairButton);
-        detailsEditTextRepair = findViewById(R.id.detailsEditTextRepair);
-        roomsEditTextRepair = findViewById(R.id.roomsEditTextRepair);
-        addPhotoRepairLinearLayout = findViewById(R.id.addPhotoRepairLinearLayout);
-        imagesContainerForRepair = findViewById(R.id.imagesContainerForRepair);
+        setContentView(R.layout.add_guide);
+        publishGuideButton = findViewById(R.id.publishGuideButton);
+        backToGuideButton = findViewById(R.id.backToGuideButton);
+        headersEditTextGuide = findViewById(R.id.headersEditTextGuide);
+        detailsEditTextGuide = findViewById(R.id.detailsEditTextGuide);
+        addPhotoGuideLinearLayout = findViewById(R.id.addPhotoGuideLinearLayout);
+        imagesContainerForGuide = findViewById(R.id.imagesContainerForGuide);
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String accessToken = prefs.getString("access_token", null);
         String refreshToken = prefs.getString("refresh_token", null);
@@ -70,17 +66,18 @@ public class addRepairActivity extends AppCompatActivity
             finish();
         }
 
-        backToRepairButton.setOnClickListener(new View.OnClickListener()
+
+        backToGuideButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent (addRepairActivity.this, repairActivity.class);
+                Intent intent = new Intent (addGuideActivity.this, guideActivity.class);
                 startActivity(intent);
             }
         });
 
-        addPhotoRepairLinearLayout.setOnClickListener(new View.OnClickListener()
+        addPhotoGuideLinearLayout.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -92,20 +89,19 @@ public class addRepairActivity extends AppCompatActivity
             }
         });
 
-        publishRepairButton.setOnClickListener(new View.OnClickListener()
+        publishGuideButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                String details = detailsEditTextRepair.getText().toString();
-                String room = roomsEditTextRepair.getText().toString();
+                String header = headersEditTextGuide.getText().toString();
+                String detail = detailsEditTextGuide.getText().toString();
 
-                if(details.isEmpty() || room.isEmpty())
+                if(header.isEmpty() || detail.isEmpty())
                 {
-                    Toast.makeText(addRepairActivity.this, "Нужно заполнить все поля", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(addGuideActivity.this, "Нужно заполнить все поля", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                int rooms = Integer.parseInt(room);
 
                 // Запускаем в отдельном потоке чтобы не блокировать UI
                 new Thread(new Runnable()
@@ -119,16 +115,16 @@ public class addRepairActivity extends AppCompatActivity
                             List<String> photoPaths = new ArrayList<>();
                             for (Uri imageUri : selectedImages)
                             {
-                                String path = utils.uploadFileToServer(addRepairActivity.this, imageUri,"repair", "photo");
+                                String path = utils.uploadFileToServer(addGuideActivity.this, imageUri, "tutor", "photo");
                                 photoPaths.add(path);
                             }
 
                             // 2. Отправляем данные о ремонте
-                            sendRepairData(details, rooms, photoPaths, repairType, accessToken, refreshToken);
+                            sendGuideData(header, detail, photoPaths, accessToken, refreshToken);
 
                             // Показываем успех
                             runOnUiThread(() -> {
-                                Toast.makeText(addRepairActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(addGuideActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
                                 finish();
                             });
 
@@ -136,7 +132,7 @@ public class addRepairActivity extends AppCompatActivity
                         catch (Exception e)
                         {
                             runOnUiThread(() -> {
-                                Toast.makeText(addRepairActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(addGuideActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                         }
                     }
@@ -198,30 +194,29 @@ public class addRepairActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                imagesContainerForRepair.removeView(imageLayout);
+                imagesContainerForGuide.removeView(imageLayout);
                 selectedImages.remove(imageUri);
             }
         });
 
         imageLayout.addView(imageView);
         imageLayout.addView(deleteButton);
-        imagesContainerForRepair.addView(imageLayout);
+        imagesContainerForGuide.addView(imageLayout);
     }
 
-    private void sendRepairData(String details,
-                                int rooms,
+
+    private void sendGuideData(String details,
+                                String header,
                                 List<String> photos,
-                                String repairType,
                                 String accessToken,
                                 String refreshToken) throws Exception
     {
-        String apiUrl = "http://10.0.2.2:3000/repair";
+        String apiUrl = "http://10.0.2.2:3000/tutor";
 
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("body", details);
-        jsonBody.put("room", rooms);
-        jsonBody.put("type", repairType);
-        jsonBody.put("repair_paths", new JSONArray(photos));
+        jsonBody.put("header", header);
+        jsonBody.put("tutor_path", new JSONArray(photos));
 
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
         connection.setRequestMethod("POST");
@@ -240,7 +235,7 @@ public class addRepairActivity extends AppCompatActivity
         {
             //токен устарел → делаем запрос на бек /refresh
             connection.disconnect();
-            if (utils.refreshAccessToken(addRepairActivity.this, refreshToken))
+            if (utils.refreshAccessToken(addGuideActivity.this, refreshToken))
             {
                 // читаем новые токены из SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
@@ -248,7 +243,7 @@ public class addRepairActivity extends AppCompatActivity
                 String newRefresh = prefs.getString("refresh_token", null);
 
                 // повторяем исходный запрос с новым токеном
-                sendRepairData(details, rooms, photos, repairType, newAccess, newRefresh);
+                sendGuideData(details, header, photos, newAccess, newRefresh);
                 return;
             }
             else

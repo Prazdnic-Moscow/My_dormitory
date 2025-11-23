@@ -34,7 +34,8 @@ public class documentsActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(documentsActivity.this, "Добавление документа!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent (documentsActivity.this, addDocumentsActivity.class);
+                startActivity(intent);
             }
         });
 

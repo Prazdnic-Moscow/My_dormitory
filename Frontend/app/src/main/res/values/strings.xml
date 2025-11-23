@@ -38,13 +38,17 @@
     <string name="ad_type_required">Тип объявления*</string>
     <string name="title_required">Заголовок*</string>
     <string name="title_hint">Краткое описание</string>
-    <string name="detailed_description_required">Подробное описание проблемы</string>
+    <string name="detailed_description_required">Подробное описание</string>
     <string name="description_hint">Опишите детали</string>
     <string name="contacts_required">Ваши контакты</string>
+    <string name="for_guide">Заголовок</string>
     <string name="contacts_hint">Ваша комната</string>
+    <string name="for_guide_header">Заголовок</string>
     <string name="photos_max_3">Фотографии (макс. 3)</string>
     <string name="add_photo">Добавить фото</string>
     <string name="publish_announcement">Отправить заявку</string>
+    <string name="add_guide">Опубликовать гайд</string>
+    <string name="add_news">Опубликовать новость</string>
 
     <!-- Гайд -->
     <string name="guide_title">Гайд</string>
@@ -86,4 +90,20 @@
     <string name="attach_photo">Прикрепить фото</string>
     <string name="submit_request">Отправить заявку</string>
     <string name="close">Закрыть</string>
+
+
+    <!-- Новости -->
+    <string name="date_start_for_news">Дата начала</string>
+    <string name="date_end_for_news">Дата окончания</string>
+    <string name="date_start_for_news_example">Дата в формате 25.12.2015</string>
+    <string name="date_end_for_news_example">Дата в формате 25.12.2015</string>
+    <string name="news_for_title">Создать новость</string>
+    <string name="news_author">Введите автора</string>
+
+    <!-- Документы -->
+    <string name="documents_header">Новый документ</string>
+    <string name="add_documents">Добавить файл</string>
+    <string name="add_docs">Опубликовать документ (ы)</string>
+    <string name="for_documents">Название</string>
+    <string name="docs_max_3">Файлы (макс. 3)</string>
 </resources>

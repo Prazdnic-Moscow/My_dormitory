@@ -96,7 +96,7 @@ public class registerActivity extends AppCompatActivity {
                         // Загружаем файлы на /file/user и получаем пути
                         List<String> uploadedPaths = new ArrayList<>();
                         for (Uri fileUri : selectedFiles) {
-                            String filePath = uploadFileToServer(fileUri);
+                            String filePath = utils.uploadFileToServer( registerActivity.this, fileUri, "user", "file");
                             uploadedPaths.add(filePath);
                         }
 
@@ -193,45 +193,6 @@ public class registerActivity extends AppCompatActivity {
                 result = path.substring(path.lastIndexOf("/") + 1);
         }
         return result;
-    }
-
-    private String uploadFileToServer(Uri fileUri) throws Exception {
-        String uploadUrl = "http://10.0.2.2:3000/file/user";
-        ContentResolver resolver = getContentResolver();
-        InputStream inputStream = resolver.openInputStream(fileUri);
-
-        String mimeType = resolver.getType(fileUri);
-        if (mimeType == null) mimeType = "application/octet-stream";
-
-        HttpURLConnection connection = (HttpURLConnection) new URL(uploadUrl).openConnection();
-        connection.setRequestMethod("POST");
-        connection.setDoOutput(true);
-        connection.setDoInput(true);
-        connection.setRequestProperty("Content-Type", mimeType);
-
-        DataOutputStream outputStream = new DataOutputStream(connection.getOutputStream());
-        byte[] buffer = new byte[4096];
-        int bytesRead;
-        while ((bytesRead = inputStream.read(buffer)) != -1) {
-            outputStream.write(buffer, 0, bytesRead);
-        }
-        inputStream.close();
-        outputStream.flush();
-        outputStream.close();
-
-        int responseCode = connection.getResponseCode();
-        if (responseCode != HttpURLConnection.HTTP_OK && responseCode != HttpURLConnection.HTTP_CREATED) {
-            throw new Exception("Ошибка загрузки файла: " + responseCode);
-        }
-
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder response = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) response.append(line);
-        reader.close();
-
-        JSONObject jsonResponse = new JSONObject(response.toString());
-        return jsonResponse.getString("file_path");
     }
 
     private void sendRegistration(String login, String password, String name, String lastName, String surname, List<String> filePaths) throws Exception {

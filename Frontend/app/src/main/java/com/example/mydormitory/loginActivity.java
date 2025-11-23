@@ -127,7 +127,7 @@ public class loginActivity extends AppCompatActivity
 
                             Toast.makeText(this, "Вход выполнен успешно!", Toast.LENGTH_SHORT).show();
                             // Переход на главный экран
-                            startActivity(new Intent(this, newsActivity.class));
+                            startActivity(new Intent(this, allWidjet.class));
                             finish();
                         });
                     }

@@ -10,13 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 
 public class newsActivity extends AppCompatActivity
 {
-    ImageButton menuButton;
+    ImageButton menuButton, addNewsButton;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.news);
         menuButton = findViewById(R.id.menuButton);
+        addNewsButton = findViewById(R.id.addNewsButton);
 
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String accessToken = prefs.getString("access_token", null);
@@ -40,6 +41,14 @@ public class newsActivity extends AppCompatActivity
             public void onClick(View v)
             {
                 Intent intent = new Intent (newsActivity.this, allWidjet.class);
+                startActivity(intent);
+            }
+        });
+
+        addNewsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent (newsActivity.this, addNewsActivity.class);
                 startActivity(intent);
             }
         });

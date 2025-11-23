@@ -69,6 +69,18 @@
         android:name=".addRepairActivity"
         android:exported="false"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+    <activity
+        android:name=".addGuideActivity"
+        android:exported="false"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+    <activity
+        android:name=".addNewsActivity"
+        android:exported="false"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
+    <activity
+        android:name=".addDocumentsActivity"
+        android:exported="false"
+        android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 </application>
 
     </manifest>

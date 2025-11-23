@@ -21,7 +21,7 @@
 
         <!-- Кнопка назад -->
         <ImageButton
-            android:id="@+id/backToRepairButton"
+            android:id="@+id/backToNewsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -35,7 +35,7 @@
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:layout_marginStart="16dp"
-            android:text="Новое объявление"
+            android:text="@string/news_for_title"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -57,6 +57,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <!-- Контакты -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/for_guide"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/headersEditTextNews"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                android:hint="@string/for_guide_header"
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="12dp"
+                android:textSize="16sp" />
+
             <!-- Подробное описание -->
             <TextView
                 android:layout_width="wrap_content"
@@ -68,7 +88,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/detailsEditTextRepair"
+                android:id="@+id/detailsEditTextNews"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_marginBottom="20dp"
@@ -79,25 +99,64 @@
                 android:paddingVertical="12dp"
                 android:textSize="16sp" />
 
-            <!-- Контакты -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/contacts_required"
+                android:text="@string/date_start_for_news"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/roomsEditTextRepair"
+                android:id="@+id/dateStartEditTextNews"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="20dp"
-                android:hint="@string/contacts_hint"
+                android:hint="@string/date_start_for_news_example"
                 android:inputType="textCapSentences"
                 android:paddingHorizontal="12dp"
                 android:textSize="16sp" />
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/date_end_for_news"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/dateEndEditTextNews"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                android:hint="@string/date_end_for_news_example"
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="12dp"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="@string/news_author"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/authorEditTextNews"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginBottom="20dp"
+                android:hint="@string/news_author"
+                android:inputType="textCapSentences"
+                android:paddingHorizontal="12dp"
+                android:textSize="16sp" />
+
 
             <!-- Фотографии -->
             <TextView
@@ -118,7 +177,7 @@
 
                 <!-- Кнопка добавления фото -->
                 <LinearLayout
-                    android:id="@+id/addPhotoRepairLinearLayout"
+                    android:id="@+id/addPhotoNewsLinearLayout"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginEnd="12dp"
@@ -152,7 +211,7 @@
                 android:layout_marginTop="-25dp">
 
                 <LinearLayout
-                    android:id="@+id/imagesContainerForRepair"
+                    android:id="@+id/imagesContainerForNews"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:orientation="horizontal" />
@@ -161,12 +220,12 @@
             <!-- Кнопка публикации -->
 
             <Button
-                android:id="@+id/publishRepairButton"
+                android:id="@+id/publishNewsButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/primary_color"
-                android:text="@string/publish_announcement"
+                android:text="@string/add_news"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />

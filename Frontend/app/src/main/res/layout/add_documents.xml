@@ -8,7 +8,7 @@
 
     <!-- Верхняя панель в стиле Avito -->
     <LinearLayout
-        android:id="@+id/avitoToolbar"
+        android:id="@+id/DocumentToolbar"
         android:layout_width="0dp"
         android:layout_height="100dp"
         android:background="@color/primary_color"
@@ -21,7 +21,7 @@
 
         <!-- Кнопка назад -->
         <ImageButton
-            android:id="@+id/backToRepairButton"
+            android:id="@+id/backToDocumentsButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -35,7 +35,7 @@
             android:layout_marginTop="20dp"
             android:layout_weight="1"
             android:layout_marginStart="16dp"
-            android:text="Новое объявление"
+            android:text="@string/documents_header"
             android:textColor="@color/white"
             android:textSize="20sp"
             android:textStyle="bold" />
@@ -50,61 +50,41 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/avitoToolbar">
+        app:layout_constraintTop_toBottomOf="@+id/DocumentToolbar">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Подробное описание -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/detailed_description_required"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/detailsEditTextRepair"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:layout_marginBottom="20dp"
-                android:gravity="top"
-                android:hint="@string/description_hint"
-                android:inputType="textCapSentences|textMultiLine"
-                android:paddingHorizontal="12dp"
-                android:paddingVertical="12dp"
-                android:textSize="16sp" />
-
             <!-- Контакты -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/contacts_required"
+                android:text="@string/for_documents"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/roomsEditTextRepair"
+                android:id="@+id/headersEditTextDocuments"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="20dp"
-                android:hint="@string/contacts_hint"
+                android:hint="@string/for_documents"
                 android:inputType="textCapSentences"
                 android:paddingHorizontal="12dp"
                 android:textSize="16sp" />
+
+
 
             <!-- Фотографии -->
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="@string/photos_max_3"
+                android:text="@string/docs_max_3"
                 android:textColor="@color/black"
                 android:textSize="16sp"
                 android:textStyle="bold" />
@@ -116,9 +96,8 @@
                 android:layout_marginBottom="20dp"
                 android:orientation="horizontal">
 
-                <!-- Кнопка добавления фото -->
                 <LinearLayout
-                    android:id="@+id/addPhotoRepairLinearLayout"
+                    android:id="@+id/addDocumentsLinearLayout"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginEnd="12dp"
@@ -138,7 +117,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"
-                        android:text="@string/add_photo"
+                        android:text="@string/add_documents"
                         android:textColor="@color/black"
                         android:textSize="12sp" />
 
@@ -146,27 +125,34 @@
 
             </LinearLayout>
 
-            <HorizontalScrollView
+            <!-- Контейнер для отображения выбранных файлов -->
+            <ScrollView
+                android:id="@+id/scrollFiles"
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                android:layout_marginTop="-25dp">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/registrationButtonSelectDocument">
 
                 <LinearLayout
-                    android:id="@+id/imagesContainerForRepair"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:orientation="horizontal" />
-            </HorizontalScrollView>
+                    android:id="@+id/filesContainerForDocuments"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="4dp"
+                    android:gravity="center_vertical"/>
+            </ScrollView>
 
             <!-- Кнопка публикации -->
 
             <Button
-                android:id="@+id/publishRepairButton"
+                android:id="@+id/publishDocumentButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:layout_marginTop="20dp"
                 android:backgroundTint="@color/primary_color"
-                android:text="@string/publish_announcement"
+                android:text="@string/add_docs"
                 android:textColor="@color/white"
                 android:textSize="16sp"
                 android:textStyle="bold" />

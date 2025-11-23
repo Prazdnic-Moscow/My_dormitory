@@ -92,6 +92,7 @@ std::list<std::string> UserService::login(const std::string &phone_number,
 
 std::list<std::string> UserService::refreshTokens(const std::string &refresh_token)
 {
+    LOG_ERROR << "Зашли в метод генерации токенов";
     try 
     {
         // Декодируем и проверяем refresh token

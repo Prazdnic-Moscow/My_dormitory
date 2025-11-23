@@ -35,7 +35,8 @@ public class guideActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Toast.makeText(guideActivity.this, "Добавление гайда!", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent (guideActivity.this, addGuideActivity.class);
+                startActivity(intent);
             }
         });
 

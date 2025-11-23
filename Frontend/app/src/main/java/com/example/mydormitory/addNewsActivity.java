@@ -1,15 +1,12 @@
 package com.example.mydormitory;
-
 import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -34,26 +31,33 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class addRepairActivity extends AppCompatActivity
+public class addNewsActivity extends AppCompatActivity
 {
-    private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int PICK_IMAGE_REQUEST = 3;
     private List<Uri> selectedImages = new ArrayList<>();
-    Button publishRepairButton;
-    ImageButton backToRepairButton;
-    EditText detailsEditTextRepair, roomsEditTextRepair;
-    LinearLayout addPhotoRepairLinearLayout, imagesContainerForRepair;
+    Button publishNewsButton;
+    ImageButton backToNewsButton;
+    EditText headersEditTextNews, detailsEditTextNews, dateEndEditTextNews, dateStartEditTextNews, authorEditTextNews;
+    LinearLayout addPhotoNewsLinearLayout, imagesContainerForNews;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        String repairType = getIntent().getStringExtra("repair_type");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.add_repair);
-        publishRepairButton = findViewById(R.id.publishRepairButton);
-        backToRepairButton = findViewById(R.id.backToRepairButton);
-        detailsEditTextRepair = findViewById(R.id.detailsEditTextRepair);
-        roomsEditTextRepair = findViewById(R.id.roomsEditTextRepair);
-        addPhotoRepairLinearLayout = findViewById(R.id.addPhotoRepairLinearLayout);
-        imagesContainerForRepair = findViewById(R.id.imagesContainerForRepair);
+        setContentView(R.layout.add_news);
+        publishNewsButton = findViewById(R.id.publishNewsButton);
+        backToNewsButton = findViewById(R.id.backToNewsButton);
+
+        headersEditTextNews = findViewById(R.id.headersEditTextNews);
+        detailsEditTextNews = findViewById(R.id.detailsEditTextNews);
+
+        addPhotoNewsLinearLayout = findViewById(R.id.addPhotoNewsLinearLayout);
+        imagesContainerForNews = findViewById(R.id.imagesContainerForNews);
+
+        dateEndEditTextNews = findViewById(R.id.dateEndEditTextNews);
+        dateStartEditTextNews = findViewById(R.id.dateStartEditTextNews);
+        authorEditTextNews = findViewById(R.id.authorEditTextNews);
+
+
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         String accessToken = prefs.getString("access_token", null);
         String refreshToken = prefs.getString("refresh_token", null);
@@ -70,17 +74,18 @@ public class addRepairActivity extends AppCompatActivity
             finish();
         }
 
-        backToRepairButton.setOnClickListener(new View.OnClickListener()
+
+        backToNewsButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent (addRepairActivity.this, repairActivity.class);
+                Intent intent = new Intent (addNewsActivity.this, newsActivity.class);
                 startActivity(intent);
             }
         });
 
-        addPhotoRepairLinearLayout.setOnClickListener(new View.OnClickListener()
+        addPhotoNewsLinearLayout.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
@@ -92,20 +97,24 @@ public class addRepairActivity extends AppCompatActivity
             }
         });
 
-        publishRepairButton.setOnClickListener(new View.OnClickListener()
+        publishNewsButton.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View v)
             {
-                String details = detailsEditTextRepair.getText().toString();
-                String room = roomsEditTextRepair.getText().toString();
+                String header = headersEditTextNews.getText().toString();
+                String detail = detailsEditTextNews.getText().toString();
+                String dateEnd = dateEndEditTextNews.getText().toString();
+                String dateStart = dateStartEditTextNews.getText().toString();
+                String author = authorEditTextNews.getText().toString();
 
-                if(details.isEmpty() || room.isEmpty())
-                {
-                    Toast.makeText(addRepairActivity.this, "Нужно заполнить все поля", Toast.LENGTH_SHORT).show();
-                    return;
+
+
+
+
+                if (header.isEmpty() || detail.isEmpty() || dateStart.isEmpty() || dateEnd.isEmpty()) {
+                    Toast.makeText(addNewsActivity.this, "Все поля должны быть заполнены", Toast.LENGTH_SHORT).show();
                 }
-                int rooms = Integer.parseInt(room);
 
                 // Запускаем в отдельном потоке чтобы не блокировать UI
                 new Thread(new Runnable()
@@ -119,16 +128,16 @@ public class addRepairActivity extends AppCompatActivity
                             List<String> photoPaths = new ArrayList<>();
                             for (Uri imageUri : selectedImages)
                             {
-                                String path = utils.uploadFileToServer(addRepairActivity.this, imageUri,"repair", "photo");
+                                String path = utils.uploadFileToServer(addNewsActivity.this, imageUri, "news", "photo");
                                 photoPaths.add(path);
                             }
 
                             // 2. Отправляем данные о ремонте
-                            sendRepairData(details, rooms, photoPaths, repairType, accessToken, refreshToken);
+                            sendNewsData(detail, header, dateStart, dateEnd, author, photoPaths, accessToken, refreshToken);
 
                             // Показываем успех
                             runOnUiThread(() -> {
-                                Toast.makeText(addRepairActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(addNewsActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
                                 finish();
                             });
 
@@ -136,7 +145,7 @@ public class addRepairActivity extends AppCompatActivity
                         catch (Exception e)
                         {
                             runOnUiThread(() -> {
-                                Toast.makeText(addRepairActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                Toast.makeText(addNewsActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                             });
                         }
                     }
@@ -198,30 +207,35 @@ public class addRepairActivity extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                imagesContainerForRepair.removeView(imageLayout);
+                imagesContainerForNews.removeView(imageLayout);
                 selectedImages.remove(imageUri);
             }
         });
 
         imageLayout.addView(imageView);
         imageLayout.addView(deleteButton);
-        imagesContainerForRepair.addView(imageLayout);
+        imagesContainerForNews.addView(imageLayout);
     }
 
-    private void sendRepairData(String details,
-                                int rooms,
-                                List<String> photos,
-                                String repairType,
-                                String accessToken,
-                                String refreshToken) throws Exception
+
+    private void sendNewsData(String details,
+                               String header,
+                               String dateStart,
+                               String dateEnd,
+                               String author,
+                               List<String> photos,
+                               String accessToken,
+                               String refreshToken) throws Exception
     {
-        String apiUrl = "http://10.0.2.2:3000/repair";
+        String apiUrl = "http://10.0.2.2:3000/news";
 
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("body", details);
-        jsonBody.put("room", rooms);
-        jsonBody.put("type", repairType);
-        jsonBody.put("repair_paths", new JSONArray(photos));
+        jsonBody.put("header", header);
+        jsonBody.put("date_start", dateStart);
+        jsonBody.put("date_end", dateEnd);
+        jsonBody.put("author", author);
+        jsonBody.put("news_path", new JSONArray(photos));
 
         HttpURLConnection connection = (HttpURLConnection) new URL(apiUrl).openConnection();
         connection.setRequestMethod("POST");
@@ -240,7 +254,7 @@ public class addRepairActivity extends AppCompatActivity
         {
             //токен устарел → делаем запрос на бек /refresh
             connection.disconnect();
-            if (utils.refreshAccessToken(addRepairActivity.this, refreshToken))
+            if (utils.refreshAccessToken(addNewsActivity.this, refreshToken))
             {
                 // читаем новые токены из SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
@@ -248,7 +262,7 @@ public class addRepairActivity extends AppCompatActivity
                 String newRefresh = prefs.getString("refresh_token", null);
 
                 // повторяем исходный запрос с новым токеном
-                sendRepairData(details, rooms, photos, repairType, newAccess, newRefresh);
+                sendNewsData(details, header, dateStart, dateEnd, author, photos, newAccess, newRefresh);
                 return;
             }
             else

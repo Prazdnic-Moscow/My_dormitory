@@ -72,6 +72,7 @@ void UserController::login(const HttpRequestPtr& req,
 void UserController::refresh(const HttpRequestPtr& req,
                  std::function<void(const HttpResponsePtr&)>&& callback)
 {
+    LOG_ERROR << "Зашли в метод refresh token";
     auto json = req->getJsonObject();
     if (!json || !json->isMember("refresh_token"))
     {
