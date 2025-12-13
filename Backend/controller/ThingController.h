@@ -32,5 +32,6 @@ class ThingController : public HttpController<ThingController>
 
         void deleteThing(const HttpRequestPtr& req,
                                 std::function<void(const HttpResponsePtr&)>&& callback, 
-                                int id_thing);
+                                int id_thing,
+                                int id_user);
 };

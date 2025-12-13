@@ -4,21 +4,27 @@ void NewsController::getNews(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback, 
                             int limit)
 {
+    LOG_ERROR << "Зашли в метод"<<limit;
     std::string token = Headerhelper::getTokenFromHeaders(req);
+    LOG_ERROR << "Получили токен"<< token;
     auto decoded = jwt::decode<traits>(token);
+    LOG_ERROR << "Декодировали токен";
 
     if (!Headerhelper::verifyToken(decoded))
     {
         Headerhelper::responseCheckToken(callback);
         return;
     }
+    LOG_ERROR << "Токен прошел проверку";
     if (!Headerhelper::checkRoles(decoded, "news_read"))
     {
         Headerhelper::responseCheckRoles(callback);
         return;
     }
+    LOG_ERROR << "Роль прошла проверку";
 
     if (limit > 20) limit = 20;
+    LOG_ERROR << "Извлекли лимит";
     // 6. Получение данных пользователя
     auto dbClient = drogon::app().getDbClient();
     NewsService newsService(dbClient);

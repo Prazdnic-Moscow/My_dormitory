@@ -108,10 +108,6 @@ public class addNewsActivity extends AppCompatActivity
                 String dateStart = dateStartEditTextNews.getText().toString();
                 String author = authorEditTextNews.getText().toString();
 
-
-
-
-
                 if (header.isEmpty() || detail.isEmpty() || dateStart.isEmpty() || dateEnd.isEmpty()) {
                     Toast.makeText(addNewsActivity.this, "Все поля должны быть заполнены", Toast.LENGTH_SHORT).show();
                 }
@@ -133,11 +129,21 @@ public class addNewsActivity extends AppCompatActivity
                             }
 
                             // 2. Отправляем данные о ремонте
-                            sendNewsData(detail, header, dateStart, dateEnd, author, photoPaths, accessToken, refreshToken);
+                            sendNewsData(detail,
+                                         header,
+                                         dateStart,
+                                         dateEnd,
+                                         author,
+                                         photoPaths,
+                                         accessToken,
+                                         refreshToken);
 
                             // Показываем успех
                             runOnUiThread(() -> {
                                 Toast.makeText(addNewsActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(addNewsActivity.this, newsActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
                                 finish();
                             });
 

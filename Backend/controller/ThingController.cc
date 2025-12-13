@@ -106,7 +106,8 @@ void ThingController::getThings(const HttpRequestPtr& req,
 
 void ThingController::deleteThing(const HttpRequestPtr& req,
                                   std::function<void(const HttpResponsePtr&)>&& callback, 
-                                  int id_thing)
+                                  int id_thing,
+                                  int id_user)
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decoded = jwt::decode<traits>(token);
@@ -117,9 +118,10 @@ void ThingController::deleteThing(const HttpRequestPtr& req,
         return;
     }
     
-    if (!Headerhelper::checkRoles(decoded, "thing_write"))
+    if (!Headerhelper::checkRoles(decoded, "thing_write") && id_user != decoded.get_payload_claim("Id").as_integer())
     {
-        throw std::runtime_error("Not rights Role - Thing_write");
+        Headerhelper::responseCheckRoles(callback);
+        return;
     }
 
     // 3. Получаем подключение к БД

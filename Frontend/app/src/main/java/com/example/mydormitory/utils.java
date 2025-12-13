@@ -190,4 +190,21 @@ public class utils {
             return false;
         }
     }
+
+    public static String changeDate(String date)
+    {
+        if (date != null && date.length() >= 16) {
+            try {
+                String datePart = date.substring(0, 10); // "2025-01-23"
+                String timePart = date.substring(11, 16); // "19:43"
+                String[] timeParts = timePart.split(":");
+                int hours = (Integer.parseInt(timeParts[0]) + 3) % 24;
+                return datePart + " " + String.format("%02d", hours) + ":" + timeParts[1];
+            } catch (Exception e) {
+                // если что-то пошло не так, оставляем оригинальную дату
+                return date;
+            }
+        }
+        return date;
+    }
 }

@@ -14,7 +14,7 @@
         android:padding="16dp">
 
         <TextView
-            android:id="@+id/guideHeader"
+            android:id="@+id/newsHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Header"
@@ -23,7 +23,7 @@
             android:textColor="@color/black" />
 
         <TextView
-            android:id="@+id/guideBody"
+            android:id="@+id/newsBody"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -41,7 +41,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/guideDate"
+                android:id="@+id/newsDateStartAndEnd"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -49,7 +49,26 @@
                 android:textSize="12sp"
                 android:textColor="@color/black" />
 
+
         </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/newsAuthor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Author"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+        </LinearLayout>
+
         <!-- Контейнер для отображения -->
         <ScrollView
             android:id="@+id/scrollFiles"
@@ -60,13 +79,31 @@
             app:layout_constraintStart_toStartOf="parent">
 
             <LinearLayout
-                android:id="@+id/filesContainerForGuides"
+                android:id="@+id/filesContainerForNews"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:padding="4dp"
                 android:gravity="center_vertical"/>
         </ScrollView>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/newsDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Date"
+                android:textSize="12sp"
+                android:textColor="@color/black" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

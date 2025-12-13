@@ -1,5 +1,6 @@
 package com.example.mydormitory;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -26,12 +27,25 @@ public class loginActivity extends AppCompatActivity
 {
     private EditText login, password;
     private Button buttonForgotPassword, buttonLogin, buttonRegistration;
+    private String accessToken;
+    private String refreshToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
+        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+        accessToken = prefs.getString("access_token", null);
+        refreshToken = prefs.getString("refresh_token", null);
+
+        if (accessToken != null)
+        {
+            // Пользователь авторизован
+            startActivity(new Intent(this, newsActivity.class));
+            finish();
+            return;
+        }
 
         // ВАЖНО: Инициализация ДО использования!
         login = findViewById(R.id.login);

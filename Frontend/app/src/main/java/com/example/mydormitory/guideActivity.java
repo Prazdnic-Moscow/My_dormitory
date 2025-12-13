@@ -135,8 +135,30 @@ public class guideActivity extends AppCompatActivity {
 
                 // Повторяем исходный запрос с новым токеном
                 return sendGetRequest(newAccess, newRefresh);
-            } else {
-                throw new Exception("Токен устарел и обновить не удалось");
+            }
+            else
+            {
+                // Сессия истекла
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.remove("access_token");
+                        editor.remove("refresh_token");
+                        editor.apply();
+
+                        Toast.makeText(guideActivity.this,
+                                "Сессия истекла. Войдите снова",
+                                Toast.LENGTH_SHORT).show();
+
+                        Intent intent = new Intent(guideActivity.this, loginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                return null;
             }
         }
 
@@ -173,20 +195,7 @@ public class guideActivity extends AppCompatActivity {
             int id = guideJson.getInt("id");
             String header = guideJson.getString("header");
             String body = guideJson.getString("body");
-            String date = guideJson.getString("date");
-
-            // Преобразуем дату в пару строк
-            if (date != null && date.length() >= 16) {
-                try {
-                    String datePart = date.substring(0, 10); // "2025-01-23"
-                    String timePart = date.substring(11, 16); // "19:43"
-                    String[] timeParts = timePart.split(":");
-                    int hours = (Integer.parseInt(timeParts[0]) + 3) % 24;
-                    date = datePart + " " + String.format("%02d", hours) + ":" + timeParts[1];
-                } catch (Exception e) {
-                    // если что-то пошло не так, оставляем оригинальную дату
-                }
-            }
+            String date = utils.changeDate(guideJson.getString("date"));
 
             // Парсим массив изображений
             List<String> imagePaths = new ArrayList<>();
