@@ -40,11 +40,8 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-
-
     </LinearLayout>
 
-    <!-- ScrollView для формы -->
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -70,31 +67,12 @@
                 android:textStyle="bold" />
 
             <Spinner
-                android:id="@+id/categorySpinner"
+                android:id="@+id/categoryAvitostan"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="20dp"
-                android:paddingHorizontal="12dp" />
-
-            <!-- Заголовок -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:text="@string/title_required"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <EditText
-                android:id="@+id/titleEditText"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginBottom="20dp"
-                android:hint="@string/title_hint"
-                android:inputType="textCapSentences"
                 android:paddingHorizontal="12dp"
-                android:textSize="16sp" />
+                android:entries="@array/avito_categories"/>
 
             <!-- Подробное описание -->
             <TextView
@@ -107,7 +85,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/descriptionEditText"
+                android:id="@+id/bodyAvitostan"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
                 android:layout_marginBottom="20dp"
@@ -129,7 +107,7 @@
                 android:textStyle="bold" />
 
             <EditText
-                android:id="@+id/contactsEditText"
+                android:id="@+id/roomAvitostan"
                 android:layout_width="match_parent"
                 android:layout_height="48dp"
                 android:layout_marginBottom="20dp"
@@ -157,7 +135,7 @@
 
                 <!-- Кнопка добавления фото -->
                 <LinearLayout
-                    android:id="@+id/addPhotoButton"
+                    android:id="@+id/addPhotoForAvitostan"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:layout_marginEnd="12dp"
@@ -185,10 +163,22 @@
 
             </LinearLayout>
 
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="-25dp">
+
+                <LinearLayout
+                    android:id="@+id/imagesContainerForAvitostan"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
+
             <!-- Кнопка публикации -->
 
             <Button
-                android:id="@+id/publishButton"
+                android:id="@+id/publishAvitostanButton"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
                 android:backgroundTint="@color/primary_color"

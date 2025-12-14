@@ -2,12 +2,11 @@ package com.example.mydormitory;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.ImageView;
 import androidx.appcompat.app.AppCompatActivity;
 import java.util.List;
 
-public class FullScreenImageActivity extends AppCompatActivity {
+public class fullScreenImageActivity extends AppCompatActivity {
 
     private ImageView fullScreenImage;
     private List<String> imagePaths;

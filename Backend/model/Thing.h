@@ -8,6 +8,7 @@ class Thing
     int id;
     std::string type;
     std::string body;
+    int room;
     std::string date;
     std::list<std::string> thing_paths;
 
@@ -18,6 +19,7 @@ class Thing
             type = result["type"].as<std::string>();
             body = result["body"].as<std::string>();
             date = result["date"].as<std::string>();
+            room = result["room"].as<int>();
         }
 
         // Setters
@@ -34,6 +36,11 @@ class Thing
         void setBody(const std::string& body_thing)
         {
             this->body = body_thing;
+        }
+
+        void setRoom(const int& room_thing)
+        {
+            this->room = room_thing;
         }
 
         void setDate(const std::string& date_thing)
@@ -60,6 +67,11 @@ class Thing
         std::string getBody()
         {
             return body;
+        }
+
+        int getRoom()
+        {
+            return room;
         }
 
         std::string getDate()

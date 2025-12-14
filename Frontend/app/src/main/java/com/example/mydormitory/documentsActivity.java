@@ -26,8 +26,8 @@ public class documentsActivity extends AppCompatActivity
 {
     ImageButton menuButton, addDocumentButton;
     private RecyclerView documentsRecyclerView;
-    private DocumentsAdapter documentsAdapter;
-    private List<Documents> documentsList = new ArrayList<>();
+    private documentsAdapter documentsAdapter;
+    private List<documents> documentsList = new ArrayList<>();
     private static final String API_URL = "http://10.0.2.2:3000/file";
     private String accessToken;
     private String refreshToken;
@@ -53,7 +53,7 @@ public class documentsActivity extends AppCompatActivity
         documentsRecyclerView = findViewById(R.id.documentsList);
 
         // Настройка RecyclerView
-        documentsAdapter = new DocumentsAdapter(documentsList, this);
+        documentsAdapter = new documentsAdapter(documentsList, this);
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         documentsRecyclerView.setAdapter(documentsAdapter);
 
@@ -88,7 +88,7 @@ public class documentsActivity extends AppCompatActivity
                 try {
                     String response = sendGetRequest(accessToken, refreshToken);
                     JSONArray jsonArray = new JSONArray(response);
-                    final List<Documents> documents = parseNewsFromJson(jsonArray);
+                    final List<documents> documents = parseNewsFromJson(jsonArray);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -188,8 +188,8 @@ public class documentsActivity extends AppCompatActivity
         return response.toString();
     }
 
-    private List<Documents> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
-        List<Documents> documents = new ArrayList<>();
+    private List<documents> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
+        List<documents> documents = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject guideJson = jsonArray.getJSONObject(i);
@@ -207,7 +207,7 @@ public class documentsActivity extends AppCompatActivity
                 }
             }
 
-            documents.add(new Documents(id, body, date, files_path));
+            documents.add(new documents(id, body, date, files_path));
         }
 
         return documents;

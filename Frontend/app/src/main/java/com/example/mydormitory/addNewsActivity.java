@@ -273,7 +273,23 @@ public class addNewsActivity extends AppCompatActivity
             }
             else
             {
-                throw new Exception("Токен устарел и обновить не удалось");
+                // Сессия истекла
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.remove("access_token");
+                        editor.remove("refresh_token");
+                        editor.apply();
+                        Toast.makeText(addNewsActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(addNewsActivity.this, loginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                return;
             }
         }
 

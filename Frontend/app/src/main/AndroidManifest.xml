@@ -51,7 +51,7 @@
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />
     <activity
-        android:name=".avitoStanActivity"
+        android:name=".avitostanActivity"
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />
     <activity
@@ -83,7 +83,7 @@
         android:exported="false"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
     <activity
-        android:name=".FullScreenImageActivity"
+        android:name=".fullScreenImageActivity"
         android:exported="false"
         android:theme="@style/Theme.Material3.DayNight.NoActionBar" />
 </application>

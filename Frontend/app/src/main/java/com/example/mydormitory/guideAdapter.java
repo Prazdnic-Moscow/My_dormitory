@@ -13,10 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
-public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHolder> {
+public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHolder> {
 
-    private List<Guide> guideList;
-    public GuideAdapter(List<Guide> guideList) {
+    private List<guide> guideList;
+    public guideAdapter(List<guide> guideList) {
         this.guideList = guideList;
     }
 
@@ -30,7 +30,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
 
     @Override
     public void onBindViewHolder(@NonNull GuideViewHolder holder, int position) {
-        Guide guide = guideList.get(position);
+        guide guide = guideList.get(position);
 
         holder.guideHeader.setText(guide.getHeader());
         holder.guideBody.setText(guide.getBody());
@@ -55,7 +55,7 @@ public class GuideAdapter extends RecyclerView.Adapter<GuideAdapter.GuideViewHol
         loadImage(imageView, imagePath);
 
         imageView.setOnClickListener(v -> {
-            Intent intent = new Intent(container.getContext(), FullScreenImageActivity.class);
+            Intent intent = new Intent(container.getContext(), fullScreenImageActivity.class);
             intent.putExtra("image_path", imagePath);
             container.getContext().startActivity(intent);
         });

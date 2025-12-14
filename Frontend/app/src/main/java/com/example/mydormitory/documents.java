@@ -2,25 +2,22 @@ package com.example.mydormitory;
 import java.util.List;
 
 // Guide.java
-public class Guide {
+public class documents {
     private int id;
-    private String header;
     private String body;
     private String date;
-    private List<String> tutorPath;
+    private List<String> documentsPath;
 
-    public Guide(int id, String header, String body, String date, List<String> tutorPath) {
+    public documents(int id, String body, String date, List<String> documentsPath) {
         this.id = id;
-        this.header = header;
         this.body = body;
         this.date = date;
-        this.tutorPath = tutorPath;
+        this.documentsPath = documentsPath;
     }
 
     // Getters
     public int getId() { return id; }
-    public String getHeader() { return header; }
     public String getBody() { return body; }
     public String getDate() { return date; }
-    public List<String> getTutorPath() { return tutorPath; }
+    public List<String> getDocumentsPath() { return documentsPath; }
 }

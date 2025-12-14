@@ -3,7 +3,6 @@ package com.example.mydormitory;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -28,8 +27,8 @@ public class newsActivity extends AppCompatActivity
     ImageButton menuButton, addNewsButton;
 
     private RecyclerView newsRecyclerView;
-    private NewsAdapter newsAdapter;
-    private List<News> newsList = new ArrayList<>();
+    private newsAdapter newsAdapter;
+    private List<news> newsList = new ArrayList<>();
     private static final String API_URL = "http://10.0.2.2:3000/news/";
     private static final int NEWS_LIMIT = 50; // лимит новостей
     private String accessToken;
@@ -58,7 +57,7 @@ public class newsActivity extends AppCompatActivity
         newsRecyclerView = findViewById(R.id.newsList);
 
         // Настройка RecyclerView
-        newsAdapter = new NewsAdapter(newsList);
+        newsAdapter = new newsAdapter(newsList);
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         newsRecyclerView.setAdapter(newsAdapter);
 
@@ -91,7 +90,7 @@ public class newsActivity extends AppCompatActivity
                 try {
                     String response = sendGetRequest(accessToken, refreshToken, NEWS_LIMIT);
                     JSONArray jsonArray = new JSONArray(response);
-                    final List<News> news = parseNewsFromJson(jsonArray);
+                    final List<news> news = parseNewsFromJson(jsonArray);
 
                     runOnUiThread(new Runnable() {
                         @Override
@@ -191,8 +190,8 @@ public class newsActivity extends AppCompatActivity
         return response.toString();
     }
 
-    private List<News> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
-        List<News> news = new ArrayList<>();
+    private List<news> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
+        List<news> news = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject guideJson = jsonArray.getJSONObject(i);
@@ -214,7 +213,7 @@ public class newsActivity extends AppCompatActivity
                 }
             }
 
-            news.add(new News(id, header, body, author, date, dateStart, dateEnd, imagePaths));
+            news.add(new news(id, header, body, author, date, dateStart, dateEnd, imagePaths));
         }
 
         return news;

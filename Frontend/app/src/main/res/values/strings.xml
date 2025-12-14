@@ -30,6 +30,7 @@
     <string name="category_give_away">Отдам</string>
     <string name="category_take">Возьму</string>
     <string name="category_lost_found">Потеряшки</string>
+    <string name="category_all_found">Все</string>
     <string name="latest_announcements">Последние объявления</string>
     <string name="add_announcement">Добавить объявление</string>
 

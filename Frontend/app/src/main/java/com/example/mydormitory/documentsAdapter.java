@@ -17,12 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class DocumentsAdapter extends RecyclerView.Adapter<DocumentsAdapter.DocumentsViewHolder> {
+public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.DocumentsViewHolder> {
 
-    private List<Documents> documentsList;
+    private List<documents> documentsList;
     private Context context;
 
-    public DocumentsAdapter(List<Documents> documentsList, Context context) {
+    public documentsAdapter(List<documents> documentsList, Context context) {
         this.documentsList = documentsList;
         this.context = context;
     }
@@ -37,7 +37,7 @@ public class DocumentsAdapter extends RecyclerView.Adapter<DocumentsAdapter.Docu
 
     @Override
     public void onBindViewHolder(@NonNull DocumentsViewHolder holder, int position) {
-        Documents documents = documentsList.get(position);
+        documents documents = documentsList.get(position);
 
         holder.documentsBody.setText(documents.getBody());
         holder.documentsDate.setText(documents.getDate());

@@ -2,7 +2,7 @@ package com.example.mydormitory;
 import java.util.List;
 
 // Guide.java
-public class News {
+public class news {
     private int id;
     private String header;
     private String body;
@@ -12,7 +12,7 @@ public class News {
     private String dateEnd;
     private List<String> newsPath;
 
-    public News(int id, String header, String body, String author, String date, String dateStart, String dateEnd, List<String> newsPath) {
+    public news(int id, String header, String body, String author, String date, String dateStart, String dateEnd, List<String> newsPath) {
         this.id = id;
         this.header = header;
         this.body = body;

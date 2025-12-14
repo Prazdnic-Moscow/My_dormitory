@@ -15,10 +15,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder> {
+public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder> {
 
-    private List<News> newsList;
-    public NewsAdapter(List<News> newsList) {
+    private List<news> newsList;
+    public newsAdapter(List<news> newsList) {
         this.newsList = newsList;
     }
 
@@ -32,7 +32,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
-        News news = newsList.get(position);
+        news news = newsList.get(position);
 
         holder.newsHeader.setText(news.getHeader());
         holder.newsBody.setText(news.getBody());
@@ -61,7 +61,7 @@ public class NewsAdapter extends RecyclerView.Adapter<NewsAdapter.NewsViewHolder
         loadImage(imageView, imagePath);
 
         imageView.setOnClickListener(v -> {
-            Intent intent = new Intent(container.getContext(), FullScreenImageActivity.class);
+            Intent intent = new Intent(container.getContext(), fullScreenImageActivity.class);
             intent.putExtra("image_path", imagePath);
             container.getContext().startActivity(intent);
         });

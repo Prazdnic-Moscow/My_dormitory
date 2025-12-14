@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="avito_categories_view">
+        <item>Все</item>
+        <item>Отдам</item>
+        <item>Возьму</item>
+        <item>Потеряшки</item>
+    </string-array>
+</resources>

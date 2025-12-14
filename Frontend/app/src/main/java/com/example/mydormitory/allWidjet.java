@@ -72,7 +72,7 @@ public class allWidjet extends AppCompatActivity
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent (allWidjet.this, avitoStanActivity.class);
+                Intent intent = new Intent (allWidjet.this, avitostanActivity.class);
                 startActivity(intent);
                 finish();
             }

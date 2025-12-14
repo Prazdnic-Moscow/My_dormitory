@@ -20,6 +20,7 @@ void ThingController::postThing(const HttpRequestPtr& req,
     // Извлекаем данные из JSON
     std::string type = json->get("type", "").asString();
     std::string body = json->get("body", "").asString();
+    int room = json->get("room", "").asInt();
     // Получаем массив файлов
     std::list<std::string> thing_paths;
     if (!json->isMember("thing_paths") || !(*json)["thing_paths"].isArray()) 
@@ -43,6 +44,7 @@ void ThingController::postThing(const HttpRequestPtr& req,
     
     auto thing_data = thing.createThing(type, 
                                         body, 
+                                        room,
                                         thing_paths);
 
     // 3. Формируем JSON-ответ
@@ -50,6 +52,7 @@ void ThingController::postThing(const HttpRequestPtr& req,
     jsonThing["id"] = thing_data.getId();
     jsonThing["type"] = thing_data.getType();
     jsonThing["body"] = thing_data.getBody();
+    jsonThing["room"] = thing_data.getRoom();
     jsonThing["date"] = thing_data.getDate();
     // Добавляем массив изображений
         Json::Value jsonImages(Json::arrayValue);
@@ -86,7 +89,9 @@ void ThingController::getThings(const HttpRequestPtr& req,
     {
         Json::Value jsonThing;
         jsonThing["id"] = files.getId();
+        jsonThing["type"] = files.getType();
         jsonThing["body"] = files.getBody();
+        jsonThing["room"] = files.getRoom();
         jsonThing["date"] = files.getDate();
         // Добавляем массив изображений
         Json::Value jsonImages(Json::arrayValue);

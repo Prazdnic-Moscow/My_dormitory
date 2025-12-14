@@ -131,6 +131,9 @@ public class addDocumentsActivity extends AppCompatActivity
                             // Показываем успех
                             runOnUiThread(() -> {
                                 Toast.makeText(addDocumentsActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(addDocumentsActivity.this, documentsActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(intent);
                                 finish();
                             });
 
@@ -209,7 +212,23 @@ public class addDocumentsActivity extends AppCompatActivity
             }
             else
             {
-                throw new Exception("Токен устарел и обновить не удалось");
+                // Сессия истекла
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.remove("access_token");
+                        editor.remove("refresh_token");
+                        editor.apply();
+                        Toast.makeText(addDocumentsActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(addDocumentsActivity.this, loginActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+                return;
             }
         }
 

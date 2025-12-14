@@ -5,16 +5,15 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
-
+import android.widget.AdapterView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -22,20 +21,22 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class guideActivity extends AppCompatActivity {
-    ImageButton menuButton, addGuideButton;
-    private RecyclerView guideRecyclerView;
-    private guideAdapter guideAdapter;
-    private List<guide> guideList = new ArrayList<>();
-    private static final String API_URL = "http://10.0.2.2:3000/tutor";
+public class avitostanActivity extends AppCompatActivity
+{
+    ImageButton menuButton, addAvitoButton;
+    Spinner categoryAvitostanView;
+    private RecyclerView avitostanRecyclerView;
+    private avitostanAdapter avitostanAdapter;
+    private List<avitostan> avitostanList = new ArrayList<>();
+    private List<avitostan> allAvitostans = new ArrayList<>();
+    private static final String API_URL = "http://10.0.2.2:3000/thing";
     private String accessToken;
     private String refreshToken;
-
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.guide);
-
+        setContentView(R.layout.avitostan);
         // Получаем токены из SharedPreferences
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         accessToken = prefs.getString("access_token", null);
@@ -48,52 +49,57 @@ public class guideActivity extends AppCompatActivity {
             finish();
             return;
         }
-
-        // Инициализация элементов
         menuButton = findViewById(R.id.menuButton);
-        addGuideButton = findViewById(R.id.addGuideButton);
-        guideRecyclerView = findViewById(R.id.guideList);
+        addAvitoButton = findViewById(R.id.addAvitoButton);
+        avitostanRecyclerView = findViewById(R.id.avitostanList);
+        categoryAvitostanView = findViewById(R.id.categoryAvitostanView);
 
         // Настройка RecyclerView
-        guideAdapter = new guideAdapter(guideList);
-        guideRecyclerView.setLayoutManager(new LinearLayoutManager(this));
-        guideRecyclerView.setAdapter(guideAdapter);
+        avitostanAdapter = new avitostanAdapter(avitostanList);
+        avitostanRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        avitostanRecyclerView.setAdapter(avitostanAdapter);
+
+        // Настройка слушателя для Spinner
+        setupSpinnerListener();
 
         // Загрузка данных с API
-        loadGuidesFromApi();
+        loadAvitostanFromApi();
 
-        menuButton.setOnClickListener(new View.OnClickListener() {
+        menuButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(guideActivity.this, allWidjet.class);
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(avitostanActivity.this, allWidjet.class);
                 startActivity(intent);
             }
         });
 
-        addGuideButton.setOnClickListener(new View.OnClickListener() {
+        addAvitoButton.setOnClickListener(new View.OnClickListener()
+        {
             @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(guideActivity.this, addGuideActivity.class);
+            public void onClick(View v)
+            {
+                Intent intent = new Intent (avitostanActivity.this, addAvitoActivity.class);
                 startActivity(intent);
             }
         });
     }
-
-    private void loadGuidesFromApi() {
+    private void loadAvitostanFromApi() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     String response = sendGetRequest(accessToken, refreshToken);
                     JSONArray jsonArray = new JSONArray(response);
-                    final List<guide> guides = parseGuidesFromJson(jsonArray);
+                    final List<avitostan> avitostans = parseAvitostansFromJson(jsonArray);
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            guideList.clear();
-                            guideList.addAll(guides);
-                            guideAdapter.notifyDataSetChanged();
+                            avitostanList.clear();
+                            avitostanList.addAll(avitostans);
+                            avitostanAdapter.notifyDataSetChanged();
                         }
                     });
 
@@ -101,7 +107,7 @@ public class guideActivity extends AppCompatActivity {
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Toast.makeText(guideActivity.this, "Ошибка загрузки гайдов: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(avitostanActivity.this, "Ошибка загрузки Обьявлений (Возможно еще нету ни одного обьявления) " + e.getMessage(), Toast.LENGTH_SHORT).show();
                         }
                     });
                     e.printStackTrace();
@@ -121,15 +127,15 @@ public class guideActivity extends AppCompatActivity {
         if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             // Токен устарел → делаем запрос на бек /refresh
             connection.disconnect();
-            if (utils.refreshAccessToken(guideActivity.this, refreshToken)) {
+            if (utils.refreshAccessToken(avitostanActivity.this, refreshToken)) {
                 // Читаем новые токены из SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                 String newAccess = prefs.getString("access_token", null);
                 String newRefresh = prefs.getString("refresh_token", null);
 
                 // Обновляем переменные класса
-                guideActivity.this.accessToken = newAccess;
-                guideActivity.this.refreshToken = newRefresh;
+                avitostanActivity.this.accessToken = newAccess;
+                avitostanActivity.this.refreshToken = newRefresh;
 
                 // Повторяем исходный запрос с новым токеном
                 return sendGetRequest(newAccess, newRefresh);
@@ -145,8 +151,8 @@ public class guideActivity extends AppCompatActivity {
                         editor.remove("access_token");
                         editor.remove("refresh_token");
                         editor.apply();
-                        Toast.makeText(guideActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(guideActivity.this, loginActivity.class);
+                        Toast.makeText(avitostanActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(avitostanActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
@@ -176,33 +182,99 @@ public class guideActivity extends AppCompatActivity {
         }
         reader.close();
         connection.disconnect();
-
         return response.toString();
     }
 
-    private List<guide> parseGuidesFromJson(JSONArray jsonArray) throws JSONException {
-        List<guide> guides = new ArrayList<>();
+    // Простейший метод фильтрации
+    // Метод фильтрации
+    private void filterAvitostans(String filterText) {
+        List<avitostan> filteredList = new ArrayList<>();
+
+        // Определяем, какой тип искать в зависимости от выбранного текста
+        String searchType;
+        switch (filterText) {
+            case "Отдам":
+                searchType = "Отдам вещь";
+                break;
+            case "Возьму":
+                searchType = "Возьму вещь";
+                break;
+            case "Потеряшки":
+                searchType = "Нашел вещь";
+                break;
+            default:
+                searchType = filterText;
+        }
+
+        // Фильтруем по типу
+        for (avitostan item : allAvitostans) {
+            if (item.getType() != null && item.getType().equals(searchType)) {
+                filteredList.add(item);
+            }
+        }
+
+        // Обновляем список в адаптере
+        avitostanList.clear();
+        avitostanList.addAll(filteredList);
+        avitostanAdapter.notifyDataSetChanged();
+    }
+
+    // Настройка слушателя выбора в Spinner
+    private void setupSpinnerListener() {
+        categoryAvitostanView.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Получаем выбранный текст
+                String selectedCategory = parent.getItemAtPosition(position).toString();
+
+                if (position == 0)
+                {
+                    showAllAvitostans();
+                }
+                else
+                {
+                    filterAvitostans(selectedCategory);
+                }
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Ничего не выбрано - ничего не делаем
+            }
+        });
+    }
+
+    // Метод показа всех объявлений
+    private void showAllAvitostans() {
+        avitostanList.clear();
+        avitostanList.addAll(allAvitostans);
+        avitostanAdapter.notifyDataSetChanged();
+    }
+    private List<avitostan> parseAvitostansFromJson(JSONArray jsonArray) throws JSONException {
+        List<avitostan> avitostans = new ArrayList<>();
 
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject guideJson = jsonArray.getJSONObject(i);
 
             int id = guideJson.getInt("id");
-            String header = guideJson.getString("header");
+            String type = guideJson.getString("type");
             String body = guideJson.getString("body");
+            int room = guideJson.getInt("room");
             String date = utils.changeDate(guideJson.getString("date"));
 
             // Парсим массив изображений
             List<String> imagePaths = new ArrayList<>();
-            if (guideJson.has("tutor_path")) {
-                JSONArray imagesArray = guideJson.getJSONArray("tutor_path");
+            if (guideJson.has("files_path")) {
+                JSONArray imagesArray = guideJson.getJSONArray("files_path");
                 for (int j = 0; j < imagesArray.length(); j++) {
                     imagePaths.add(imagesArray.getString(j));
                 }
             }
-
-            guides.add(new guide(id, header, body, date, imagePaths));
+            avitostans.add(new avitostan(id, type, body, room, date, imagePaths));
         }
-
-        return guides;
+        // Сохраняем ВСЕ данные в отдельный список
+        allAvitostans.clear();
+        allAvitostans.addAll(avitostans);
+        return avitostans;
     }
+
 }
