@@ -36,6 +36,7 @@ void WashMachineController::addWashMachine(const HttpRequestPtr& req,
 void WashMachineController::getWashMachines(const HttpRequestPtr& req,
                                             std::function<void(const HttpResponsePtr&)>&& callback)
 {
+    LOG_ERROR << "Зашли в метод getWashMachines";
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decode = jwt::decode<traits>(token);
     if (!Headerhelper::verifyToken(decode))
@@ -43,6 +44,7 @@ void WashMachineController::getWashMachines(const HttpRequestPtr& req,
         Headerhelper::responseCheckToken(callback);
         return;
     }
+    LOG_ERROR << "Прошли проверку токена в getWashMachines";
     
     if (!Headerhelper::checkRoles(decode, "wash_machine_read"))
     {
@@ -61,7 +63,9 @@ void WashMachineController::getWashMachines(const HttpRequestPtr& req,
         machineJson["name"] = m.getName();
         respJson.append(machineJson);
     }
-    callback(HttpResponse::newHttpJsonResponse(respJson));
+    auto resp = HttpResponse::newHttpJsonResponse(respJson);
+    resp->setStatusCode(k200OK);
+    callback(resp);
 }
 
 

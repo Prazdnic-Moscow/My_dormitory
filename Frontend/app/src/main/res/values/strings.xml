@@ -107,4 +107,8 @@
     <string name="add_docs">Опубликовать документ (ы)</string>
     <string name="for_documents">Название</string>
     <string name="docs_max_3">Файлы (макс. 3)</string>
+
+    <!-- Стиральная машина -->
+    <string name="wash_machine_header">Новая машина</string>
+    <string name="add_machine">Добавить машину</string>
 </resources>

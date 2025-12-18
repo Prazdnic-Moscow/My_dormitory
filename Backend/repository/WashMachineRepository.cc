@@ -22,7 +22,13 @@ bool WashMachineRepository::deleteWashMachine(int id)
     auto result = db_->execSqlSync
     (
         "DELETE FROM machines "
-        "WHERE id=$1", id
+        "WHERE id = $1", id
+    );
+
+    auto result_2 = db_->execSqlSync
+    (
+        "DELETE FROM bookings "
+        "WHERE machine_id = $1", id
     );
     return result.affectedRows() > 0;
 }

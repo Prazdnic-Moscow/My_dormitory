@@ -80,7 +80,8 @@ void ReserveWashMachineController::getReserveWashMachines(const HttpRequestPtr &
 
 void ReserveWashMachineController::deleteReserveWashMachine(const HttpRequestPtr &req,
                                                             std::function<void(const HttpResponsePtr&)>&& callback,
-                                                            int reserve_id, int user_id)
+                                                            int reserve_id, 
+                                                            int user_id)
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decode = jwt::decode<traits>(token);
