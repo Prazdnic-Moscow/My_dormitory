@@ -10,9 +10,9 @@
     // Создаем запись файла
     auto result = transaction->execSqlSync
     (
-        "INSERT INTO repair (type, body, room, user_id) "
-        "VALUES ($1, $2, $3, $4) "
-        "RETURNING id, type, body, room, date, user_id",
+        "INSERT INTO repair (type, body, room, user_id, activity) "
+        "VALUES ($1, $2, $3, $4, false) "
+        "RETURNING id, type, body, room, date, user_id, activity",
         type, body, room, user_id
     );
     

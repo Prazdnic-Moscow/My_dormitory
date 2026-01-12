@@ -122,3 +122,48 @@ std::list<News> NewsRepository::getNews(int limit)
 
     return news_all;
 }
+
+std::list<Repair> NewsRepository::getNewsForRepairman(int limit)
+{
+    auto tran = db_->newTransaction();
+    std::string limit_str = std::to_string(limit);
+    auto result = tran->execSqlSync
+    (
+        "SELECT * FROM repair "
+        "ORDER BY date DESC "
+        "LIMIT $1 ",
+        limit_str
+    );
+
+    std::list<Repair> news_all;
+    // Шаг 2: Для каждой новости получаем ее изображения
+    for (const auto& news_row : result) 
+    {
+        Repair newsForRepair;
+        newsForRepair.fromDb(news_row); // Заполняем основные данные
+        
+        int newsForRepair_id = newsForRepair.getId();
+        
+        // Шаг 3: Получаем ВСЕ изображения для этой новости
+        auto images_result = tran->execSqlSync
+        (
+            "SELECT image_path FROM repair_file "
+            "WHERE repair_id = $1 "
+            "ORDER BY repair_id",
+            newsForRepair_id
+        );
+        
+        std::list<std::string> image_paths;
+        for (const auto& image_row : images_result) 
+        {
+            image_paths.push_back(image_row["image_path"].as<std::string>());
+        }
+
+        // Шаг 4: Устанавливаем список изображений для новости
+        newsForRepair.setRepairPaths(image_paths);
+
+        news_all.push_back(newsForRepair);
+    }
+
+    return news_all;
+}

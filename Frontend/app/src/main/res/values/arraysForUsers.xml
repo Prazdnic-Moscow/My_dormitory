@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="user_categories">
+        <item>Выберите категорию пользователя</item>
+        <item>Студент</item>
+        <item>Ремонтник</item>
+    </string-array>
+</resources>

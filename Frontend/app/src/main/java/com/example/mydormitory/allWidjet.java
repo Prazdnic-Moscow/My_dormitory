@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 public class allWidjet extends AppCompatActivity
 {
     private ImageButton openNewsButton, openDocumentButton, openMachineButton, openAvitostanButton, openGuideButton, openRepairButton, exitButton;
-    private String accessToken, refreshToken;
+    private String accessToken, refreshToken, userType;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -21,6 +21,8 @@ public class allWidjet extends AppCompatActivity
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         accessToken = prefs.getString("access_token", null);
         refreshToken = prefs.getString("refresh_token", null);
+        userType = prefs.getString("type", null);
+        Toast.makeText(this, "type = " + userType, Toast.LENGTH_SHORT).show();
 
         if (accessToken == null)
         {

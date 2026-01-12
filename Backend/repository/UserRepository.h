@@ -17,6 +17,16 @@ class UserRepository
                             const std::string &last_name, 
                             const std::string &surname, 
                             const std::list<std::string> &document);
+
+
+
+        UserData createRepairMan(const std::string &phone_number, 
+                                 const std::string &passwordHash, 
+                                 const std::string &name,
+                                 const std::string &last_name, 
+                                 const std::string &surname, 
+                                 const std::list<std::string> &document);
+
         
         UserData getUserByPhone(const std::string &phone_number);
         

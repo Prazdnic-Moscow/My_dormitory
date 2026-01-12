@@ -59,8 +59,9 @@ void RepairController::postRepair(const HttpRequestPtr& req,
     jsonRepair["id"] = repair_data.getId();
     jsonRepair["type"] = repair_data.getType();
     jsonRepair["body"] = repair_data.getBody();
-    jsonRepair["room"] = repair_data.getRoom();
     jsonRepair["date"] = repair_data.getDate();
+    jsonRepair["room"] = repair_data.getRoom();
+    jsonRepair["activity"] = repair_data.getActivity();
     // Добавляем массив изображений
     Json::Value jsonImages(Json::arrayValue);
     for (const auto& repair_path : repair_data.getRepairPaths()) 

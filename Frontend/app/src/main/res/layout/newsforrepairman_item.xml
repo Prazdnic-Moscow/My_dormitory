@@ -17,7 +17,7 @@
             android:id="@+id/typeRepairman"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Header"
+            android:text="Type"
             android:textSize="18sp"
             android:textStyle="bold"
             android:textColor="@color/black" />
@@ -41,7 +41,7 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/newsDateStartAndEnd"
+                android:id="@+id/repairmanDate"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -64,7 +64,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Author"
+                android:text="Room"
                 android:textSize="12sp"
                 android:textColor="@color/black" />
         </LinearLayout>
@@ -95,15 +95,28 @@
             android:gravity="center_vertical">
 
             <TextView
-                android:id="@+id/newsDate"
+                android:id="@+id/repairmanActivity"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="Date"
+                android:text="Flag"
                 android:textSize="12sp"
                 android:textColor="@color/black" />
 
         </LinearLayout>
+
+        <Button
+            android:id="@+id/buttonActivity"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="25dp"
+            android:text="Взять заказ"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:backgroundTint="@color/primary_color"
+            android:textColor="@color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
 
     </LinearLayout>
 

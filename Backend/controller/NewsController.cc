@@ -2,7 +2,8 @@
 
 void NewsController::getNews(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback, 
-                            int limit)
+                            int limit,
+                            std::string userType)
 {
     LOG_ERROR << "Зашли в метод"<<limit;
     std::string token = Headerhelper::getTokenFromHeaders(req);
@@ -27,36 +28,75 @@ void NewsController::getNews(const HttpRequestPtr& req,
     LOG_ERROR << "Извлекли лимит";
     // 6. Получение данных пользователя
     auto dbClient = drogon::app().getDbClient();
-    NewsService newsService(dbClient);
-    auto news = newsService.getNews(limit);
 
-    // Формируем JSON-ответ
-    Json::Value jsonNewsArray;
-    for (auto news_current : news) 
+    if (userType == "Студент")
     {
-        Json::Value jsonNewsItem;
-        jsonNewsItem["id"] = news_current.getId();
-        jsonNewsItem["header"] = news_current.getHeader();
-        jsonNewsItem["body"] = news_current.getBody();
-        jsonNewsItem["author"] = news_current.getAuthor();
-        jsonNewsItem["date"] = news_current.getDate();
-        jsonNewsItem["date_start"] = news_current.getDateStart();
-        jsonNewsItem["date_end"] = news_current.getDateEnd();
-        
-        // Добавляем массив изображений
-        Json::Value jsonImages(Json::arrayValue);
-        for (const auto& image_path : news_current.getImagePaths()) 
+        LOG_ERROR << "Зашли в if для студента"<< userType;
+        NewsService newsService(dbClient);
+        auto news = newsService.getNews(limit);
+
+        // Формируем JSON-ответ
+        Json::Value jsonNewsArray;
+        for (auto news_current : news) 
         {
-            jsonImages.append(image_path);
+            Json::Value jsonNewsItem;
+            jsonNewsItem["id"] = news_current.getId();
+            jsonNewsItem["header"] = news_current.getHeader();
+            jsonNewsItem["body"] = news_current.getBody();
+            jsonNewsItem["author"] = news_current.getAuthor();
+            jsonNewsItem["date"] = news_current.getDate();
+            jsonNewsItem["date_start"] = news_current.getDateStart();
+            jsonNewsItem["date_end"] = news_current.getDateEnd();
+            
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : news_current.getImagePaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+            jsonNewsItem["news_path"] = jsonImages;
+            jsonNewsArray.append(jsonNewsItem);
         }
-        jsonNewsItem["news_path"] = jsonImages;
-        jsonNewsArray.append(jsonNewsItem);
+
+        // 4. Создаем и настраиваем ответ
+        auto resp = HttpResponse::newHttpJsonResponse(jsonNewsArray);
+        resp->setStatusCode(k200OK);
+        callback(resp);
     }
 
-    // 4. Создаем и настраиваем ответ
-    auto resp = HttpResponse::newHttpJsonResponse(jsonNewsArray);
-    resp->setStatusCode(k200OK);
-    callback(resp);
+    else
+    {
+        LOG_ERROR << "Зашли в if для ремонтника"<<userType;
+        NewsService newsService(dbClient);
+        auto news = newsService.getNewsForRepairman(limit);
+
+        // Формируем JSON-ответ
+        Json::Value jsonNewsArray;
+        for (auto news_current : news) 
+        {
+            Json::Value jsonNewsItem;
+            jsonNewsItem["id"] = news_current.getId();
+            jsonNewsItem["type"] = news_current.getType();
+            jsonNewsItem["body"] = news_current.getBody();
+            jsonNewsItem["date"] = news_current.getDate();
+            jsonNewsItem["room"] = news_current.getRoom();
+            jsonNewsItem["activity"] = news_current.getActivity();
+            
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : news_current.getRepairPaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+            jsonNewsItem["news_path"] = jsonImages;
+            jsonNewsArray.append(jsonNewsItem);
+        }
+
+        // 4. Создаем и настраиваем ответ
+        auto resp = HttpResponse::newHttpJsonResponse(jsonNewsArray);
+        resp->setStatusCode(k200OK);
+        callback(resp);
+    }
 }
 
 

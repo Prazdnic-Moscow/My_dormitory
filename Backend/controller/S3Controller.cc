@@ -3,7 +3,7 @@ void S3Controller::postFile(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback,
                             std::string folder)
 {
-    if (folder != "user" && folder != "news" && folder != "file" && folder != "tutor" && folder != "repair" && folder != "thing")
+    if (folder != "user" && folder != "news" && folder != "file" && folder != "tutor" && folder != "repair" && folder != "thing" && folder != "repairman")
     {
         Json::Value error;
         error["error"] = "Invalid path for file";

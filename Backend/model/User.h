@@ -11,6 +11,7 @@ class UserData
         std::string name;
         std::string last_name;
         std::string surname;
+        std::string userType;
         std::list<std::string> document;
         std::list<std::string> role_type;
         int id;
@@ -45,6 +46,11 @@ class UserData
         void setName(const std::string& name) 
         { 
             this->name = name; 
+        }
+
+        void setTypeName(const std::string& name) 
+        { 
+            this->userType = name; 
         }
 
         void setLastName(const std::string& lastName) 
@@ -86,6 +92,11 @@ class UserData
         std::string getName()
         { 
             return name; 
+        }
+
+        std::string getTypeName()
+        { 
+            return userType;
         }
 
         std::string getLastName()

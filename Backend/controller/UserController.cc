@@ -43,9 +43,10 @@ void UserController::login(const HttpRequestPtr& req,
     UserService userService(dbClient);
 
     // 5. Вызываем метод логина
-    auto tokens = userService.login(phone_number, password);
+    auto tokens = userService.login(phone_number, 
+                                    password);
 
-    if (tokens.size() != 2 || tokens.empty()) 
+    if (tokens.size() != 3 || tokens.empty()) 
     {
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k401Unauthorized);
@@ -55,11 +56,13 @@ void UserController::login(const HttpRequestPtr& req,
 
     std::string access_token = *tokens.begin();
     std::string refresh_token = *std::next(tokens.begin());
+    std::string userType = *std::next(tokens.begin(), 2);  // третий
 
     // 6. Формируем JSON-ответ
     Json::Value ret;
     ret["access_token"] = access_token;
     ret["refresh_token"] = refresh_token;
+    ret["userType"] = userType;
     ret["token_type"] = "bearer";
     ret["status"] = "success";
     
@@ -109,6 +112,7 @@ void UserController::refresh(const HttpRequestPtr& req,
 void UserController::registerUser(const HttpRequestPtr& req,
                                   std::function<void(const HttpResponsePtr&)>&& callback)
 {
+    LOG_ERROR << "зашли в метод регистрации";
     // 1. Получаем JSON из запроса
     auto json = req->getJsonObject();
     if (!json) 
@@ -123,13 +127,15 @@ void UserController::registerUser(const HttpRequestPtr& req,
     std::string name = json->get("name", "").asString();
     std::string last_name = json->get("last_name", "").asString();
     std::string surname = json->get("surname", "").asString();
-    // Получаем список изображений (list)
+    std::string typeName = json->get("typeName", "").asString();
+    LOG_ERROR << "Извлекли данные";
     std::list<std::string> document_paths;
     if (!json->isMember("document_path") || !(*json)["document_path"].isArray()) 
     {
         Headerhelper::responseCheckJson(callback);
         return;
     }
+    LOG_ERROR << "файл прошел проверку";
 
     const Json::Value& imagesArray = (*json)["document_path"];
         for (const auto& doc : imagesArray) 
@@ -141,6 +147,8 @@ void UserController::registerUser(const HttpRequestPtr& req,
             }
         }
 
+        LOG_ERROR << "Извлекли данные из файла";
+
     if (password.size() < 5)
     {
         Json::Value error;
@@ -151,6 +159,8 @@ void UserController::registerUser(const HttpRequestPtr& req,
         callback(resp);
         return;
     }
+
+    LOG_ERROR << "проверили пароль на длину";
 
     if (phone_number.empty() || password.empty() || name.empty() || last_name.empty() || surname.empty() || document_paths.empty()) 
     {
@@ -183,35 +193,12 @@ void UserController::registerUser(const HttpRequestPtr& req,
 
     // 5. Вызываем метод регистрации
     auto users = userService.registerUser(phone_number,
-                                            password,
-                                            name,
-                                            last_name,
-                                            surname,
-                                            document_paths);
-
-    
-    // // Формируем JSON-ответ
-    // Json::Value jsonUser;
-    // jsonUser["id"] = users.getId();
-    // jsonUser["phone_number"] = users.getPhoneNumber();
-    // jsonUser["name"] = users.getName();
-    // jsonUser["last_name"] = users.getLastName();
-    // jsonUser["surname"] = users.getSurname();
-
-    // // Добавляем массив изображений
-    // Json::Value jsonFiles(Json::arrayValue);
-    // for (const auto& document_path : users.getDocument()) 
-    // {
-    //     jsonFiles.append(document_path);
-    // }
-    // jsonUser["document_path"] = jsonFiles;
-
-    // Json::Value jsonRoles(Json::arrayValue);
-    // for (const auto& role : users.getRoles()) 
-    // {
-    //     jsonRoles.append(role);
-    // }
-    // jsonUser["roles"] = jsonRoles;
+                                          password,
+                                          name,
+                                          last_name,
+                                          surname,
+                                          document_paths,
+                                          typeName);
 
     Json::Value message;
     message["message"] = "User Created!";

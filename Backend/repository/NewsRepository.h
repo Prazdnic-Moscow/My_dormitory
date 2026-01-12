@@ -2,6 +2,7 @@
 #include <DbClient.h> // Подключение к PostgreSQL
 #include <string>
 #include "News.h"
+#include "Repair.h"
 #include "S3Controller.h"
 #include <list>
 class NewsRepository 
@@ -22,6 +23,8 @@ public:
     bool deleteNews(int id);
 
     std::list<News> getNews(int limit);
+
+    std::list<Repair> getNewsForRepairman(int limit);
 
 private:
     drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

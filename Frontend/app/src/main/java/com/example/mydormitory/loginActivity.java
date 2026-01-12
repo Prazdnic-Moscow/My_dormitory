@@ -9,18 +9,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.List;
-import java.util.Scanner;
 
 
 public class loginActivity extends AppCompatActivity
@@ -28,7 +23,7 @@ public class loginActivity extends AppCompatActivity
     private EditText login, password;
     private Button buttonForgotPassword, buttonLogin, buttonRegistration;
     private String accessToken;
-    private String refreshToken;
+    private String refreshToken, userType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -38,11 +33,19 @@ public class loginActivity extends AppCompatActivity
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         accessToken = prefs.getString("access_token", null);
         refreshToken = prefs.getString("refresh_token", null);
+        userType = prefs.getString("type", null);
 
-        if (accessToken != null)
+        if (accessToken != null && userType.equals("Студент"))
         {
             // Пользователь авторизован
             startActivity(new Intent(this, newsActivity.class));
+            finish();
+            return;
+        }
+        else if (accessToken != null && userType.equals("Ремонтник"))
+        {
+            // Пользователь авторизован
+            startActivity(new Intent(this, newsforrepairmanActivity.class));
             finish();
             return;
         }
@@ -128,6 +131,7 @@ public class loginActivity extends AppCompatActivity
                     String status = json.optString("status");
                     String access = json.optString("access_token");
                     String refresh = json.optString("refresh_token");
+                    String type = json.optString("userType");
 
                     if ("success".equals(status))
                     {
@@ -137,12 +141,22 @@ public class loginActivity extends AppCompatActivity
                                     .edit()
                                     .putString("access_token", access)
                                     .putString("refresh_token", refresh)
+                                    .putString("type", type)
                                     .apply();
 
                             Toast.makeText(this, "Вход выполнен успешно!", Toast.LENGTH_SHORT).show();
-                            // Переход на главный экран
-                            startActivity(new Intent(this, allWidjet.class));
-                            finish();
+                            Toast.makeText(this, "type = " + type, Toast.LENGTH_SHORT).show();
+                            if (type.equals("Студент"))
+                            {
+                                // Переход на главный экран
+                                startActivity(new Intent(this, allWidjet.class));
+                                finish();
+                            }
+                            if (type.equals("Ремонтник"))
+                            {
+                                startActivity(new Intent(this, newsforrepairmanActivity.class));
+                                finish();
+                            }
                         });
                     }
                     else

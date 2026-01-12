@@ -12,6 +12,7 @@ class Repair
     int room;
     std::list<std::string> repair_paths;
     int user_id;
+    bool activity;
 
     public:
         void fromDb(const drogon::orm::Row& result)
@@ -22,6 +23,7 @@ class Repair
             room = result["room"].as<int>();
             date = result["date"].as<std::string>();
             user_id = result["user_id"].as<int>();
+            activity = result["activity"].as<bool>();
         }
 
         // Setters
@@ -60,6 +62,11 @@ class Repair
             user_id = userId;
         }
 
+        void setActivity(const bool& newActivity) 
+        { 
+            this->activity = newActivity; 
+        }
+
         // Getters
         int getId() const
         {
@@ -94,5 +101,10 @@ class Repair
         std::list<std::string>& getRepairPaths()
         {
             return repair_paths;
+        }
+
+        bool getActivity()
+        {
+            return activity;
         }
 };

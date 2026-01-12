@@ -13,6 +13,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,6 +38,7 @@ public class registerActivity extends AppCompatActivity {
     private LinearLayout filesContainerForRegister;
     private EditText registrationLogin, registrationPassword, registrationName, registrationLastName, registrationSurname;
     private Button buttonBack, registrationButtonSelectDocument, buttonRegistration;
+    private Spinner user_categories;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,7 @@ public class registerActivity extends AppCompatActivity {
         registrationButtonSelectDocument = findViewById(R.id.registrationButtonSelectDocument);
         buttonRegistration = findViewById(R.id.buttonRegistration);
         filesContainerForRegister = findViewById(R.id.filesContainerForRegister);
+        user_categories = findViewById(R.id.user_categories);
 
         // Кнопка назад
         buttonBack.setOnClickListener(v ->
@@ -78,6 +81,7 @@ public class registerActivity extends AppCompatActivity {
             String name = registrationName.getText().toString();
             String lastName = registrationLastName.getText().toString();
             String surname = registrationSurname.getText().toString();
+            String typeUser = user_categories.getSelectedItem().toString();
 
             if (login.isEmpty() || password.isEmpty() || name.isEmpty() || lastName.isEmpty() || surname.isEmpty()) {
                 Toast.makeText(registerActivity.this, "Заполните все поля!", Toast.LENGTH_SHORT).show();
@@ -86,6 +90,11 @@ public class registerActivity extends AppCompatActivity {
 
             if (selectedFiles.isEmpty()) {
                 Toast.makeText(registerActivity.this, "Выберите хотя бы один файл!", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            if (typeUser.equals("Выберите категорию пользователя")) {
+                Toast.makeText(registerActivity.this, "Выберите категорию пользователя", Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -101,7 +110,7 @@ public class registerActivity extends AppCompatActivity {
                         }
 
                         // Отправляем JSON с регистрацией на /registration
-                        sendRegistration(login, password, name, lastName, surname, uploadedPaths);
+                        sendRegistration(login, password, name, lastName, surname, uploadedPaths, typeUser);
 
                         runOnUiThread(() -> {
                             Toast.makeText(registerActivity.this, "Регистрация успешна!", Toast.LENGTH_SHORT).show();
@@ -113,7 +122,7 @@ public class registerActivity extends AppCompatActivity {
                     }
                 }
             }).start();
-        });
+    });
     }
 
     @Override
@@ -195,7 +204,7 @@ public class registerActivity extends AppCompatActivity {
         return result;
     }
 
-    private void sendRegistration(String login, String password, String name, String lastName, String surname, List<String> filePaths) throws Exception {
+    private void sendRegistration(String login, String password, String name, String lastName, String surname, List<String> filePaths, String typeUser) throws Exception {
         String registerUrl = "http://10.0.2.2:3000/register";
 
         JSONObject json = new JSONObject();
@@ -204,6 +213,7 @@ public class registerActivity extends AppCompatActivity {
         json.put("name", name);
         json.put("last_name", lastName);
         json.put("surname", surname);
+        json.put("typeName", typeUser);
 
         JSONArray filesArray = new JSONArray();
         for (String path : filePaths) filesArray.put(path);

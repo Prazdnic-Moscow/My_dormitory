@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,10 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder> {
+public class newsforrepairmanAdapter extends RecyclerView.Adapter<newsforrepairmanAdapter.NewsViewHolder> {
 
-    private List<news> newsList;
-    public newsAdapter(List<news> newsList) {
+    private List<newsforrepairman> newsList;
+    public newsforrepairmanAdapter(List<newsforrepairman> newsList) {
         this.newsList = newsList;
     }
 
@@ -26,26 +27,31 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.news_item, parent, false);
+                .inflate(R.layout.newsforrepairman_item, parent, false);
         return new NewsViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull NewsViewHolder holder, int position) {
-        news news = newsList.get(position);
+        newsforrepairman news = newsList.get(position);
 
-        holder.newsHeader.setText(news.getHeader());
-        holder.newsBody.setText(news.getBody());
-        // Форматируем даты с разделителем
-        String datesText = "Начало: " + news.getDateStart() + " Конец: " + news.getDateEnd();
-        holder.newsDateStartAndEnd.setText(datesText);
-        holder.newsAuthor.setText(news.getAuthor());
-        holder.filesContainerForNews.removeAllViews();
-        holder.newsDate.setText(news.getDate());
+        holder.typeRepairman.setText(news.getType());
+        holder.repairmanBody.setText(news.getBody());
+        holder.repairmanDate.setText(news.getDate());
+        holder.repairmanRoom.setText("Комната: " + news.getRoom());
+        holder.filesContainerForRepairman.removeAllViews();
+        if (news.getActivity())
+        {
+            holder.repairmanActivity.setText("Заказ занят");
+        }
+        else
+        {
+            holder.repairmanActivity.setText("Заказ свободен");
+        }
 
         if (news.getNewsPath() != null && !news.getNewsPath().isEmpty()) {
             for (int i = 0; i < news.getNewsPath().size(); i++) {
-                addImageToContainer(holder.filesContainerForNews, news.getNewsPath().get(i));
+                addImageToContainer(holder.filesContainerForRepairman, news.getNewsPath().get(i));
             }
         }
     }
@@ -87,17 +93,19 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
     }
 
     public static class NewsViewHolder extends RecyclerView.ViewHolder {
-        TextView newsHeader, newsBody, newsDateStartAndEnd, newsAuthor, newsDate;
-        LinearLayout filesContainerForNews;
+        TextView typeRepairman, repairmanBody, repairmanDate, repairmanRoom, repairmanActivity;
+        Button buttonActivity;
+        LinearLayout filesContainerForRepairman;
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
-            newsHeader = itemView.findViewById(R.id.typeRepairman);
-            newsBody = itemView.findViewById(R.id.repairmanBody);
-            newsDateStartAndEnd = itemView.findViewById(R.id.newsDateStartAndEnd);
-            newsAuthor = itemView.findViewById(R.id.repairmanRoom);
-            filesContainerForNews = itemView.findViewById(R.id.filesContainerForRepairman);
-            newsDate = itemView.findViewById(R.id.newsDate);
+            typeRepairman = itemView.findViewById(R.id.typeRepairman);
+            repairmanBody = itemView.findViewById(R.id.repairmanBody);
+            repairmanDate = itemView.findViewById(R.id.repairmanDate);
+            repairmanRoom = itemView.findViewById(R.id.repairmanRoom);
+            filesContainerForRepairman = itemView.findViewById(R.id.filesContainerForRepairman);
+            repairmanActivity = itemView.findViewById(R.id.repairmanActivity);
+            buttonActivity = itemView.findViewById(R.id.buttonActivity);
         }
     }
 }

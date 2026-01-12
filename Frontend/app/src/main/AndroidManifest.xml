@@ -39,6 +39,10 @@
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />
     <activity
+        android:name=".newsforrepairmanActivity"
+        android:exported="false"
+        android:theme="@style/Theme.MyDormitory.NoActionBar" />
+    <activity
         android:name=".allWidjet"
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />

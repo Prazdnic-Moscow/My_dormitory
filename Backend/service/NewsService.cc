@@ -41,3 +41,8 @@ std::list<News> NewsService::getNews(int limit)
 {
     return repository->getNews(limit);
 }
+
+std::list<Repair> NewsService::getNewsForRepairman(int limit)
+{
+    return repository->getNewsForRepairman(limit);
+}

@@ -24,7 +24,8 @@ class UserService
                               const std::string &name,
                               const std::string &last_name,
                               const std::string &surname,
-                              const std::list<std::string> &document);
+                              const std::list<std::string> &document,
+                              const std::string &typeName);
 
         std::list<std::string> login(const std::string &phone_number, 
                                      const std::string &password);

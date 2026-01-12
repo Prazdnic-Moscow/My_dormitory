@@ -17,7 +17,8 @@ UserData UserService::registerUser(const std::string &phone_number,
                                    const std::string &name,
                                    const std::string &last_name,
                                    const std::string &surname,
-                                   const std::list<std::string> &document)
+                                   const std::list<std::string> &document,
+                                   const std::string &typeName)
 {
 
     checkData(phone_number, 
@@ -25,14 +26,23 @@ UserData UserService::registerUser(const std::string &phone_number,
 
     // Хешируем пароль
     std::string passwordHash = BCrypt::generateHash(password);
-    // Создаём пользователя в БД
+
+    if (typeName == "Ремонтник")
+    {
+        return repository->createRepairMan(phone_number,
+                                           passwordHash, 
+                                           name, 
+                                           last_name, 
+                                           surname, 
+                                           document);
+    }
     
     return repository->createUser(phone_number,
-                                    passwordHash, 
-                                    name, 
-                                    last_name, 
-                                    surname, 
-                                    document);
+                                  passwordHash, 
+                                  name, 
+                                  last_name, 
+                                  surname, 
+                                  document);
 }
 
 std::list<std::string> UserService::login(const std::string &phone_number, 
@@ -41,6 +51,7 @@ std::list<std::string> UserService::login(const std::string &phone_number,
     // Получаем пользователя из БД
     UserData user;
     user = repository->getUserByPhone(phone_number);
+
     std::string db_password_hash = user.getPassword();
 
     // Проверяем пароль
@@ -77,9 +88,11 @@ std::list<std::string> UserService::login(const std::string &phone_number,
         .sign(jwt::algorithm::hs256{"your_secret_key"});
 
         // Возвращаем в списке: [access_token, refresh_token]
+        std::string userType = user.getTypeName();
         std::list<std::string> tokens;
         tokens.push_back(access_token);
         tokens.push_back(refresh_token);
+        tokens.push_back(userType);
         return tokens;
     } 
 
