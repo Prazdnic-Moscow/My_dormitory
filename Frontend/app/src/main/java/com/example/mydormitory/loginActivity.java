@@ -42,7 +42,7 @@ public class loginActivity extends AppCompatActivity
             finish();
             return;
         }
-        else if (accessToken != null && userType.equals("Ремонтник"))
+        if (accessToken != null && userType.equals("Ремонтник"))
         {
             // Пользователь авторизован
             startActivity(new Intent(this, newsforrepairmanActivity.class));

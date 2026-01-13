@@ -21,6 +21,10 @@ public class newsforrepairman {
         this.newsPath = newsPath;
     }
 
+    public void setActivity(boolean activity) {
+        this.activity = activity;
+    }
+
     // Getters
     public int getId() { return id; }
     public String getType() { return type; }

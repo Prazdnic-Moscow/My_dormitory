@@ -18,6 +18,14 @@ Repair RepairService::createRepair(std::string type,
 }
 
 
+bool RepairService::changeActivateRepair(int id,
+                                         bool activity)
+{
+    return repository->changeActivateRepair(id,
+                                            activity);
+}
+
+
 bool RepairService::deleteRepair(int id_repair)
 {
     return repository->deleteRepair(id_repair);

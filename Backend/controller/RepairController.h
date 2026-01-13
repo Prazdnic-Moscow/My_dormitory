@@ -20,6 +20,7 @@ class RepairController : public HttpController<RepairController>
 public:
     METHOD_LIST_BEGIN
         ADD_METHOD_TO(RepairController::postRepair, "/repair", Post);
+        ADD_METHOD_TO(RepairController::activateRepair, "/activaterepair", Post);
         ADD_METHOD_TO(RepairController::getRepairs, "/repair", Get);
         ADD_METHOD_TO(RepairController::deleteRepair, "/repair/{}/{}", Delete);
 
@@ -34,4 +35,7 @@ public:
     void deleteRepair(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback, 
                             int id_repair, int id_user);
+
+    void activateRepair(const HttpRequestPtr& req,
+                            std::function<void(const HttpResponsePtr&)>&& callback);
 };

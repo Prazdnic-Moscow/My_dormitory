@@ -17,6 +17,9 @@ class RepairRepository
                             int room,
                             std::list<std::string> repair_paths,
                             int user_id);
+
+        bool changeActivateRepair(int id,
+                                  bool activity);
         
         // Удаление
         bool deleteRepair(int id_repair);

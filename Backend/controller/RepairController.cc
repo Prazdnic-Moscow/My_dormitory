@@ -76,6 +76,71 @@ void RepairController::postRepair(const HttpRequestPtr& req,
     callback(resp);
 }
 
+void RepairController::activateRepair(const HttpRequestPtr& req,
+                            std::function<void(const HttpResponsePtr&)>&& callback)
+{
+    LOG_ERROR << "Зашли в activateRepair";
+    std::string token = Headerhelper::getTokenFromHeaders(req);
+    auto decoded = jwt::decode<traits>(token);
+    if (!Headerhelper::verifyToken(decoded)) 
+    {
+        Headerhelper::responseCheckToken(callback);
+        return;
+    }
+    int user_id = decoded.get_payload_claim("Id").as_integer();
+    // Получаем JSON данные
+    auto json = req->getJsonObject();
+    if (!json) 
+    {
+        Headerhelper::responseCheckJson(callback);
+        return;
+    }
+    // Извлекаем данные из JSON
+    int id = json->get("id", "").asInt();
+    bool activity = json->get("activity", "").asBool();
+    LOG_ERROR << "Извлекли данные"<<activity;
+    
+    if (activity != true && activity != false)
+    {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+    }
+
+    // 3. Получаем подключение к БД
+    auto dbClient = drogon::app().getDbClient();
+    RepairService repair(dbClient);
+    auto success = repair.changeActivateRepair(id,
+                                               activity);
+
+    if (success)
+    {
+        // Простой JSON ответ с успехом
+        Json::Value jsonResponse;
+        jsonResponse["success"] = true;
+        jsonResponse["message"] = "Repair activity updated successfully";
+        jsonResponse["id"] = id;
+        jsonResponse["new_activity"] = activity; // или !activity если инвертируется
+        
+        auto resp = HttpResponse::newHttpJsonResponse(jsonResponse);
+        resp->setStatusCode(k200OK); // 200 OK - успешное обновление
+        callback(resp);
+    }
+    else 
+    {
+        // JSON ответ с ошибкой
+        Json::Value jsonResponse;
+        jsonResponse["success"] = false;
+        jsonResponse["error"] = "Failed to update repair activity";
+        jsonResponse["id"] = id;
+        
+        auto resp = HttpResponse::newHttpJsonResponse(jsonResponse);
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+    }
+}
+
+
 
 void RepairController::getRepairs(const HttpRequestPtr& req,
                                   std::function<void(const HttpResponsePtr&)>&& callback)

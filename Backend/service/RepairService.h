@@ -25,6 +25,10 @@ class RepairService
                             std::list<std::string> repair_path,
                             int user_id);
 
+        
+        bool changeActivateRepair(int id,
+                                  bool activity);
+
         bool deleteRepair(int id_repair);
 
         std::list<Repair> getRepairs();

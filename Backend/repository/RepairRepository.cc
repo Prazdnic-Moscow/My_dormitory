@@ -37,6 +37,19 @@
     repair.setRepairPaths(repair_paths);
     return repair;
 }
+
+bool RepairRepository::changeActivateRepair(int id,
+                                            bool activity)
+{
+    auto totalResult = db_->execSqlSync
+    (
+        "update repair "
+        "set activity = $1 "
+        "where id = $2 ",
+        activity, id
+    );
+    return totalResult.affectedRows() > 0;
+}
     
 // Удаление
 bool RepairRepository::deleteRepair(int id_repair)

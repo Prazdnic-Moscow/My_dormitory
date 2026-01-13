@@ -19,8 +19,16 @@ import java.util.List;
 public class newsforrepairmanAdapter extends RecyclerView.Adapter<newsforrepairmanAdapter.NewsViewHolder> {
 
     private List<newsforrepairman> newsList;
+    private OnRepairButtonClickListener listener;
+    public interface OnRepairButtonClickListener {
+        void onRepairButtonClick(int position, newsforrepairman news);
+    }
     public newsforrepairmanAdapter(List<newsforrepairman> newsList) {
         this.newsList = newsList;
+    }
+
+    public void setOnRepairButtonClickListener(OnRepairButtonClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -43,10 +51,12 @@ public class newsforrepairmanAdapter extends RecyclerView.Adapter<newsforrepairm
         if (news.getActivity())
         {
             holder.repairmanActivity.setText("Заказ занят");
+            holder.buttonActivity.setText("Отменить заказ");
         }
         else
         {
             holder.repairmanActivity.setText("Заказ свободен");
+            holder.buttonActivity.setText("Взять заказ");
         }
 
         if (news.getNewsPath() != null && !news.getNewsPath().isEmpty()) {
@@ -54,6 +64,12 @@ public class newsforrepairmanAdapter extends RecyclerView.Adapter<newsforrepairm
                 addImageToContainer(holder.filesContainerForRepairman, news.getNewsPath().get(i));
             }
         }
+        // Обработка клика по кнопке
+        holder.buttonActivity.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onRepairButtonClick(position, news);
+            }
+        });
     }
 
     private void addImageToContainer(LinearLayout container, String imagePath) {
