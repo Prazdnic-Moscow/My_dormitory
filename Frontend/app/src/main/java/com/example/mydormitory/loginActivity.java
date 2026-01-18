@@ -45,7 +45,7 @@ public class loginActivity extends AppCompatActivity
         if (accessToken != null && userType.equals("Ремонтник"))
         {
             // Пользователь авторизован
-            startActivity(new Intent(this, newsforrepairmanActivity.class));
+            startActivity(new Intent(this, NewsForRepairManActivity.class));
             finish();
             return;
         }
@@ -154,7 +154,7 @@ public class loginActivity extends AppCompatActivity
                             }
                             if (type.equals("Ремонтник"))
                             {
-                                startActivity(new Intent(this, newsforrepairmanActivity.class));
+                                startActivity(new Intent(this, NewsForRepairManActivity.class));
                                 finish();
                             }
                         });

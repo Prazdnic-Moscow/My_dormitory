@@ -16,14 +16,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-public class newsforrepairmanAdapter extends RecyclerView.Adapter<newsforrepairmanAdapter.NewsViewHolder> {
+public class NewsForRepairManAdapter extends RecyclerView.Adapter<NewsForRepairManAdapter.NewsViewHolder> {
 
     private List<newsforrepairman> newsList;
     private OnRepairButtonClickListener listener;
     public interface OnRepairButtonClickListener {
         void onRepairButtonClick(int position, newsforrepairman news);
     }
-    public newsforrepairmanAdapter(List<newsforrepairman> newsList) {
+    public NewsForRepairManAdapter(List<newsforrepairman> newsList) {
         this.newsList = newsList;
     }
 

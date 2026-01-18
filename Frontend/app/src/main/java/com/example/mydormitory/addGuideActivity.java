@@ -249,7 +249,7 @@ public class addGuideActivity extends AppCompatActivity
                 String newAccess = prefs.getString("access_token", null);
                 String newRefresh = prefs.getString("refresh_token", null);
                 // повторяем исходный запрос с новым токеном
-                sendGuideData(detail, header, photos, newAccess, newRefresh);
+                sendGuideData(header, detail, photos, newAccess, newRefresh);
                 return;
             }
             else

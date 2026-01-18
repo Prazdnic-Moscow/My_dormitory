@@ -23,10 +23,10 @@ void UserController::login(const HttpRequestPtr& req,
         phone_numberWithPlus7 = "+7" + phone_numberWithPlus7.substr(1);
     }
     std::string phone_number = phone_numberWithPlus7;
-    if (phone_number.empty() || password.empty()) 
+    if (phone_number.empty() || password.empty() || phone_number.length() !=12) 
     {
         Json::Value error;
-        error["error"] = "Phone number and password are required";
+        error["error"] = "Phone number and password are Unright";
         error["code"] = 400;
         
         auto resp = HttpResponse::newHttpJsonResponse(error);
@@ -103,6 +103,7 @@ void UserController::refresh(const HttpRequestPtr& req,
     }
     catch (const std::exception &e)
     {
+        LOG_ERROR << e.what();
         auto resp = HttpResponse::newHttpJsonResponse(Json::Value(e.what()));
         resp->setStatusCode(k401Unauthorized);
         callback(resp);

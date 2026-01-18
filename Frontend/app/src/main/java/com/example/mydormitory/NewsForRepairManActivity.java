@@ -24,10 +24,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class newsforrepairmanActivity extends AppCompatActivity implements newsforrepairmanAdapter.OnRepairButtonClickListener
+public class NewsForRepairManActivity extends AppCompatActivity implements NewsForRepairManAdapter.OnRepairButtonClickListener
 {
     private RecyclerView newsRecyclerView;
-    private newsforrepairmanAdapter newsAdapter;
+    private NewsForRepairManAdapter newsAdapter;
     private List<newsforrepairman> newsList = new ArrayList<>();
     private static final String API_URL = "http://10.0.2.2:3000/news/";
     private static final String UPDATE_STATUS_URL = "http://10.0.2.2:3000/activaterepair";
@@ -67,7 +67,7 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                 editor.remove("access_token");
                 editor.remove("refresh_token");
                 editor.apply();
-                Intent intent = new Intent (newsforrepairmanActivity.this, loginActivity.class);
+                Intent intent = new Intent (NewsForRepairManActivity.this, loginActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -76,7 +76,7 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
         newsRecyclerView = findViewById(R.id.newsListForRepairman);
 
         // Настройка RecyclerView
-        newsAdapter = new newsforrepairmanAdapter(newsList);
+        newsAdapter = new NewsForRepairManAdapter(newsList);
         // Устанавливаем listener для адаптера
         newsAdapter.setOnRepairButtonClickListener(this);
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -90,16 +90,16 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
     public void onRepairButtonClick(int position, newsforrepairman news) {
         // Инвертируем статус активности
         boolean newStatus = !news.getActivity();
-        updateRepairStatusOnServer(news.getId(), newStatus, position);
+        updateRepairStatusOnServer(news.getId(), accessToken, newStatus, position);
     }
 
-    private void updateRepairStatusOnServer(int repairId, boolean newStatus, int position) {
+    private void updateRepairStatusOnServer(int repairId, String access, boolean newStatus, int position) {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try
                 {
-                    sendPatchRequest(UPDATE_STATUS_URL, repairId, newStatus);
+                    sendPatchRequest(UPDATE_STATUS_URL, access, repairId, newStatus);
                     // Если сервер успешно обновил статус
                     runOnUiThread(new Runnable() {
                         @Override
@@ -108,7 +108,7 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                             updatedNews.setActivity(newStatus);
                             // Обновляем UI
                             newsAdapter.notifyItemChanged(position);
-                            Toast.makeText(newsforrepairmanActivity.this, "Статус заказа обновлен", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(NewsForRepairManActivity.this, "Статус заказа обновлен", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -116,14 +116,14 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                 catch (Exception e)
                 {
                     runOnUiThread(() -> {
-                        Toast.makeText(newsforrepairmanActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(NewsForRepairManActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                     });
                 }
             }
         }).start();
     }
 
-    private void sendPatchRequest(String urlString, int repairId, boolean newStatus) throws Exception {
+    private void sendPatchRequest(String urlString, String accessToken, int repairId, boolean newStatus) throws Exception {
         JSONObject jsonBody = new JSONObject();
         jsonBody.put("id", repairId);
         jsonBody.put("activity", newStatus);
@@ -144,16 +144,16 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
         {
             //токен устарел → делаем запрос на бек /refresh
             connection.disconnect();
-            if (utils.refreshAccessToken(newsforrepairmanActivity.this, refreshToken))
+            if (utils.refreshAccessToken(NewsForRepairManActivity.this, refreshToken))
             {
                 // читаем новые токены из SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
                 String newAccess = prefs.getString("access_token", null);
                 String newRefresh = prefs.getString("refresh_token", null);
-                newsforrepairmanActivity.this.accessToken = newAccess;
-                newsforrepairmanActivity.this.refreshToken = newRefresh;
+                NewsForRepairManActivity.this.accessToken = newAccess;
+                NewsForRepairManActivity.this.refreshToken = newRefresh;
                 // повторяем исходный запрос с новым токеном
-                sendPatchRequest(urlString, repairId, newStatus);
+                sendPatchRequest(urlString, newAccess, repairId, newStatus);
                 return;
             }
             else
@@ -167,8 +167,8 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                         editor.remove("access_token");
                         editor.remove("refresh_token");
                         editor.apply();
-                        Toast.makeText(newsforrepairmanActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(newsforrepairmanActivity.this, loginActivity.class);
+                        Toast.makeText(NewsForRepairManActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
@@ -193,32 +193,21 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
     }
 
     private void loadNewsFromApi() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String response = sendGetRequest(accessToken, refreshToken, NEWS_LIMIT, userType);
-                    JSONArray jsonArray = new JSONArray(response);
-                    final List<newsforrepairman> news = parseNewsFromJson(jsonArray);
+        new Thread(() -> {
+            try {
+                String response = sendGetRequest(accessToken, refreshToken, NEWS_LIMIT, userType);
+                JSONArray jsonArray = new JSONArray(response);
+                final List<newsforrepairman> news = parseNewsFromJson(jsonArray);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            newsList.clear();
-                            newsList.addAll(news);
-                            newsAdapter.notifyDataSetChanged();
-                        }
-                    });
+                runOnUiThread(() -> {
+                    newsList.clear();
+                    newsList.addAll(news);
+                    newsAdapter.notifyDataSetChanged();
+                });
 
-                } catch (Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(newsforrepairmanActivity.this, "Ошибка загрузки Новостей: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(NewsForRepairManActivity.this, "Ошибка загрузки Новостей: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
             }
         }).start();
     }
@@ -235,7 +224,7 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
 
         if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
             connection.disconnect();
-            if (utils.refreshAccessToken(newsforrepairmanActivity.this, refreshToken))
+            if (utils.refreshAccessToken(NewsForRepairManActivity.this, refreshToken))
             {
                 // Читаем новые токены из SharedPreferences
                 SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
@@ -243,8 +232,8 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                 String newRefresh = prefs.getString("refresh_token", null);
 
                 // Обновляем переменные класса
-                newsforrepairmanActivity.this.accessToken = newAccess;
-                newsforrepairmanActivity.this.refreshToken = newRefresh;
+                NewsForRepairManActivity.this.accessToken = newAccess;
+                NewsForRepairManActivity.this.refreshToken = newRefresh;
 
                 // Повторяем исходный запрос с новым токеном
                 return sendGetRequest(newAccess, newRefresh, limit, userType);
@@ -261,11 +250,11 @@ public class newsforrepairmanActivity extends AppCompatActivity implements newsf
                         editor.remove("refresh_token");
                         editor.apply();
 
-                        Toast.makeText(newsforrepairmanActivity.this,
+                        Toast.makeText(NewsForRepairManActivity.this,
                                 "Сессия истекла. Войдите снова",
                                 Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(newsforrepairmanActivity.this, loginActivity.class);
+                        Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();

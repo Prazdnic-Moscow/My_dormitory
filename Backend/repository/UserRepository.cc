@@ -289,54 +289,105 @@ std::list<UserData> UserRepository::getUsers()
 
 UserData UserRepository::getUser(int id)
 {
-    auto tran = db_->newTransaction();
-    auto result = tran->execSqlSync
-    (
-        "SELECT * FROM users "
-        "WHERE id = $1", 
-        id
-    );
-    
-    if (result.empty()) 
     {
-        throw std::runtime_error("User not found");
+        auto tran = db_->newTransaction();
+        auto result = tran->execSqlSync
+        (
+            "SELECT * FROM users "
+            "WHERE id = $1", 
+            id
+        );
+
+        if (!result.empty()) 
+        {
+            UserData user;
+            user.fromDb(result[0]);
+
+            auto result_2 = tran->execSqlSync
+            (
+                "SELECT r.role_type FROM users u " 
+                "JOIN users_roles u_r ON u.id = u_r.user_id "
+                "JOIN roles r ON u_r.role_id = r.id "
+                "WHERE u.id = $1", 
+                id
+            );
+
+            std::list<std::string> role_type;
+            for (int i=0; i < result_2.size(); i++)
+            {
+                role_type.push_back(result_2[i]["role_type"].as<std::string>());
+            }
+            user.setRoles(role_type);
+            
+            
+            auto result_3 = tran->execSqlSync
+            (
+                "SELECT u_f.file_path FROM users u " 
+                "JOIN user_file u_f ON u.id = u_f.user_id "
+                "WHERE u.id = $1", 
+                id
+            );
+            std::list<std::string> file_path;
+            for (int i = 0; i < result_3.size(); i++)
+            {
+                file_path.push_back(result_3[i]["file_path"].as<std::string>());
+            }
+            user.setDocuments(file_path);
+            
+            return user;
+        }
     }
 
-    UserData user;
-    user.fromDb(result[0]);
-
-    auto result_2 = tran->execSqlSync
-    (
-        "SELECT r.role_type FROM users u " 
-        "JOIN users_roles u_r ON u.id = u_r.user_id "
-        "JOIN roles r ON u_r.role_id = r.id "
-        "WHERE u.id = $1", 
-        id
-    );
-
-    std::list<std::string> role_type;
-    for (int i=0; i < result_2.size(); i++)
     {
-        role_type.push_back(result_2[i]["role_type"].as<std::string>());
+        auto tran = db_->newTransaction();
+        auto result = tran->execSqlSync
+        (
+            "SELECT * FROM repairman "
+            "WHERE id = $1", 
+            id
+        );
+
+        if (result.empty()) 
+        {
+            throw std::runtime_error("User not found");
+        }
+
+        UserData user;
+        user.fromDb(result[0]);
+
+        auto result_2 = tran->execSqlSync
+        (
+            "SELECT r.role_type FROM repairman rm " 
+            "JOIN repairman_roles r_r ON rm.id = r_r.repairman_id "
+            "JOIN roles r ON r_r.role_id = r.id "
+            "WHERE rm.id = $1", 
+            id
+        );
+
+        std::list<std::string> role_type;
+        for (int i=0; i < result_2.size(); i++)
+        {
+            role_type.push_back(result_2[i]["role_type"].as<std::string>());
+        }
+        user.setRoles(role_type);
+        
+        
+        auto result_3 = tran->execSqlSync
+        (
+            "SELECT rm_f.file_path FROM repairman rm " 
+            "JOIN repairman_file rm_f ON rm.id = rm_f.repairman_id "
+            "WHERE rm.id = $1", 
+            id
+        );
+        std::list<std::string> file_path;
+        for (int i = 0; i < result_3.size(); i++)
+        {
+            file_path.push_back(result_3[i]["file_path"].as<std::string>());
+        }
+        user.setDocuments(file_path);
+        
+        return user;
     }
-    user.setRoles(role_type);
-    
-    
-    auto result_3 = tran->execSqlSync
-    (
-        "SELECT u_f.file_path FROM users u " 
-        "JOIN user_file u_f ON u.id = u_f.user_id "
-        "WHERE u.id = $1", 
-        id
-    );
-    std::list<std::string> file_path;
-    for (int i = 0; i < result_3.size(); i++)
-    {
-        file_path.push_back(result_3[i]["file_path"].as<std::string>());
-    }
-    user.setDocuments(file_path);
-    
-    return user;
 }
 
 bool UserRepository::deleteUser(int id)

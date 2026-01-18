@@ -39,7 +39,7 @@
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />
     <activity
-        android:name=".newsforrepairmanActivity"
+        android:name=".NewsForRepairManActivity"
         android:exported="false"
         android:theme="@style/Theme.MyDormitory.NoActionBar" />
     <activity
