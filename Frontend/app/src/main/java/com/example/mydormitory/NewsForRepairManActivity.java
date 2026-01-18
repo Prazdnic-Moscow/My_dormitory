@@ -297,7 +297,7 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
             int id = guideJson.getInt("id");
             String type = guideJson.getString("type");
             String body = guideJson.getString("body");
-            String date = guideJson.getString("date");
+            String date = utils.changeDate(guideJson.getString("date"));
             int room = guideJson.getInt("room");
             boolean activity = guideJson.getBoolean("activity");
 

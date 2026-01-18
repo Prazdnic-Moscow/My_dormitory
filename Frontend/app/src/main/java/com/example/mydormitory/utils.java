@@ -37,6 +37,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -195,11 +199,12 @@ public class utils {
     {
         if (date != null && date.length() >= 16) {
             try {
-                String datePart = date.substring(0, 10); // "2025-01-23"
-                String timePart = date.substring(11, 16); // "19:43"
-                String[] timeParts = timePart.split(":");
-                int hours = (Integer.parseInt(timeParts[0]) + 3) % 24;
-                return datePart + " " + String.format("%02d", hours) + ":" + timeParts[1];
+                String datePart = date.substring(0, 10);
+                String timePart = date.substring(11, 16);
+                LocalDateTime parsedDate = LocalDateTime.parse(datePart + "T" + timePart); // ISO
+
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm");
+                return parsedDate.format(formatter);
             } catch (Exception e) {
                 // если что-то пошло не так, оставляем оригинальную дату
                 return date;
