@@ -109,11 +109,18 @@
                 </LinearLayout>
 
                 <!-- Даты в виде горизонтального RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/dateRecyclerView"
+                <HorizontalScrollView
+                    android:id="@+id/dateScrollView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp" />
+                    android:layout_marginBottom="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/dateContainer"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"/>
+                </HorizontalScrollView>
 
             </LinearLayout>
 

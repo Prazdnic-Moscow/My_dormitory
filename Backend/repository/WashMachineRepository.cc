@@ -4,14 +4,34 @@ std::list<WashMachine> WashMachineRepository::getWashMachines()
 {
     auto result = db_->execSqlSync
     (
-        "SELECT * FROM machines "
+        "SELECT * FROM machines"
     );
-
+    auto dbClient = drogon::app().getDbClient();
+    ReserveWashMachineRepository reserve(dbClient);
+    auto reservations = reserve.getReserveWashMachines();
+    
+    // Создаем хэш-таблицу для быстрого поиска резерваций по machine_id
+    std::unordered_map<int, std::list<ReserveWashMachine>> reservationsMap;
+    
+    // Группируем резервации по machine_id
+    for (auto& reservation : reservations) 
+    {
+        reservationsMap[reservation.getMachineId()].push_back(reservation);
+    }
+    
+    // Создаем список машин с их резервациями
     std::list<WashMachine> machines;
-    for (auto &i : result)
+    for (auto& row : result) 
     {
         WashMachine washmachine;
-        washmachine.FromDB(i);
+        washmachine.FromDB(row);
+        int machineId = washmachine.getId();
+        auto it = reservationsMap.find(machineId);
+        if (it != reservationsMap.end()) 
+        {
+            washmachine.setReserve(it->second);
+        }
+        
         machines.push_back(washmachine);
     }
     return machines;

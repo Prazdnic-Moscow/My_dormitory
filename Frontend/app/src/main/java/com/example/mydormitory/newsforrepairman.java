@@ -27,7 +27,11 @@ public class newsforrepairman {
 
     // Getters
     public int getId() { return id; }
-    public String getType() { return type; }
+
+    public String getType()
+    {
+        return Type.getTypeStrByType(type);
+    }
     public String getBody() { return body; }
     public int getRoom() { return room; }
     public String getDate() { return date; }

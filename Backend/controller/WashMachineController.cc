@@ -61,6 +61,19 @@ void WashMachineController::getWashMachines(const HttpRequestPtr& req,
         Json::Value machineJson;
         machineJson["id"] = m.getId();
         machineJson["name"] = m.getName();
+        
+        Json::Value reserveArray(Json::arrayValue);
+        for (const auto& reserve : m.getReserve()) 
+        {
+            Json::Value reserveJson;
+            reserveJson["idReserve"] = reserve.getId();
+            reserveJson["user_id"] = reserve.getUserId();
+            reserveJson["date"] = reserve.getDate();
+            reserveJson["start_time"] = reserve.getStartTime();
+            reserveJson["duration"] = reserve.getDuration();
+            reserveArray.append(reserveJson);
+        }
+        machineJson["reservations"] = reserveArray;
         respJson.append(machineJson);
     }
     auto resp = HttpResponse::newHttpJsonResponse(respJson);

@@ -64,14 +64,14 @@ void ReserveWashMachineController::getReserveWashMachines(const HttpRequestPtr &
     Json::Value respJsons;
     for (auto& machines : machine)
     {
-    Json::Value respJson;
-    respJson["id"] = machines.getId();
-    respJson["user_id"] = machines.getUserId();
-    respJson["machine_id"] = machines.getMachineId();
-    respJson["date"] = machines.getDate();
-    respJson["start_time"] = machines.getStartTime();
-    respJson["duration"] = machines.getDuration();
-    respJsons.append(respJson);
+        Json::Value respJson;
+        respJson["id"] = machines.getId();
+        respJson["user_id"] = machines.getUserId();
+        respJson["machine_id"] = machines.getMachineId();
+        respJson["date"] = machines.getDate();
+        respJson["start_time"] = machines.getStartTime();
+        respJson["duration"] = machines.getDuration();
+        respJsons.append(respJson);
     }
     auto resp = HttpResponse::newHttpJsonResponse(respJsons);
     resp->setStatusCode(k200OK);

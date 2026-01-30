@@ -3,10 +3,12 @@
 #include <list>
 #include <drogon.h>
 #include <string>
+#include "ReserveWashMachine.h"
 class WashMachine 
 {
     int id;
     std::string name;
+    std::list<ReserveWashMachine> reserve;
 
     public :
         void FromDB(const drogon::orm::Row &result)
@@ -25,6 +27,11 @@ class WashMachine
             this -> name = namee; 
         }
 
+        void setReserve(std::list<ReserveWashMachine> reserver)
+        {
+            this -> reserve = reserver; 
+        }
+
         int getId() 
         { 
             return id; 
@@ -33,5 +40,10 @@ class WashMachine
         std::string getName()
         {
             return name; 
+        }
+
+        std::list<ReserveWashMachine> getReserve()
+        {
+            return reserve; 
         }
 };

@@ -40,7 +40,7 @@ android {
 }
 
 dependencies {
-
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.21.0")
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)

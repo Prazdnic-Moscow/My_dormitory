@@ -3,6 +3,7 @@
 #include <string>
 #include "WashMachine.h"
 #include "ReserveWashMachine.h"
+#include "ReserveWashMachineRepository.h"
 #include <list>
 #include "bcrypt/BCrypt.hpp"
 class WashMachineRepository
