@@ -35,7 +35,7 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.textView.setText(reservations.get(position));
+        holder.tvReservation.setText(reservations.get(position));
 
         holder.btnDelete.setOnClickListener(v -> {
             if (onDeleteClickListener != null) {
@@ -50,12 +50,12 @@ public class ReservationAdapter extends RecyclerView.Adapter<ReservationAdapter.
     }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textView;
+        TextView tvReservation;
         ImageButton btnDelete;
 
         ViewHolder(View view) {
             super(view);
-            textView = view.findViewById(R.id.tvReservation);
+            tvReservation = view.findViewById(R.id.tvReservation);
             btnDelete = view.findViewById(R.id.btnDelete);
         }
     }

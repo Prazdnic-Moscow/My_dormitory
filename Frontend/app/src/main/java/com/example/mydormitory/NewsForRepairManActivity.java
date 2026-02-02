@@ -3,6 +3,7 @@ package com.example.mydormitory;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -35,8 +36,9 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
     private String accessToken;
     private String refreshToken;
     private String userType;
+    private int currentUserId;
 
-    ImageButton exitFromRepairman;
+    ImageButton allWidjetForRepairBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -47,7 +49,8 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
         accessToken = prefs.getString("access_token", null);
         refreshToken = prefs.getString("refresh_token", null);
         userType = prefs.getString("type", null);
-        exitFromRepairman = findViewById(R.id.exitFromRepairman);
+        currentUserId = utils.getUserIdFromToken(this, accessToken, refreshToken);
+        allWidjetForRepairBtn = findViewById(R.id.allWidjetForRepairBtn);
 
         if (accessToken == null)
         {
@@ -58,19 +61,10 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
             return;
         }
 
-        exitFromRepairman.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                SharedPreferences.Editor editor = prefs.edit();
-                editor.remove("access_token");
-                editor.remove("refresh_token");
-                editor.apply();
-                Intent intent = new Intent (NewsForRepairManActivity.this, loginActivity.class);
-                startActivity(intent);
-                finish();
-            }
+        allWidjetForRepairBtn.setOnClickListener(v -> {
+            Intent intent = new Intent (NewsForRepairManActivity.this, allWidjetForRepairman.class);
+            startActivity(intent);
+            finish();
         });
 
         newsRecyclerView = findViewById(R.id.newsListForRepairman);
@@ -88,45 +82,46 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
 
     @Override
     public void onRepairButtonClick(int position, newsforrepairman news) {
-        // Инвертируем статус активности
         boolean newStatus = !news.getActivity();
-        updateRepairStatusOnServer(news.getId(), accessToken, newStatus, position);
+
+        if (newStatus) {
+            // Обновляем на сервере
+            updateRepairStatusOnServer(news.getId(), accessToken, newStatus, position, currentUserId);
+
+            Toast.makeText(this, "Заказ взят!", Toast.LENGTH_SHORT).show();
+        }
     }
+    private void updateRepairStatusOnServer(int repairId, String access, boolean newStatus, int position, int userId) {
+        final int safePosition = position;
+        new Thread(() -> {
+            try {
+                sendPatchRequest(UPDATE_STATUS_URL, access, repairId, newStatus, userId);
 
-    private void updateRepairStatusOnServer(int repairId, String access, boolean newStatus, int position) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try
-                {
-                    sendPatchRequest(UPDATE_STATUS_URL, access, repairId, newStatus);
-                    // Если сервер успешно обновил статус
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            newsforrepairman updatedNews = newsList.get(position);
-                            updatedNews.setActivity(newStatus);
-                            // Обновляем UI
-                            newsAdapter.notifyItemChanged(position);
-                            Toast.makeText(NewsForRepairManActivity.this, "Статус заказа обновлен", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                runOnUiThread(() -> {
+                    // Проверяем позицию как в MyRepairsActivity
+                    if (safePosition >= 0 && safePosition < newsList.size()) {
+                        newsList.remove(safePosition);
+                        newsAdapter.notifyItemRemoved(safePosition);
+                        Toast.makeText(NewsForRepairManActivity.this, "Заказ взят и перемещён в «Мои заказы»", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        loadNewsFromApi();
+                    }
+                });
 
-                }
-                catch (Exception e)
-                {
-                    runOnUiThread(() -> {
-                        Toast.makeText(NewsForRepairManActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    });
-                }
+            }
+            catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(NewsForRepairManActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                loadNewsFromApi();
             }
         }).start();
     }
 
-    private void sendPatchRequest(String urlString, String accessToken, int repairId, boolean newStatus) throws Exception {
+    private void sendPatchRequest(String urlString, String accessToken, int repairId, boolean newStatus, int userId) throws Exception {
         JSONObject jsonBody = new JSONObject();
-        jsonBody.put("id", repairId);
+        jsonBody.put("repair_id", repairId);
         jsonBody.put("activity", newStatus);
+        jsonBody.put("user_id", userId);
         HttpURLConnection connection = (HttpURLConnection) new URL(urlString).openConnection();
         connection.setRequestMethod("POST");
         connection.setRequestProperty("Content-Type", "application/json; utf-8");
@@ -153,26 +148,23 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
                 NewsForRepairManActivity.this.accessToken = newAccess;
                 NewsForRepairManActivity.this.refreshToken = newRefresh;
                 // повторяем исходный запрос с новым токеном
-                sendPatchRequest(urlString, newAccess, repairId, newStatus);
+                sendPatchRequest(urlString, newAccess, repairId, newStatus, userId);
                 return;
             }
             else
             {
                 // Сессия истекла
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove("access_token");
-                        editor.remove("refresh_token");
-                        editor.apply();
-                        Toast.makeText(NewsForRepairManActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
+                    Toast.makeText(NewsForRepairManActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 });
                 return;
             }
@@ -197,11 +189,20 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
             try {
                 String response = sendGetRequest(accessToken, refreshToken, NEWS_LIMIT, userType);
                 JSONArray jsonArray = new JSONArray(response);
-                final List<newsforrepairman> news = parseNewsFromJson(jsonArray);
+                List<newsforrepairman> allNews =
+                        utils.parseNewsFromJson(jsonArray);
+
+                List<newsforrepairman> freeNews = new ArrayList<>();
+
+                for (newsforrepairman n : allNews) {
+                    if (!n.getActivity()) {
+                        freeNews.add(n);
+                    }
+                }
 
                 runOnUiThread(() -> {
                     newsList.clear();
-                    newsList.addAll(news);
+                    newsList.addAll(freeNews);
                     newsAdapter.notifyDataSetChanged();
                 });
 
@@ -241,24 +242,21 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
             else
             {
                 // Сессия истекла
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove("access_token");
-                        editor.remove("refresh_token");
-                        editor.apply();
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
 
-                        Toast.makeText(NewsForRepairManActivity.this,
-                                "Сессия истекла. Войдите снова",
-                                Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewsForRepairManActivity.this,
+                            "Сессия истекла. Войдите снова",
+                            Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
+                    Intent intent = new Intent(NewsForRepairManActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 });
                 return null;
             }
@@ -286,33 +284,5 @@ public class NewsForRepairManActivity extends AppCompatActivity implements NewsF
         connection.disconnect();
 
         return response.toString();
-    }
-
-    private List<newsforrepairman> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
-        List<newsforrepairman> news = new ArrayList<>();
-
-        for (int i = 0; i < jsonArray.length(); i++) {
-            JSONObject guideJson = jsonArray.getJSONObject(i);
-
-            int id = guideJson.getInt("id");
-            String type = guideJson.getString("type");
-            String body = guideJson.getString("body");
-            String date = utils.changeDate(guideJson.getString("date"));
-            int room = guideJson.getInt("room");
-            boolean activity = guideJson.getBoolean("activity");
-
-            // Парсим массив изображений
-            List<String> imagePaths = new ArrayList<>();
-            if (guideJson.has("news_path")) {
-                JSONArray imagesArray = guideJson.getJSONArray("news_path");
-                for (int j = 0; j < imagesArray.length(); j++) {
-                    imagePaths.add(imagesArray.getString(j));
-                }
-            }
-
-            news.add(new newsforrepairman(id, type, body, date, room, activity, imagePaths));
-        }
-
-        return news;
     }
 }

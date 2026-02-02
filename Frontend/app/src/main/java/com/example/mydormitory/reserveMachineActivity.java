@@ -280,7 +280,7 @@ public class reserveMachineActivity extends AppCompatActivity {
         }
 
         // Парсим user_id из access token (JWT token)
-        int currentUserId = getUserIdFromToken(accessToken);
+        int currentUserId = utils.getUserIdFromToken(this, accessToken, refreshToken);
 
         if (currentUserId == -1) {
             Toast.makeText(this, "Ошибка: не удалось получить ID пользователя", Toast.LENGTH_SHORT).show();
@@ -350,7 +350,7 @@ public class reserveMachineActivity extends AppCompatActivity {
         new Thread(() -> {
             try {
                 // Получаем user_id из токена
-                int currentUserId = getUserIdFromToken(accessToken);
+                int currentUserId = utils.getUserIdFromToken(this, accessToken, refreshToken);
 
                 if (currentUserId == -1) {
                     runOnUiThread(() ->
@@ -413,33 +413,6 @@ public class reserveMachineActivity extends AppCompatActivity {
                         Toast.makeText(this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show());
             }
         }).start();
-    }
-
-    // Метод для извлечения user_id из JWT токена
-    private int getUserIdFromToken(String token) {
-        try {
-            String secretKey = "my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw";
-            SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
-
-            Claims claims = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody();
-
-            System.out.println("CLAIMS = " + claims);
-            System.out.println("CLAIMS KEYS = " + claims.keySet());
-
-            Number id = claims.get("Id", Number.class);
-            if (id == null) {
-                return -1;
-            }
-            return id.intValue();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-            return -1;
-        }
     }
 
     private String convertDateToBackendFormat(String date) {

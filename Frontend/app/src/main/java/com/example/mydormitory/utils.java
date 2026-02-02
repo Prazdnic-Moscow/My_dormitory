@@ -26,6 +26,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
@@ -37,12 +38,19 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.crypto.SecretKey;
+
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
 
 public class utils {
     public static String uploadFileToServer(Context context, Uri fileUri, String folder, String fileType) throws Exception {
@@ -143,6 +151,52 @@ public class utils {
         }
     }
 
+    public static int getUserIdFromToken(Context context, String token, String refreshToken) {
+        try {
+            if (token == null || token.isEmpty()) {
+                Log.d("TokenDebug", "Токен пустой");
+                return -1;
+            }
+
+            try {
+                String secretKey = "my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw";
+                SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+                Claims claims = Jwts.parserBuilder()
+                        .setSigningKey(key)
+                        .build()
+                        .parseClaimsJws(token)
+                        .getBody();
+
+                Number id = claims.get("Id", Number.class);
+                if (id == null) {
+                    return -1;
+                }
+                return id.intValue();
+            }
+            catch (Exception e) {
+                Log.d("TokenDebug", "Ошибка парсинга токена, пробуем обновить: " + e.getMessage());
+
+                if (refreshToken != null && !refreshToken.isEmpty()) {
+                    boolean refreshed = refreshAccessToken(context, refreshToken);
+                    if (refreshed) {
+                        SharedPreferences prefs = context.getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                        String newToken = prefs.getString("access_token", null);
+
+                        if (newToken != null) {
+                            return getUserIdFromToken(context, newToken, refreshToken);
+                        }
+                    }
+                }
+                return -1;
+            }
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
 
     public static boolean refreshAccessToken(Context context, String refreshToken)
     {
@@ -211,5 +265,35 @@ public class utils {
             }
         }
         return date;
+    }
+
+    public static List<newsforrepairman> parseNewsFromJson(JSONArray jsonArray) throws JSONException {
+        List<newsforrepairman> news = new ArrayList<>();
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            JSONObject guideJson = jsonArray.getJSONObject(i);
+
+            int id = guideJson.getInt("id");
+            String type = guideJson.getString("type");
+            String body = guideJson.getString("body");
+            String date = utils.changeDate(guideJson.getString("date"));
+            int room = guideJson.getInt("room");
+            int user_id = guideJson.getInt("user_id");
+            boolean activity = guideJson.getBoolean("activity");
+            int repairman_id = guideJson.getInt("repairman_id");
+
+            // Парсим массив изображений
+            List<String> imagePaths = new ArrayList<>();
+            if (guideJson.has("repair_path")) {
+                JSONArray imagesArray = guideJson.getJSONArray("repair_path");
+                for (int j = 0; j < imagesArray.length(); j++) {
+                    imagePaths.add(imagesArray.getString(j));
+                }
+            }
+
+            news.add(new newsforrepairman(id, type, body, date, room, user_id, repairman_id, activity, imagePaths));
+        }
+
+        return news;
     }
 }

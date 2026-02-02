@@ -19,12 +19,15 @@ class RepairRepository
                             int user_id);
 
         bool changeActivateRepair(int id,
-                                  bool activity);
+                                  bool activity,
+                                  int repairman_id);
         
         // Удаление
         bool deleteRepair(int id_repair);
 
         std::list<Repair> getRepairs();
+
+        std::list<Repair> getMyRepairs(int user_id);
 
     private:
         drogon::orm::DbClientPtr db_; // Подключение к PostgreSQL

@@ -8,17 +8,21 @@ public class newsforrepairman {
     private String body;
     private String date;
     private int room;
+    private int user_id;
+    private int repairman_id;
     private boolean activity;
     private List<String> newsPath;
 
-    public newsforrepairman(int id, String type, String body, String date, int room, boolean activity, List<String> newsPath) {
+    public newsforrepairman(int id, String type, String body, String date, int room, int user_id, int repairman_id, boolean activity, List<String> newsPath) {
         this.id = id;
         this.type = type;
         this.body = body;
         this.date = date;
         this.room = room;
+        this.user_id = user_id;
         this.activity = activity;
         this.newsPath = newsPath;
+        this.repairman_id = repairman_id;
     }
 
     public void setActivity(boolean activity) {
@@ -34,6 +38,9 @@ public class newsforrepairman {
     }
     public String getBody() { return body; }
     public int getRoom() { return room; }
+    public int getUserId() { return user_id; }
+    public int getRepairmanId() { return repairman_id; }
+
     public String getDate() { return date; }
     public boolean getActivity() { return activity; }
     public List<String> getNewsPath() { return newsPath; }

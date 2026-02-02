@@ -67,7 +67,10 @@ public class NewsForRepairManAdapter extends RecyclerView.Adapter<NewsForRepairM
         // Обработка клика по кнопке
         holder.buttonActivity.setOnClickListener(v -> {
             if (listener != null) {
-                listener.onRepairButtonClick(position, news);
+                int adapterPosition = holder.getAdapterPosition();
+                if (adapterPosition != RecyclerView.NO_POSITION) {
+                    listener.onRepairButtonClick(adapterPosition, news);
+                }
             }
         });
     }

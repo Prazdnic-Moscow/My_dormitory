@@ -19,10 +19,12 @@ Repair RepairService::createRepair(std::string type,
 
 
 bool RepairService::changeActivateRepair(int id,
-                                         bool activity)
+                                         bool activity,
+                                         int repairman_id)
 {
     return repository->changeActivateRepair(id,
-                                            activity);
+                                            activity,
+                                            repairman_id);
 }
 
 
@@ -34,4 +36,9 @@ bool RepairService::deleteRepair(int id_repair)
 std::list<Repair> RepairService::getRepairs()
 {
     return repository->getRepairs();
+}
+
+std::list<Repair> RepairService::getMyRepairs(int user_id)
+{
+    return repository->getMyRepairs(user_id);
 }

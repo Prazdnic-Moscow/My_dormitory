@@ -80,7 +80,9 @@ void NewsController::getNews(const HttpRequestPtr& req,
             jsonNewsItem["body"] = news_current.getBody();
             jsonNewsItem["date"] = news_current.getDate();
             jsonNewsItem["room"] = news_current.getRoom();
+            jsonNewsItem["user_id"] = news_current.getUserId();
             jsonNewsItem["activity"] = news_current.getActivity();
+            jsonNewsItem["repairman_id"] = news_current.getRepairmanId();
             
             // Добавляем массив изображений
             Json::Value jsonImages(Json::arrayValue);
@@ -88,7 +90,7 @@ void NewsController::getNews(const HttpRequestPtr& req,
             {
                 jsonImages.append(image_path);
             }
-            jsonNewsItem["news_path"] = jsonImages;
+            jsonNewsItem["repair_path"] = jsonImages;
             jsonNewsArray.append(jsonNewsItem);
         }
 

@@ -27,11 +27,14 @@ class RepairService
 
         
         bool changeActivateRepair(int id,
-                                  bool activity);
+                                  bool activity,
+                                  int repairman_id);
 
         bool deleteRepair(int id_repair);
 
         std::list<Repair> getRepairs();
+
+        std::list<Repair> getMyRepairs(int user_id);
 
     private:
         std::shared_ptr<RepairRepository> repository; // Доступ к БД

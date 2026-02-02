@@ -19,6 +19,7 @@ void RepairController::postRepair(const HttpRequestPtr& req,
         return;
     }
     // Извлекаем данные из JSON
+    int user_id_from_front = json->get("user_id", "").asInt();
     std::string type = json->get("type", "").asString();
     std::string body = json->get("body", "").asString();
     int room = json->get("room", "").asInt();
@@ -38,7 +39,15 @@ void RepairController::postRepair(const HttpRequestPtr& req,
             repair_paths.push_back(path);
         }
     }
+
     if (type != "plumber" && type != "carpenter" && type != "electrician")
+    {
+        auto resp = HttpResponse::newHttpResponse();
+        resp->setStatusCode(k400BadRequest);
+        callback(resp);
+    }
+
+    if (user_id_from_front != user_id)
     {
         auto resp = HttpResponse::newHttpResponse();
         resp->setStatusCode(k400BadRequest);
@@ -76,6 +85,55 @@ void RepairController::postRepair(const HttpRequestPtr& req,
     callback(resp);
 }
 
+
+void RepairController::getMyRepairs(const HttpRequestPtr& req,
+                            std::function<void(const HttpResponsePtr&)>&& callback)
+{
+    LOG_ERROR << "Зашли в getMyRepair для ремонтника";
+    std::string token = Headerhelper::getTokenFromHeaders(req);
+    auto decoded = jwt::decode<traits>(token);
+    if (!Headerhelper::verifyToken(decoded)) 
+    {
+        Headerhelper::responseCheckToken(callback);
+        return;
+    }
+    int user_id = decoded.get_payload_claim("Id").as_integer();
+    LOG_ERROR << "получили user_id "<<user_id;
+    // 3. Получаем подключение к БД
+    auto dbClient = drogon::app().getDbClient();
+    RepairService repair(dbClient);
+    auto repair_data = repair.getMyRepairs(user_id);
+
+        // Формируем JSON-ответ
+        Json::Value jsonNewsArray;
+        for (auto news_current : repair_data)
+        {
+            Json::Value jsonNewsItem;
+            jsonNewsItem["id"] = news_current.getId();
+            jsonNewsItem["type"] = news_current.getType();
+            jsonNewsItem["body"] = news_current.getBody();
+            jsonNewsItem["date"] = news_current.getDate();
+            jsonNewsItem["room"] = news_current.getRoom();
+            jsonNewsItem["user_id"] = news_current.getUserId();
+            jsonNewsItem["activity"] = news_current.getActivity();
+            jsonNewsItem["repairman_id"] = news_current.getRepairmanId();
+            
+            // Добавляем массив изображений
+            Json::Value jsonImages(Json::arrayValue);
+            for (const auto& image_path : news_current.getRepairPaths()) 
+            {
+                jsonImages.append(image_path);
+            }
+            jsonNewsItem["repair_path"] = jsonImages;
+            jsonNewsArray.append(jsonNewsItem);
+        }
+
+        // 4. Создаем и настраиваем ответ
+        auto resp = HttpResponse::newHttpJsonResponse(jsonNewsArray);
+        resp->setStatusCode(k200OK);
+        callback(resp);
+}
+
 void RepairController::activateRepair(const HttpRequestPtr& req,
                             std::function<void(const HttpResponsePtr&)>&& callback)
 {
@@ -87,7 +145,6 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
         Headerhelper::responseCheckToken(callback);
         return;
     }
-    int user_id = decoded.get_payload_claim("Id").as_integer();
     // Получаем JSON данные
     auto json = req->getJsonObject();
     if (!json) 
@@ -96,9 +153,10 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
         return;
     }
     // Извлекаем данные из JSON
-    int id = json->get("id", "").asInt();
+    int repair_id = json->get("repair_id", "").asInt();
     bool activity = json->get("activity", "").asBool();
-    LOG_ERROR << "Извлекли данные"<<activity;
+    int repairman_id = json->get("user_id", "").asInt();
+    LOG_ERROR << "Извлекли данные"<<repairman_id;
     
     if (activity != true && activity != false)
     {
@@ -106,12 +164,14 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
         resp->setStatusCode(k400BadRequest);
         callback(resp);
     }
+    
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
     RepairService repair(dbClient);
-    auto success = repair.changeActivateRepair(id,
-                                               activity);
+    auto success = repair.changeActivateRepair(repair_id,
+                                               activity,
+                                               repairman_id);
 
     if (success)
     {
@@ -119,7 +179,7 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
         Json::Value jsonResponse;
         jsonResponse["success"] = true;
         jsonResponse["message"] = "Repair activity updated successfully";
-        jsonResponse["id"] = id;
+        jsonResponse["id"] = repair_id;
         jsonResponse["new_activity"] = activity; // или !activity если инвертируется
         
         auto resp = HttpResponse::newHttpJsonResponse(jsonResponse);
@@ -132,7 +192,7 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
         Json::Value jsonResponse;
         jsonResponse["success"] = false;
         jsonResponse["error"] = "Failed to update repair activity";
-        jsonResponse["id"] = id;
+        jsonResponse["id"] = repair_id;
         
         auto resp = HttpResponse::newHttpJsonResponse(jsonResponse);
         resp->setStatusCode(k400BadRequest);
@@ -140,46 +200,6 @@ void RepairController::activateRepair(const HttpRequestPtr& req,
     }
 }
 
-
-
-void RepairController::getRepairs(const HttpRequestPtr& req,
-                                  std::function<void(const HttpResponsePtr&)>&& callback)
-{
-    std::string token = Headerhelper::getTokenFromHeaders(req);
-    auto decoded = jwt::decode<traits>(token);
-    if (!Headerhelper::verifyToken(decoded)) 
-    {
-        Headerhelper::responseCheckToken(callback);
-        return;
-    }
-    // 3. Получаем подключение к БД
-    auto dbClient = drogon::app().getDbClient();
-    RepairService repair(dbClient);
-    auto repair_all = repair.getRepairs();
-    // 3. Формируем JSON-ответ
-    Json::Value jsonRepairs;
-    for (auto repairs : repair_all)
-    {
-        Json::Value jsonRepair;
-        jsonRepair["id"] = repairs.getId();
-        jsonRepair["body"] = repairs.getBody();
-        jsonRepair["room"] = repairs.getRoom();
-        jsonRepair["date"] = repairs.getDate();
-        // Добавляем массив изображений
-        Json::Value jsonImages(Json::arrayValue);
-        for (const auto& repair_path : repairs.getRepairPaths()) 
-        {
-            jsonImages.append(repair_path);
-        }
-
-        jsonRepair["repair_path"] = jsonImages; // исправлено имя поля
-        jsonRepairs.append(jsonRepair);
-    }
-    // 4. Создаем и настраиваем ответ
-    auto resp = HttpResponse::newHttpJsonResponse(jsonRepairs);
-    resp->setStatusCode(k200OK);
-    callback(resp);
-}
 
 void RepairController::deleteRepair(const HttpRequestPtr& req,
                                     std::function<void(const HttpResponsePtr&)>&& callback, 
