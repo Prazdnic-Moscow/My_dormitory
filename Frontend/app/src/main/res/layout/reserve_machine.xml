@@ -183,20 +183,41 @@
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <!-- Длительности в виде горизонтального RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/durationRecyclerView"
+                <ScrollView
+                    android:id="@+id/timeScrollView"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:id="@+id/timeContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"/>
+                </ScrollView>
 
             </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/TimeSelectedDateRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:id="@+id/resetTimeButton"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/red"
+                android:text="Сбросить выбор"
+                android:textColor="@color/white" />
 
             <!-- Сводка бронирования -->
             <LinearLayout
                 android:id="@+id/bookingSummaryLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="16dp"
                 android:background="@color/white"
                 android:orientation="vertical"
                 android:padding="16dp">
@@ -205,7 +226,7 @@
                     android:id="@+id/bookingSummaryText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="27dp"
                     android:text="Бронируете с 09:30 до 10:30"
                     android:textColor="@color/black"
                     android:textSize="14sp" />

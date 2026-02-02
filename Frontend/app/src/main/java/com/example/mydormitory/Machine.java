@@ -5,9 +5,9 @@ import java.util.List;
 public class Machine {
     private int id;
     private String name;
-    private List<reserveWashMachine> reservations;
+    private List<ReserveWashMachine> reservations;
 
-    public Machine(int id, String name, List<reserveWashMachine> reservations) {
+    public Machine(int id, String name, List<ReserveWashMachine> reservations) {
         this.id = id;
         this.name = name;
         this.reservations = reservations;
@@ -32,11 +32,11 @@ public class Machine {
         this.name = name;
     }
 
-    public List<reserveWashMachine> getReservations() {
+    public List<ReserveWashMachine> getReservations() {
         return reservations;
     }
 
-    public void setReservations(List<reserveWashMachine> reservations) {
+    public void setReservations(List<ReserveWashMachine> reservations) {
         this.reservations = reservations;
     }
 

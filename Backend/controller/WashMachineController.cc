@@ -66,7 +66,7 @@ void WashMachineController::getWashMachines(const HttpRequestPtr& req,
         for (const auto& reserve : m.getReserve()) 
         {
             Json::Value reserveJson;
-            reserveJson["idReserve"] = reserve.getId();
+            reserveJson["id_reserve"] = reserve.getId();
             reserveJson["user_id"] = reserve.getUserId();
             reserveJson["date"] = reserve.getDate();
             reserveJson["start_time"] = reserve.getStartTime();

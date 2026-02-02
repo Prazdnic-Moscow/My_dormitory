@@ -40,6 +40,10 @@ android {
 }
 
 dependencies {
+    implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.21.0")
     implementation(libs.appcompat)
     implementation(libs.material)

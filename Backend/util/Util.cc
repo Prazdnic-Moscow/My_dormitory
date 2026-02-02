@@ -23,7 +23,7 @@ bool Headerhelper::verifyToken (jwt::decoded_jwt<traits> decoded)
     {
         // 1. Создаем верификатор
         auto verifier = jwt::verify<traits>()
-        .allow_algorithm(jwt::algorithm::hs256{"your_secret_key"});
+        .allow_algorithm(jwt::algorithm::hs256{"my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw"});
         // 3. Верифицируем
         verifier.verify(decoded);
         return true;

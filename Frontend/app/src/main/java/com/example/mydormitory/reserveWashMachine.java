@@ -1,44 +1,49 @@
 package com.example.mydormitory;
 
-public class reserveWashMachine {
-    private int id;
-    private int UserId;
-    private int MachineId;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+public class ReserveWashMachine {
+    @JsonProperty("id_reserve")
+    private int idReserve;
+
+    @JsonProperty("user_id")
+    private int userId;
+
+    @JsonProperty("date")
     private String date;
+
+    @JsonProperty("start_time")
     private String startTime;
+
+    @JsonProperty("duration")
     private float duration;
 
-    public reserveWashMachine(int id, int userId, int machineId, String date, String startTime, float duration) {
-        this.id = id;
-        UserId = userId;
-        MachineId = machineId;
+    public ReserveWashMachine(int idReserve, int userId, String date, String startTime, float duration) {
+        this.idReserve = idReserve;
+        this.userId = userId;
         this.date = date;
         this.startTime = startTime;
         this.duration = duration;
     }
 
-    public int getId() {
-        return id;
+    public ReserveWashMachine() {
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public int getIdReserve() {
+        return idReserve;
+    }
+
+    public void setIdReserve(int idReserve) {
+        this.idReserve = idReserve;
     }
 
     public int getUserId() {
-        return UserId;
+        return userId;
     }
 
     public void setUserId(int userId) {
-        UserId = userId;
-    }
-
-    public int getMachineId() {
-        return MachineId;
-    }
-
-    public void setMachineId(int machineId) {
-        MachineId = machineId;
+        this.userId = userId;
     }
 
     public String getDate() {

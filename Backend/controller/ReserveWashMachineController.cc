@@ -22,6 +22,12 @@ void ReserveWashMachineController::postReserveWashMachine(const HttpRequestPtr &
     std::string date = json->get("date_start", "").asString();
     std::string time_start = json->get("time_start", "").asString();
     float duration = json->get("duration", "").asFloat();
+
+    LOG_ERROR << "userId"<<userId;
+    LOG_ERROR << "machineId"<<machineId;
+    LOG_ERROR << "date"<<date;
+    LOG_ERROR << "time_start"<<time_start;
+    LOG_ERROR << "duration"<<duration;
     
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
@@ -91,7 +97,7 @@ void ReserveWashMachineController::deleteReserveWashMachine(const HttpRequestPtr
         return;
     }
 
-    if (!Headerhelper::checkRoles(decode, "reserve_wash_machine_write") && user_id != decode.get_payload_claim("Id").as_integer())
+    if (user_id != decode.get_payload_claim("Id").as_integer())
     {
         Headerhelper::responseCheckRoles(callback);
         return;

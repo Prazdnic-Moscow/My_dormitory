@@ -117,7 +117,8 @@ public class addDocumentsActivity extends AppCompatActivity
                     @Override
                     public void run()
                     {
-                        try {
+                        try
+                        {
                             // Загружаем файлы на /file/user и получаем пути
                             List<String> photoPaths = new ArrayList<>();
                             for (Uri fileUri : selectedFiles) {

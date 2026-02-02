@@ -77,7 +77,7 @@ std::list<std::string> UserService::login(const std::string &phone_number,
         .set_subject(phone_number)
         .set_type("access")
         .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{1})
-        .sign(jwt::algorithm::hs256{"your_secret_key"});
+        .sign(jwt::algorithm::hs256{"my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw"});
 
         // Refresh token (7 дней)
         auto refresh_token = jwt::create<traits>()
@@ -85,7 +85,7 @@ std::list<std::string> UserService::login(const std::string &phone_number,
         .set_subject(phone_number)
         .set_type("refresh")
         .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{168})
-        .sign(jwt::algorithm::hs256{"your_secret_key"});
+        .sign(jwt::algorithm::hs256{"my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw"});
 
         // Возвращаем в списке: [access_token, refresh_token]
         std::string userType = user.getTypeName();
@@ -139,15 +139,13 @@ std::list<std::string> UserService::refreshTokens(const std::string &refresh_tok
             .set_subject(user.getPhoneNumber())
             .set_type("access")
             .set_expires_at(std::chrono::system_clock::now() + std::chrono::minutes{1})
-            .sign(jwt::algorithm::hs256{"your_secret_key"});
-
+            .sign(jwt::algorithm::hs256{"my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw"});
         auto new_refresh_token = jwt::create<traits>()
             .set_payload_claim("Id", user.getId())
             .set_subject(user.getPhoneNumber())
             .set_type("refresh")
             .set_expires_at(std::chrono::system_clock::now() + std::chrono::hours{168})
-            .sign(jwt::algorithm::hs256{"your_secret_key"});
-
+            .sign(jwt::algorithm::hs256{"my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw"});
         std::list<std::string> tokens;
         tokens.push_back(new_access_token);
         tokens.push_back(new_refresh_token);

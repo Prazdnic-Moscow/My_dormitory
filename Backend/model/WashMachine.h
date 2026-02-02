@@ -3,12 +3,17 @@
 #include <list>
 #include <drogon.h>
 #include <string>
+#include <json/json.h>
 #include "ReserveWashMachine.h"
+
+
 class WashMachine 
 {
     int id;
     std::string name;
     std::list<ReserveWashMachine> reserve;
+
+
 
     public :
         void FromDB(const drogon::orm::Row &result)
