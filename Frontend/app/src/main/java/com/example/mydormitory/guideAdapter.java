@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -19,6 +20,18 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
     public guideAdapter(List<guide> guideList) {
         this.guideList = guideList;
     }
+
+
+    public interface OnGuideClickListener {
+        void onDeleteClick(guide guideItem, int position);
+    }
+
+    private OnGuideClickListener listener;
+
+    public void setOnGuideClickListener(OnGuideClickListener listener) {
+        this.listener = listener;
+    }
+
 
     @NonNull
     @Override
@@ -42,6 +55,14 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
                 addImageToContainer(holder.filesContainerForGuides, guide.getTutorPath().get(i));
             }
         }
+        holder.btnDeleteFromGuide.setOnClickListener(v -> {
+            if (listener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener.onDeleteClick(guide, pos);
+                }
+            }
+        });
     }
 
     private void addImageToContainer(LinearLayout container, String imagePath) {
@@ -83,6 +104,7 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
     public static class GuideViewHolder extends RecyclerView.ViewHolder {
         TextView guideHeader, guideBody, guideDate;
         LinearLayout filesContainerForGuides;
+        ImageButton btnDeleteFromGuide;
 
         public GuideViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +112,7 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
             guideBody = itemView.findViewById(R.id.guideBody);
             guideDate = itemView.findViewById(R.id.guideDate);
             filesContainerForGuides = itemView.findViewById(R.id.filesContainerForGuides);
+            btnDeleteFromGuide = itemView.findViewById(R.id.btnDeleteFromGuide);
         }
     }
 }

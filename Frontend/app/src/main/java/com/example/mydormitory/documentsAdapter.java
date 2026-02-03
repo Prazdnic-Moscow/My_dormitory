@@ -7,6 +7,7 @@ import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -27,6 +28,17 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
         this.context = context;
     }
 
+    public interface OnDocumentClickListener {
+        void onDeleteClick(documents document, int position);
+    }
+
+    private OnDocumentClickListener listener;
+
+    public void setOnDocumentClickListener(OnDocumentClickListener listener) {
+        this.listener = listener;
+    }
+
+
     @NonNull
     @Override
     public DocumentsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -37,18 +49,29 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
 
     @Override
     public void onBindViewHolder(@NonNull DocumentsViewHolder holder, int position) {
-        documents documents = documentsList.get(position);
+        documents document = documentsList.get(position);
 
-        holder.documentsBody.setText(documents.getBody());
-        holder.documentsDate.setText(documents.getDate());
+        holder.documentsBody.setText(document.getBody());
+        holder.documentsDate.setText(document.getDate());
         holder.filesContainerForDocuments.removeAllViews();
 
-        if (documents.getDocumentsPath() != null) {
-            for (String filePath : documents.getDocumentsPath()) {
+        if (document.getDocumentsPath() != null) {
+            for (String filePath : document.getDocumentsPath()) {
                 addFileToContainer(holder.filesContainerForDocuments, filePath);
             }
         }
+
+        // 👇 КЛИК НА УДАЛЕНИЕ
+        holder.btnDeleteFromDocument.setOnClickListener(v -> {
+            if (listener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener.onDeleteClick(document, pos);
+                }
+            }
+        });
     }
+
 
     private void addFileToContainer(LinearLayout container, String filePath) {
         ImageView imageView = new ImageView(container.getContext());
@@ -138,12 +161,16 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
     public static class DocumentsViewHolder extends RecyclerView.ViewHolder {
         TextView documentsBody, documentsDate;
         LinearLayout filesContainerForDocuments;
+        ImageButton btnDeleteFromDocument;
+
 
         public DocumentsViewHolder(@NonNull View itemView) {
             super(itemView);
             documentsBody = itemView.findViewById(R.id.documentsBody);
             documentsDate = itemView.findViewById(R.id.documentsDate);
             filesContainerForDocuments = itemView.findViewById(R.id.filesContainerForDocuments);
+            btnDeleteFromDocument = itemView.findViewById(R.id.btnDeleteFromDocument);
+
         }
     }
 }

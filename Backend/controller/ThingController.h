@@ -20,7 +20,7 @@ class ThingController : public HttpController<ThingController>
         METHOD_LIST_BEGIN
             ADD_METHOD_TO(ThingController::postThing, "/thing", Post);
             ADD_METHOD_TO(ThingController::getThings, "/thing", Get);
-            ADD_METHOD_TO(ThingController::deleteThing, "/thing/{1}", Delete);
+            ADD_METHOD_TO(ThingController::deleteThing, "/thing/{1}/{2}", Delete);
 
         METHOD_LIST_END
 

@@ -114,17 +114,21 @@ void FileController::deleteFile(const HttpRequestPtr& req,
 {
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decoded = jwt::decode<traits>(token);
+    LOG_ERROR << "Зашли в deleteFile id_file "<<id_file;
     
-    if (Headerhelper::verifyToken(decoded))
+    if (!Headerhelper::verifyToken(decoded))
     {
         Headerhelper::responseCheckToken(callback);
         return;
     }
+
     if (!Headerhelper::checkRoles(decoded, "file_write"))
     {
         Headerhelper::responseCheckRoles(callback);
         return;
     }
+
+    LOG_ERROR << "Прошли проверку ";
 
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();

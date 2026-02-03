@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +23,17 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
         this.newsList = newsList;
     }
 
+    public interface OnNewsClickListener {
+        void onDeleteClick(news newsItem, int position);
+    }
+
+    private OnNewsClickListener listener;
+
+    public void setOnNewsClickListener(OnNewsClickListener listener) {
+        this.listener = listener;
+    }
+
+
     @NonNull
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -36,20 +48,29 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
 
         holder.newsHeader.setText(news.getHeader());
         holder.newsBody.setText(news.getBody());
-        // Форматируем даты с разделителем
-        String datesText = "Начало: " + news.getDateStart() + " Конец: " + news.getDateEnd();
-        holder.newsDateStartAndEnd.setText(datesText);
+        holder.newsDateStartAndEnd.setText(
+                "Начало: " + news.getDateStart() + " Конец: " + news.getDateEnd()
+        );
         holder.newsAuthor.setText(news.getAuthor());
-        holder.filesContainerForNews.removeAllViews();
         holder.newsDate.setText(news.getDate());
+        holder.filesContainerForNews.removeAllViews();
 
         if (news.getNewsPath() != null && !news.getNewsPath().isEmpty()) {
-            for (int i = 0; i < news.getNewsPath().size(); i++) {
-                addImageToContainer(holder.filesContainerForNews, news.getNewsPath().get(i));
+            for (String path : news.getNewsPath()) {
+                addImageToContainer(holder.filesContainerForNews, path);
             }
         }
-    }
 
+        // 👇 КЛИК НА КНОПКУ
+        holder.deleteButton.setOnClickListener(v -> {
+            if (listener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener.onDeleteClick(news, pos);
+                }
+            }
+        });
+    }
     private void addImageToContainer(LinearLayout container, String imagePath) {
         ImageView imageView = new ImageView(container.getContext());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 300);
@@ -89,6 +110,7 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
     public static class NewsViewHolder extends RecyclerView.ViewHolder {
         TextView newsHeader, newsBody, newsDateStartAndEnd, newsAuthor, newsDate;
         LinearLayout filesContainerForNews;
+        ImageButton deleteButton;
 
         public NewsViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -98,6 +120,7 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
             newsAuthor = itemView.findViewById(R.id.repairmanRoom);
             filesContainerForNews = itemView.findViewById(R.id.filesContainerForRepairman);
             newsDate = itemView.findViewById(R.id.newsDate);
+            deleteButton = itemView.findViewById(R.id.btnDeleteFromNews);
         }
     }
 }

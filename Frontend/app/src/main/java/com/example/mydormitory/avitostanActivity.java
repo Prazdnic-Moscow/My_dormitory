@@ -32,6 +32,7 @@ public class avitostanActivity extends AppCompatActivity
     private static final String API_URL = "http://10.0.2.2:3000/thing";
     private String accessToken;
     private String refreshToken;
+    private int user_id;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -41,6 +42,7 @@ public class avitostanActivity extends AppCompatActivity
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         accessToken = prefs.getString("access_token", null);
         refreshToken = prefs.getString("refresh_token", null);
+        user_id = utils.getUserIdFromToken(this, accessToken, refreshToken);
 
         // Проверяем авторизацию
         if (accessToken == null) {
@@ -56,6 +58,12 @@ public class avitostanActivity extends AppCompatActivity
 
         // Настройка RecyclerView
         avitostanAdapter = new avitostanAdapter(avitostanList);
+
+        avitostanAdapter.setOnAvitostanClickListener((item, position) -> {
+            Toast.makeText(avitostanActivity.this, "Удаление объявления: " + item.getBody(), Toast.LENGTH_SHORT).show();
+            deleteAvitostanFromServer(item.getId(), position);
+        });
+
         avitostanRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         avitostanRecyclerView.setAdapter(avitostanAdapter);
 
@@ -65,53 +73,98 @@ public class avitostanActivity extends AppCompatActivity
         // Загрузка данных с API
         loadAvitostanFromApi();
 
-        menuButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(avitostanActivity.this, allWidjet.class);
-                startActivity(intent);
-            }
+        menuButton.setOnClickListener(v -> {
+            Intent intent = new Intent(avitostanActivity.this, allWidjet.class);
+            startActivity(intent);
         });
 
-        addAvitoButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent (avitostanActivity.this, addAvitoActivity.class);
-                startActivity(intent);
-            }
+        addAvitoButton.setOnClickListener(v -> {
+            Intent intent = new Intent (avitostanActivity.this, addAvitoActivity.class);
+            startActivity(intent);
         });
     }
+
+    private void deleteAvitostanFromServer(int id, int position) {
+        new Thread(() -> {
+            try {
+                boolean success = sendDeleteRequest(id, user_id);
+                runOnUiThread(() -> {
+                    if (success)
+                    {
+                        avitostanList.remove(position);
+                        avitostanAdapter.notifyItemRemoved(position);
+                        Toast.makeText(avitostanActivity.this, "Объявление удалено", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(avitostanActivity.this, "Ошибка удаления", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(avitostanActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private boolean sendDeleteRequest(int id, int user_id) throws Exception
+    {
+        String urlStr = API_URL+ "/" + id + "/" + user_id;
+        HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+        {
+            connection.disconnect();
+            if (utils.refreshAccessToken(this, refreshToken))
+            {
+                SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                accessToken = prefs.getString("access_token", null);
+                refreshToken = prefs.getString("refresh_token", null);
+                return sendDeleteRequest(id, user_id);
+            }
+            else
+            {
+                // Сессия истекла
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
+                    Toast.makeText(avitostanActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(avitostanActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                });
+                return false;
+            }
+        }
+        connection.disconnect();
+        return responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT;
+    }
+
     private void loadAvitostanFromApi() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String response = sendGetRequest(accessToken, refreshToken);
-                    JSONArray jsonArray = new JSONArray(response);
-                    final List<avitostan> avitostans = parseAvitostansFromJson(jsonArray);
+        new Thread(() -> {
+            try {
+                String response = sendGetRequest(accessToken, refreshToken);
+                JSONArray jsonArray = new JSONArray(response);
+                final List<avitostan> avitostans = parseAvitostansFromJson(jsonArray);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            avitostanList.clear();
-                            avitostanList.addAll(avitostans);
-                            avitostanAdapter.notifyDataSetChanged();
-                        }
-                    });
+                runOnUiThread(() -> {
+                    avitostanList.clear();
+                    avitostanList.addAll(avitostans);
+                    avitostanAdapter.notifyDataSetChanged();
+                });
 
-                } catch (Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(avitostanActivity.this, "Ошибка загрузки Обьявлений (Возможно еще нету ни одного обьявления) " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(avitostanActivity.this, "Ошибка загрузки Обьявлений (Возможно еще нету ни одного обьявления) " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
             }
         }).start();
     }
@@ -143,20 +196,17 @@ public class avitostanActivity extends AppCompatActivity
             else
             {
                 // Сессия истекла
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove("access_token");
-                        editor.remove("refresh_token");
-                        editor.apply();
-                        Toast.makeText(avitostanActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(avitostanActivity.this, loginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
+                    Toast.makeText(avitostanActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(avitostanActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 });
                 return null;
             }

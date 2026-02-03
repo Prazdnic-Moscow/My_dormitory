@@ -114,6 +114,8 @@ void ThingController::deleteThing(const HttpRequestPtr& req,
                                   int id_thing,
                                   int id_user)
 {
+    LOG_ERROR << "Зашли в метод deleteThing id_thing "<<id_thing;
+    LOG_ERROR << "Зашли в метод deleteThing id_user "<<id_user;
     std::string token = Headerhelper::getTokenFromHeaders(req);
     auto decoded = jwt::decode<traits>(token);
     
@@ -129,6 +131,7 @@ void ThingController::deleteThing(const HttpRequestPtr& req,
         return;
     }
 
+    LOG_ERROR << "Прошли проверку роли";
     // 3. Получаем подключение к БД
     auto dbClient = drogon::app().getDbClient();
     ThingService thing(dbClient);

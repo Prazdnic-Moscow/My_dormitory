@@ -56,56 +56,110 @@ public class guideActivity extends AppCompatActivity {
 
         // Настройка RecyclerView
         guideAdapter = new guideAdapter(guideList);
+
+        guideAdapter.setOnGuideClickListener((item, position) -> {
+            Toast.makeText(guideActivity.this, "Удаление гайда: " + item.getBody(), Toast.LENGTH_SHORT).show();
+            deleteGuideFromServer(item.getId(), position);
+        });
+
         guideRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         guideRecyclerView.setAdapter(guideAdapter);
 
         // Загрузка данных с API
         loadGuidesFromApi();
 
-        menuButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(guideActivity.this, allWidjet.class);
-                startActivity(intent);
-            }
+        menuButton.setOnClickListener(v -> {
+            Intent intent = new Intent(guideActivity.this, allWidjet.class);
+            startActivity(intent);
         });
 
-        addGuideButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(guideActivity.this, addGuideActivity.class);
-                startActivity(intent);
-            }
+        addGuideButton.setOnClickListener(v -> {
+            Intent intent = new Intent(guideActivity.this, addGuideActivity.class);
+            startActivity(intent);
         });
     }
 
+    private void deleteGuideFromServer(int id, int position) {
+        new Thread(() -> {
+            try {
+                boolean success = sendDeleteRequest(id);
+                runOnUiThread(() -> {
+                    if (success)
+                    {
+                        guideList.remove(position);
+                        guideAdapter.notifyItemRemoved(position);
+                        Toast.makeText(guideActivity.this, "Объявление удалено", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(guideActivity.this, "Ошибка удаления", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+            catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(guideActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private boolean sendDeleteRequest(int id) throws Exception
+    {
+        String urlStr = API_URL+ "/" + id;
+        HttpURLConnection connection = (HttpURLConnection) new URL(urlStr).openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+        {
+            connection.disconnect();
+            if (utils.refreshAccessToken(this, refreshToken))
+            {
+                SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                accessToken = prefs.getString("access_token", null);
+                refreshToken = prefs.getString("refresh_token", null);
+                return sendDeleteRequest(id);
+            }
+            else
+            {
+                // Сессия истекла
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
+                    Toast.makeText(guideActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(guideActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                });
+                return false;
+            }
+        }
+        connection.disconnect();
+        return responseCode == HttpURLConnection.HTTP_OK || responseCode == HttpURLConnection.HTTP_NO_CONTENT;
+    }
+
     private void loadGuidesFromApi() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String response = sendGetRequest(accessToken, refreshToken);
-                    JSONArray jsonArray = new JSONArray(response);
-                    final List<guide> guides = parseGuidesFromJson(jsonArray);
+        new Thread(() -> {
+            try {
+                String response = sendGetRequest(accessToken, refreshToken);
+                JSONArray jsonArray = new JSONArray(response);
+                final List<guide> guides = parseGuidesFromJson(jsonArray);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            guideList.clear();
-                            guideList.addAll(guides);
-                            guideAdapter.notifyDataSetChanged();
-                        }
-                    });
+                runOnUiThread(() -> {
+                    guideList.clear();
+                    guideList.addAll(guides);
+                    guideAdapter.notifyDataSetChanged();
+                });
 
-                } catch (Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(guideActivity.this, "Ошибка загрузки гайдов: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(guideActivity.this, "Ошибка загрузки гайдов: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
             }
         }).start();
     }

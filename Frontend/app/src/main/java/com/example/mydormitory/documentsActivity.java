@@ -29,6 +29,7 @@ public class documentsActivity extends AppCompatActivity
     private documentsAdapter documentsAdapter;
     private List<documents> documentsList = new ArrayList<>();
     private static final String API_URL = "http://10.0.2.2:3000/file";
+    private static final String DELETE_API = "http://10.0.2.2:3000/file/";
     private String accessToken;
     private String refreshToken;
     @Override
@@ -39,6 +40,7 @@ public class documentsActivity extends AppCompatActivity
         SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
         accessToken = prefs.getString("access_token", null);
         refreshToken = prefs.getString("refresh_token", null);
+
         if (accessToken == null)
         {
             Toast.makeText(this, "Пользователь не авторизован", Toast.LENGTH_SHORT).show();
@@ -54,60 +56,122 @@ public class documentsActivity extends AppCompatActivity
 
         // Настройка RecyclerView
         documentsAdapter = new documentsAdapter(documentsList, this);
+
+        documentsAdapter.setOnDocumentClickListener((document, position) -> {
+
+            Toast.makeText(documentsActivity.this, "Удаление документа...", Toast.LENGTH_SHORT).show();
+
+            deleteDocumentFromServer(document.getId(), position);
+        });
+
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         documentsRecyclerView.setAdapter(documentsAdapter);
 
         // Загрузка данных с API
         loadDocumentsFromApi();
 
-        menuButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent (documentsActivity.this, allWidjet.class);
-                startActivity(intent);
-            }
+        menuButton.setOnClickListener(v -> {
+            Intent intent = new Intent (documentsActivity.this, allWidjet.class);
+            startActivity(intent);
         });
 
-        addDocumentButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent (documentsActivity.this, addDocumentsActivity.class);
-                startActivity(intent);
-            }
+        addDocumentButton.setOnClickListener(v -> {
+            Intent intent = new Intent (documentsActivity.this, addDocumentsActivity.class);
+            startActivity(intent);
         });
     }
 
+    private void deleteDocumentFromServer(int fileId, int position) {
+        new Thread(() -> {
+            try {
+                boolean success = deleteFromServer(accessToken,
+                                                   refreshToken,
+                                                   fileId);
+                runOnUiThread(() -> {
+                    if (success)
+                    {
+                        documentsList.remove(position);
+                        documentsAdapter.notifyItemRemoved(position);
+
+                        Toast.makeText(documentsActivity.this, "Документ удалён", Toast.LENGTH_SHORT).show();
+                    }
+                    else
+                    {
+                        Toast.makeText(documentsActivity.this, "Ошибка удаления", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            }
+            catch (Exception e) {
+                runOnUiThread(() ->
+                        Toast.makeText(documentsActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show()
+                );
+            }
+        }).start();
+    }
+
+    private boolean deleteFromServer(String accessToken,
+                                     String refreshToken,
+                                     int fileId) throws Exception
+    {
+        String url = DELETE_API + fileId;
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+
+        int responseCode = connection.getResponseCode();
+
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED)
+        {
+            connection.disconnect();
+            if (utils.refreshAccessToken(this, refreshToken))
+            {
+                SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                String newAccess = prefs.getString("access_token", null);
+                String newRefresh = prefs.getString("refresh_token", null);
+                this.accessToken = newAccess;
+                this.refreshToken = newRefresh;
+                return deleteFromServer(newAccess, newRefresh, fileId);
+            }
+            else
+            {
+                // Сессия истекла
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
+
+                    Toast.makeText(documentsActivity.this, "Сессия истекла. Войдите снова", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(documentsActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                });
+                return false;
+            }
+        }
+        return responseCode == HttpURLConnection.HTTP_OK  || responseCode == HttpURLConnection.HTTP_NO_CONTENT;
+    }
+
     private void loadDocumentsFromApi() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    String response = sendGetRequest(accessToken, refreshToken);
-                    JSONArray jsonArray = new JSONArray(response);
-                    final List<documents> documents = parseNewsFromJson(jsonArray);
+        new Thread(() -> {
+            try {
+                String response = sendGetRequest(accessToken, refreshToken);
+                JSONArray jsonArray = new JSONArray(response);
+                final List<documents> documents = parseNewsFromJson(jsonArray);
 
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            documentsList.clear();
-                            documentsList.addAll(documents);
-                            documentsAdapter.notifyDataSetChanged();
-                        }
-                    });
+                runOnUiThread(() -> {
+                    documentsList.clear();
+                    documentsList.addAll(documents);
+                    documentsAdapter.notifyDataSetChanged();
+                });
 
-                } catch (Exception e) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(documentsActivity.this, "Ошибка загрузки Документов: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                runOnUiThread(() -> Toast.makeText(documentsActivity.this, "Ошибка загрузки Документов: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                e.printStackTrace();
             }
         }).start();
     }

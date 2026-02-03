@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -20,6 +21,16 @@ public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.Avit
     private List<avitostan> avitostanList;
     public avitostanAdapter(List<avitostan> avitostanList) {
         this.avitostanList = avitostanList;
+    }
+
+    public interface OnAvitostanClickListener {
+        void onDeleteClick(avitostan avitostanItem, int position);
+    }
+
+    private OnAvitostanClickListener listener;
+
+    public void setOnAvitostanClickListener(OnAvitostanClickListener listener) {
+        this.listener = listener;
     }
 
     @NonNull
@@ -41,11 +52,20 @@ public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.Avit
         holder.filesContainerForAvitostan.removeAllViews();
 
         if (avitostan.getAvitoPath() != null && !avitostan.getAvitoPath().isEmpty()) {
-            for (int i = 0; i < avitostan.getAvitoPath().size(); i++) {
-                addImageToContainer(holder.filesContainerForAvitostan, avitostan.getAvitoPath().get(i));
+            for (String path : avitostan.getAvitoPath()) {
+                addImageToContainer(holder.filesContainerForAvitostan, path);
             }
         }
+        holder.btnDeleteFromAvitostan.setOnClickListener(v -> {
+            if (listener != null) {
+                int pos = holder.getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION) {
+                    listener.onDeleteClick(avitostan, pos);
+                }
+            }
+        });
     }
+
 
     private void addImageToContainer(LinearLayout container, String imagePath) {
         ImageView imageView = new ImageView(container.getContext());
@@ -86,6 +106,7 @@ public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.Avit
     public static class AvitostanViewHolder extends RecyclerView.ViewHolder {
         TextView avitostanType, avitostanBody, avitoDate, avitostanRoom;
         LinearLayout filesContainerForAvitostan;
+        ImageButton btnDeleteFromAvitostan;
 
         public AvitostanViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -94,6 +115,7 @@ public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.Avit
             avitoDate = itemView.findViewById(R.id.avitoDate);
             avitostanRoom = itemView.findViewById(R.id.avitostanRoom);
             filesContainerForAvitostan = itemView.findViewById(R.id.filesContainerForAvitostan);
+            btnDeleteFromAvitostan = itemView.findViewById(R.id.btnDeleteFromAvitostan);
         }
     }
 }
