@@ -28,7 +28,7 @@
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/news" />
+                app:srcCompat="@drawable/allorders" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,7 +78,7 @@
                 android:layout_height="60dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:scaleType="centerInside"
-                app:srcCompat="@drawable/washmachine" />
+                app:srcCompat="@drawable/profile" />
 
             <TextView
                 android:layout_width="wrap_content"

@@ -17,10 +17,12 @@ import java.util.List;
 public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHolder> {
 
     private List<guide> guideList;
-    public guideAdapter(List<guide> guideList) {
-        this.guideList = guideList;
-    }
+    private boolean hasGuidesWriteRole;
 
+    public guideAdapter(List<guide> guideList, boolean hasGuidesWriteRole) {
+        this.guideList = guideList;
+        this.hasGuidesWriteRole = hasGuidesWriteRole;
+    }
 
     public interface OnGuideClickListener {
         void onDeleteClick(guide guideItem, int position);
@@ -31,7 +33,6 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
     public void setOnGuideClickListener(OnGuideClickListener listener) {
         this.listener = listener;
     }
-
 
     @NonNull
     @Override
@@ -55,14 +56,21 @@ public class guideAdapter extends RecyclerView.Adapter<guideAdapter.GuideViewHol
                 addImageToContainer(holder.filesContainerForGuides, guide.getTutorPath().get(i));
             }
         }
-        holder.btnDeleteFromGuide.setOnClickListener(v -> {
-            if (listener != null) {
-                int pos = holder.getAdapterPosition();
-                if (pos != RecyclerView.NO_POSITION) {
-                    listener.onDeleteClick(guide, pos);
+
+        if (hasGuidesWriteRole) {
+            holder.btnDeleteFromGuide.setVisibility(View.VISIBLE);
+            holder.btnDeleteFromGuide.setOnClickListener(v -> {
+                if (listener != null) {
+                    int pos = holder.getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        listener.onDeleteClick(guide, pos);
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            holder.btnDeleteFromGuide.setVisibility(View.GONE);
+        }
     }
 
     private void addImageToContainer(LinearLayout container, String imagePath) {

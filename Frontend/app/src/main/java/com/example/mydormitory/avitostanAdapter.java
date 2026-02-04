@@ -19,8 +19,11 @@ import java.util.List;
 public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.AvitostanViewHolder> {
 
     private List<avitostan> avitostanList;
-    public avitostanAdapter(List<avitostan> avitostanList) {
+    private boolean hasAvitostanWriteRole;
+
+    public avitostanAdapter(List<avitostan> avitostanList, boolean hasAvitostanWriteRole) {
         this.avitostanList = avitostanList;
+        this.hasAvitostanWriteRole = hasAvitostanWriteRole;
     }
 
     public interface OnAvitostanClickListener {
@@ -56,16 +59,22 @@ public class avitostanAdapter extends RecyclerView.Adapter<avitostanAdapter.Avit
                 addImageToContainer(holder.filesContainerForAvitostan, path);
             }
         }
-        holder.btnDeleteFromAvitostan.setOnClickListener(v -> {
-            if (listener != null) {
-                int pos = holder.getAdapterPosition();
-                if (pos != RecyclerView.NO_POSITION) {
-                    listener.onDeleteClick(avitostan, pos);
-                }
-            }
-        });
-    }
 
+        if (hasAvitostanWriteRole) {
+            holder.btnDeleteFromAvitostan.setVisibility(View.VISIBLE);
+            holder.btnDeleteFromAvitostan.setOnClickListener(v -> {
+                if (listener != null) {
+                    int pos = holder.getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        listener.onDeleteClick(avitostan, pos);
+                    }
+                }
+            });
+        }
+        else {
+            holder.btnDeleteFromAvitostan.setVisibility(View.GONE);
+        }
+    }
 
     private void addImageToContainer(LinearLayout container, String imagePath) {
         ImageView imageView = new ImageView(container.getContext());

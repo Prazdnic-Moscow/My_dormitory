@@ -36,6 +36,7 @@ public class newsActivity extends AppCompatActivity
     private String accessToken;
     private String refreshToken;
     private int user_id;
+    private boolean hasNewsWriteRole = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -57,18 +58,21 @@ public class newsActivity extends AppCompatActivity
             return;
         }
 
+        hasNewsWriteRole = utils.hasRole(this, accessToken, refreshToken, "news_write");
+
         menuButton = findViewById(R.id.menuButton);
         addNewsButton = findViewById(R.id.addNewsButton);
         newsRecyclerView = findViewById(R.id.newsList);
 
         // Настройка RecyclerView
-        newsAdapter = new newsAdapter(newsList);
+        newsAdapter = new newsAdapter(newsList, hasNewsWriteRole);
 
-        newsAdapter.setOnNewsClickListener((newsItem, position) -> {
-            Toast.makeText(newsActivity.this, "Удаление... " + newsItem.getHeader(), Toast.LENGTH_SHORT).show();
-            deleteNewsFromServer(newsItem.getId(), position);
-        });
-
+        if (hasNewsWriteRole) {
+            newsAdapter.setOnNewsClickListener((newsItem, position) -> {
+                Toast.makeText(newsActivity.this, "Удаление... " + newsItem.getHeader(), Toast.LENGTH_SHORT).show();
+                deleteNewsFromServer(newsItem.getId(), position);
+            });
+        }
 
         newsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         newsRecyclerView.setAdapter(newsAdapter);
@@ -81,10 +85,17 @@ public class newsActivity extends AppCompatActivity
             startActivity(intent);
         });
 
-        addNewsButton.setOnClickListener(v -> {
-            Intent intent = new Intent (newsActivity.this, addNewsActivity.class);
-            startActivity(intent);
-        });
+        // Показываем/скрываем кнопку добавления в зависимости от роли
+        if (hasNewsWriteRole) {
+            addNewsButton.setVisibility(View.VISIBLE);
+            addNewsButton.setOnClickListener(v -> {
+                Intent intent = new Intent(newsActivity.this, addNewsActivity.class);
+                startActivity(intent);
+            });
+        }
+        else {
+            addNewsButton.setVisibility(View.INVISIBLE);
+        }
     }
 
     private void deleteNewsFromServer(int newsId, int position)
@@ -274,8 +285,8 @@ public class newsActivity extends AppCompatActivity
             String body = guideJson.getString("body");
             String author = guideJson.getString("author");
             String date = utils.changeDate(guideJson.getString("date"));
-            String dateStart = utils.changeDate(guideJson.getString("date_start"));
-            String dateEnd = utils.changeDate(guideJson.getString("date_end"));
+            String dateStart = utils.formatDate(guideJson.getString("date_start"));
+            String dateEnd = utils.formatDate(guideJson.getString("date_end"));
 
             // Парсим массив изображений
             List<String> imagePaths = new ArrayList<>();

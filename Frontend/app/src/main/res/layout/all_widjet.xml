@@ -33,7 +33,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Новости"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -58,7 +58,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Документы"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -83,7 +83,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Прачечная"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -117,7 +117,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Авитостан"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -142,7 +142,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Гайды"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -167,7 +167,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Ремонт"
                 android:textSize="14sp"
                 android:textStyle="bold" />
@@ -175,11 +175,40 @@
 
     </LinearLayout>
 
+    <!-- Третья строка -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center">
+        android:layout_marginBottom="32dp"
+        android:orientation="horizontal">
 
+        <!-- Первый столбец: Мой профиль -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageButton
+                android:id="@+id/openMyInfoButton"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:scaleType="centerInside"
+                app:srcCompat="@drawable/profile" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Мой профиль"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- Второй столбец: Выйти -->
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -198,15 +227,21 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="0dp"
+                android:layout_marginTop="8dp"
                 android:text="Выйти"
                 android:textSize="14sp"
-                android:layout_marginLeft="-10dp"
                 android:textStyle="bold" />
 
-
         </LinearLayout>
-    </LinearLayout>
 
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+        </LinearLayout>
+
+    </LinearLayout>
 
 </LinearLayout>

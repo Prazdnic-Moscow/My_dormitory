@@ -30,6 +30,7 @@ public class guideActivity extends AppCompatActivity {
     private static final String API_URL = "http://10.0.2.2:3000/tutor";
     private String accessToken;
     private String refreshToken;
+    private boolean hasGuidesWriteRole = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +50,22 @@ public class guideActivity extends AppCompatActivity {
             return;
         }
 
+        hasGuidesWriteRole = utils.hasRole(this, accessToken, refreshToken, "tutor_write");
+
         // Инициализация элементов
         menuButton = findViewById(R.id.menuButton);
         addGuideButton = findViewById(R.id.addGuideButton);
         guideRecyclerView = findViewById(R.id.guideList);
 
         // Настройка RecyclerView
-        guideAdapter = new guideAdapter(guideList);
+        guideAdapter = new guideAdapter(guideList, hasGuidesWriteRole);
 
-        guideAdapter.setOnGuideClickListener((item, position) -> {
-            Toast.makeText(guideActivity.this, "Удаление гайда: " + item.getBody(), Toast.LENGTH_SHORT).show();
-            deleteGuideFromServer(item.getId(), position);
-        });
+        if (hasGuidesWriteRole) {
+            guideAdapter.setOnGuideClickListener((item, position) -> {
+                Toast.makeText(guideActivity.this, "Удаление гайда: " + item.getBody(), Toast.LENGTH_SHORT).show();
+                deleteGuideFromServer(item.getId(), position);
+            });
+        }
 
         guideRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         guideRecyclerView.setAdapter(guideAdapter);
@@ -73,10 +78,17 @@ public class guideActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        addGuideButton.setOnClickListener(v -> {
-            Intent intent = new Intent(guideActivity.this, addGuideActivity.class);
-            startActivity(intent);
-        });
+        // Показываем/скрываем кнопку добавления в зависимости от роли
+        if (hasGuidesWriteRole) {
+            addGuideButton.setVisibility(View.VISIBLE);
+            addGuideButton.setOnClickListener(v -> {
+                Intent intent = new Intent(guideActivity.this, addGuideActivity.class);
+                startActivity(intent);
+            });
+        }
+        else {
+            addGuideButton.setVisibility(View.GONE);
+        }
     }
 
     private void deleteGuideFromServer(int id, int position) {

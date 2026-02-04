@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -45,7 +46,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.crypto.SecretKey;
 
@@ -150,6 +153,56 @@ public class utils {
         } finally {
             connection.disconnect();
         }
+    }
+
+    public static List<String> getUserRolesFromToken(Context context, String token, String refreshToken) {
+    List<String> defaultEmptyList = new ArrayList<>();
+
+        if (token == null || token.isEmpty()) {
+            Log.d("TokenDebug", "Токен пустой");
+            return defaultEmptyList;
+        }
+
+        try {
+            String secretKey = "my_super_secret_key_bytes_min_wawawawawwawawwawawawawaw";
+            SecretKey key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            List<String> user_roles = claims.get("roles", List.class);
+            if (user_roles == null || user_roles.isEmpty()) {
+                Log.d("TokenDebug", "Роли не найдены в токене");
+                return defaultEmptyList;
+            }
+            return user_roles;
+        }
+        catch (Exception e) {
+            Log.d("TokenDebug", "Ошибка парсинга ролей, пробуем обновить: " + e.getMessage());
+
+            if (refreshToken != null && !refreshToken.isEmpty()) {
+                boolean refreshed = refreshAccessToken(context, refreshToken);
+                if (refreshed) {
+                    SharedPreferences prefs = context.getSharedPreferences("MyAppPrefs", Context.MODE_PRIVATE);
+                    String newToken = prefs.getString("access_token", null);
+
+                    if (newToken != null) {
+                        return getUserRolesFromToken(context, newToken, refreshToken);
+                    }
+                }
+            }
+            Log.d("TokenDebug", "Не удалось получить роли даже после обновления токена");
+            return defaultEmptyList;
+        }
+    }
+
+    // Метод для проверки конкретной роли
+    public static boolean hasRole(Context context, String token, String refreshToken, String roleName) {
+        List<String> roles = getUserRolesFromToken(context, token, refreshToken);
+        return roles.contains(roleName);
     }
 
     public static int getUserIdFromToken(Context context, String token, String refreshToken) {
@@ -261,11 +314,23 @@ public class utils {
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy HH:mm");
                 return parsedDate.format(formatter);
             } catch (Exception e) {
-                // если что-то пошло не так, оставляем оригинальную дату
                 return date;
             }
         }
         return date;
+    }
+
+    public static String formatDate(String inputDate) {
+        try {
+            SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+            SimpleDateFormat outputFormat = new SimpleDateFormat("dd MMMM yyyy", Locale.getDefault());
+
+            Date date = inputFormat.parse(inputDate);
+            return outputFormat.format(date);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return inputDate; // возвращаем исходную строку в случае ошибки
+        }
     }
 
     public static List<newsforrepairman> parseNewsFromJson(JSONArray jsonArray) throws JSONException {

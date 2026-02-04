@@ -75,89 +75,69 @@ public class addNewsActivity extends AppCompatActivity
         }
 
 
-        backToNewsButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent (addNewsActivity.this, newsActivity.class);
-                startActivity(intent);
-            }
+        backToNewsButton.setOnClickListener(v -> {
+            Intent intent = new Intent (addNewsActivity.this, newsActivity.class);
+            startActivity(intent);
         });
 
-        addPhotoNewsLinearLayout.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.setType("image/*");
-                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-                startActivityForResult(intent, PICK_IMAGE_REQUEST);
-            }
+        addPhotoNewsLinearLayout.setOnClickListener(v -> {
+            Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+            intent.setType("image/*");
+            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
+            startActivityForResult(intent, PICK_IMAGE_REQUEST);
         });
 
-        publishNewsButton.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                String header = headersEditTextNews.getText().toString();
-                String detail = detailsEditTextNews.getText().toString();
-                String dateEnd = dateEndEditTextNews.getText().toString();
-                String dateStart = dateStartEditTextNews.getText().toString();
-                String author = authorEditTextNews.getText().toString();
+        publishNewsButton.setOnClickListener(v -> {
+            String header = headersEditTextNews.getText().toString();
+            String detail = detailsEditTextNews.getText().toString();
+            String dateEnd = dateEndEditTextNews.getText().toString();
+            String dateStart = dateStartEditTextNews.getText().toString();
+            String author = authorEditTextNews.getText().toString();
 
-                if (header.isEmpty() || detail.isEmpty() || dateStart.isEmpty() || dateEnd.isEmpty()) {
-                    Toast.makeText(addNewsActivity.this, "Все поля должны быть заполнены", Toast.LENGTH_SHORT).show();
-                }
+            if (header.isEmpty() || detail.isEmpty() || dateStart.isEmpty() || dateEnd.isEmpty()) {
+                Toast.makeText(addNewsActivity.this, "Все поля должны быть заполнены", Toast.LENGTH_SHORT).show();
+            }
 
-                // Запускаем в отдельном потоке чтобы не блокировать UI
-                new Thread(new Runnable()
+            // Запускаем в отдельном потоке чтобы не блокировать UI
+            new Thread(() -> {
+                try
                 {
-                    @Override
-                    public void run()
+                    // 1. Отправляем фото и получаем их пути
+                    List<String> photoPaths = new ArrayList<>();
+                    for (Uri imageUri : selectedImages)
                     {
-                        try
-                        {
-                            // 1. Отправляем фото и получаем их пути
-                            List<String> photoPaths = new ArrayList<>();
-                            for (Uri imageUri : selectedImages)
-                            {
-                                String path = utils.uploadFileToServer(addNewsActivity.this, imageUri, "news", "photo");
-                                photoPaths.add(path);
-                            }
-
-                            // 2. Отправляем данные о ремонте
-                            sendNewsData(detail,
-                                         header,
-                                         dateStart,
-                                         dateEnd,
-                                         author,
-                                         photoPaths,
-                                         accessToken,
-                                         refreshToken);
-
-                            // Показываем успех
-                            runOnUiThread(() -> {
-                                Toast.makeText(addNewsActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
-                                Intent intent = new Intent(addNewsActivity.this, newsActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(intent);
-                                finish();
-                            });
-
-                        }
-                        catch (Exception e)
-                        {
-                            runOnUiThread(() -> {
-                                Toast.makeText(addNewsActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                            });
-                        }
+                        String path = utils.uploadFileToServer(addNewsActivity.this, imageUri, "news", "photo");
+                        photoPaths.add(path);
                     }
-                }).start();
 
-            }
+                    // 2. Отправляем данные о ремонте
+                    sendNewsData(detail,
+                                 header,
+                                 dateStart,
+                                 dateEnd,
+                                 author,
+                                 photoPaths,
+                                 accessToken,
+                                 refreshToken);
+
+                    // Показываем успех
+                    runOnUiThread(() -> {
+                        Toast.makeText(addNewsActivity.this, "Успешно отправлено!", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(addNewsActivity.this, newsActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        finish();
+                    });
+
+                }
+                catch (Exception e)
+                {
+                    runOnUiThread(() -> {
+                        Toast.makeText(addNewsActivity.this, "Ошибка: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                }
+            }).start();
+
         });
     }
     @Override

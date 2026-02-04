@@ -33,6 +33,7 @@ public class avitostanActivity extends AppCompatActivity
     private String accessToken;
     private String refreshToken;
     private int user_id;
+    private boolean hasAvitostanWriteRole = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -51,19 +52,23 @@ public class avitostanActivity extends AppCompatActivity
             finish();
             return;
         }
+
+        hasAvitostanWriteRole = utils.hasRole(this, accessToken, refreshToken, "thing_write");
         menuButton = findViewById(R.id.menuButton);
         addAvitoButton = findViewById(R.id.addAvitoButton);
         avitostanRecyclerView = findViewById(R.id.avitostanList);
         categoryAvitostanView = findViewById(R.id.categoryAvitostanView);
 
         // Настройка RecyclerView
-        avitostanAdapter = new avitostanAdapter(avitostanList);
+        avitostanAdapter = new avitostanAdapter(avitostanList, hasAvitostanWriteRole);
 
-        avitostanAdapter.setOnAvitostanClickListener((item, position) -> {
-            Toast.makeText(avitostanActivity.this, "Удаление объявления: " + item.getBody(), Toast.LENGTH_SHORT).show();
-            deleteAvitostanFromServer(item.getId(), position);
-        });
-
+        // Устанавливаем слушатель только если есть права
+        if (hasAvitostanWriteRole) {
+            avitostanAdapter.setOnAvitostanClickListener((item, position) -> {
+                Toast.makeText(avitostanActivity.this, "Удаление объявления: " + item.getBody(), Toast.LENGTH_SHORT).show();
+                deleteAvitostanFromServer(item.getId(), position);
+            });
+        }
         avitostanRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         avitostanRecyclerView.setAdapter(avitostanAdapter);
 
@@ -78,10 +83,17 @@ public class avitostanActivity extends AppCompatActivity
             startActivity(intent);
         });
 
-        addAvitoButton.setOnClickListener(v -> {
-            Intent intent = new Intent (avitostanActivity.this, addAvitoActivity.class);
-            startActivity(intent);
-        });
+        // Показываем/скрываем кнопку добавления в зависимости от роли
+        if (hasAvitostanWriteRole) {
+            addAvitoButton.setVisibility(View.VISIBLE);
+            addAvitoButton.setOnClickListener(v -> {
+                Intent intent = new Intent(avitostanActivity.this, addAvitoActivity.class);
+                startActivity(intent);
+            });
+        }
+        else {
+            addAvitoButton.setVisibility(View.GONE);
+        }
     }
 
     private void deleteAvitostanFromServer(int id, int position) {

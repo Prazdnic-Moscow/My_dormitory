@@ -19,8 +19,11 @@ import java.util.List;
 public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder> {
 
     private List<news> newsList;
-    public newsAdapter(List<news> newsList) {
+    private boolean hasNewsWriteRole;
+
+    public newsAdapter(List<news> newsList, boolean hasNewsWriteRole) {
         this.newsList = newsList;
+        this.hasNewsWriteRole = hasNewsWriteRole;
     }
 
     public interface OnNewsClickListener {
@@ -33,13 +36,12 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
         this.listener = listener;
     }
 
-
     @NonNull
     @Override
     public NewsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.news_item, parent, false);
-        return new NewsViewHolder(view);
+        return new NewsViewHolder(view, hasNewsWriteRole);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
         holder.newsHeader.setText(news.getHeader());
         holder.newsBody.setText(news.getBody());
         holder.newsDateStartAndEnd.setText(
-                "Начало: " + news.getDateStart() + " Конец: " + news.getDateEnd()
+                "Начало: " + news.getDateStart() + "\n\nКонец: " + news.getDateEnd()
         );
         holder.newsAuthor.setText(news.getAuthor());
         holder.newsDate.setText(news.getDate());
@@ -61,16 +63,19 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
             }
         }
 
-        // 👇 КЛИК НА КНОПКУ
-        holder.deleteButton.setOnClickListener(v -> {
-            if (listener != null) {
+        if (hasNewsWriteRole && listener != null) {
+            holder.deleteButton.setOnClickListener(v -> {
                 int pos = holder.getAdapterPosition();
                 if (pos != RecyclerView.NO_POSITION) {
                     listener.onDeleteClick(news, pos);
                 }
-            }
-        });
+            });
+        }
+        else {
+            holder.deleteButton.setOnClickListener(null);
+        }
     }
+
     private void addImageToContainer(LinearLayout container, String imagePath) {
         ImageView imageView = new ImageView(container.getContext());
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(300, 300);
@@ -111,9 +116,12 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
         TextView newsHeader, newsBody, newsDateStartAndEnd, newsAuthor, newsDate;
         LinearLayout filesContainerForNews;
         ImageButton deleteButton;
+        boolean hasNewsWriteRole;
 
-        public NewsViewHolder(@NonNull View itemView) {
+        public NewsViewHolder(@NonNull View itemView, boolean hasNewsWriteRole) {
             super(itemView);
+            this.hasNewsWriteRole = hasNewsWriteRole;
+
             newsHeader = itemView.findViewById(R.id.typeRepairman);
             newsBody = itemView.findViewById(R.id.repairmanBody);
             newsDateStartAndEnd = itemView.findViewById(R.id.newsDateStartAndEnd);
@@ -121,6 +129,7 @@ public class newsAdapter extends RecyclerView.Adapter<newsAdapter.NewsViewHolder
             filesContainerForNews = itemView.findViewById(R.id.filesContainerForRepairman);
             newsDate = itemView.findViewById(R.id.newsDate);
             deleteButton = itemView.findViewById(R.id.btnDeleteFromNews);
+            deleteButton.setVisibility(hasNewsWriteRole ? View.VISIBLE : View.GONE);
         }
     }
 }

@@ -32,6 +32,7 @@ public class documentsActivity extends AppCompatActivity
     private static final String DELETE_API = "http://10.0.2.2:3000/file/";
     private String accessToken;
     private String refreshToken;
+    private boolean hasDocumentsWriteRole = false;
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -50,19 +51,22 @@ public class documentsActivity extends AppCompatActivity
             return;
         }
 
+        hasDocumentsWriteRole = utils.hasRole(this, accessToken, refreshToken, "file_write");
+
         menuButton = findViewById(R.id.menuButton);
         addDocumentButton = findViewById(R.id.addDocumentButton);
         documentsRecyclerView = findViewById(R.id.documentsList);
 
         // Настройка RecyclerView
-        documentsAdapter = new documentsAdapter(documentsList, this);
+        documentsAdapter = new documentsAdapter(documentsList, this, hasDocumentsWriteRole);
 
-        documentsAdapter.setOnDocumentClickListener((document, position) -> {
-
-            Toast.makeText(documentsActivity.this, "Удаление документа...", Toast.LENGTH_SHORT).show();
-
-            deleteDocumentFromServer(document.getId(), position);
-        });
+        // Устанавливаем слушатель только если есть права
+        if (hasDocumentsWriteRole) {
+            documentsAdapter.setOnDocumentClickListener((document, position) -> {
+                Toast.makeText(documentsActivity.this, "Удаление документа...", Toast.LENGTH_SHORT).show();
+                deleteDocumentFromServer(document.getId(), position);
+            });
+        }
 
         documentsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         documentsRecyclerView.setAdapter(documentsAdapter);
@@ -75,10 +79,17 @@ public class documentsActivity extends AppCompatActivity
             startActivity(intent);
         });
 
-        addDocumentButton.setOnClickListener(v -> {
-            Intent intent = new Intent (documentsActivity.this, addDocumentsActivity.class);
-            startActivity(intent);
-        });
+        // Показываем/скрываем кнопку добавления в зависимости от роли
+        if (hasDocumentsWriteRole) {
+            addDocumentButton.setVisibility(View.VISIBLE);
+            addDocumentButton.setOnClickListener(v -> {
+                Intent intent = new Intent (documentsActivity.this, addDocumentsActivity.class);
+                startActivity(intent);
+            });
+        }
+        else {
+            addDocumentButton.setVisibility(View.GONE);
+        }
     }
 
     private void deleteDocumentFromServer(int fileId, int position) {
@@ -205,24 +216,21 @@ public class documentsActivity extends AppCompatActivity
             else
             {
                 // Сессия истекла
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.remove("access_token");
-                        editor.remove("refresh_token");
-                        editor.apply();
+                runOnUiThread(() -> {
+                    SharedPreferences prefs = getSharedPreferences("MyAppPrefs", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = prefs.edit();
+                    editor.remove("access_token");
+                    editor.remove("refresh_token");
+                    editor.apply();
 
-                        Toast.makeText(documentsActivity.this,
-                                "Сессия истекла. Войдите снова",
-                                Toast.LENGTH_SHORT).show();
+                    Toast.makeText(documentsActivity.this,
+                            "Сессия истекла. Войдите снова",
+                            Toast.LENGTH_SHORT).show();
 
-                        Intent intent = new Intent(documentsActivity.this, loginActivity.class);
-                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
+                    Intent intent = new Intent(documentsActivity.this, loginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 });
                 return null;
             }

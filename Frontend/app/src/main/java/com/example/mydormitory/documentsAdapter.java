@@ -22,10 +22,12 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
 
     private List<documents> documentsList;
     private Context context;
+    private boolean hasDocumentsWriteRole;
 
-    public documentsAdapter(List<documents> documentsList, Context context) {
+    public documentsAdapter(List<documents> documentsList, Context context, boolean hasDocumentsWriteRole) {
         this.documentsList = documentsList;
         this.context = context;
+        this.hasDocumentsWriteRole = hasDocumentsWriteRole;
     }
 
     public interface OnDocumentClickListener {
@@ -37,7 +39,6 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
     public void setOnDocumentClickListener(OnDocumentClickListener listener) {
         this.listener = listener;
     }
-
 
     @NonNull
     @Override
@@ -61,17 +62,21 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
             }
         }
 
-        // 👇 КЛИК НА УДАЛЕНИЕ
-        holder.btnDeleteFromDocument.setOnClickListener(v -> {
-            if (listener != null) {
-                int pos = holder.getAdapterPosition();
-                if (pos != RecyclerView.NO_POSITION) {
-                    listener.onDeleteClick(document, pos);
+        if (hasDocumentsWriteRole) {
+            holder.btnDeleteFromDocument.setVisibility(View.VISIBLE);
+            holder.btnDeleteFromDocument.setOnClickListener(v -> {
+                if (listener != null) {
+                    int pos = holder.getAdapterPosition();
+                    if (pos != RecyclerView.NO_POSITION) {
+                        listener.onDeleteClick(document, pos);
+                    }
                 }
-            }
-        });
+            });
+        }
+        else {
+            holder.btnDeleteFromDocument.setVisibility(View.GONE);
+        }
     }
-
 
     private void addFileToContainer(LinearLayout container, String filePath) {
         ImageView imageView = new ImageView(container.getContext());
@@ -81,7 +86,6 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setBackground(null);
 
-        // ПРОВЕРКА ТИПА ФАЙЛА
         if (filePath.endsWith(".jpg") || filePath.endsWith(".jpeg") || filePath.endsWith(".png"))
         {
             loadImage(imageView, filePath);
@@ -102,7 +106,6 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
             }
         }
 
-        // СКАЧИВАНИЕ ПРИ НАЖАТИИ
         imageView.setOnClickListener(v -> {
             String fileName = filePath.substring(filePath.lastIndexOf("/"));
             String fullUrl = "http://10.0.2.2:3000/file" + filePath;
@@ -163,14 +166,12 @@ public class documentsAdapter extends RecyclerView.Adapter<documentsAdapter.Docu
         LinearLayout filesContainerForDocuments;
         ImageButton btnDeleteFromDocument;
 
-
         public DocumentsViewHolder(@NonNull View itemView) {
             super(itemView);
             documentsBody = itemView.findViewById(R.id.documentsBody);
             documentsDate = itemView.findViewById(R.id.documentsDate);
             filesContainerForDocuments = itemView.findViewById(R.id.filesContainerForDocuments);
             btnDeleteFromDocument = itemView.findViewById(R.id.btnDeleteFromDocument);
-
         }
     }
 }
